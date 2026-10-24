@@ -1,0 +1,1293 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Yillik Hedefler — Gelisim Takibi</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:       #080812;
+      --surface:  rgba(255,255,255,0.035);
+      --surface2: rgba(255,255,255,0.07);
+      --border:   rgba(255,255,255,0.07);
+      --border2:  rgba(255,255,255,0.13);
+      --border3:  rgba(255,255,255,0.22);
+      --text:     #eaeaf8;
+      --text2:    #8888aa;
+      --text3:    #44446a;
+      --accent:   #7c5cfc;
+      --accent2:  #4e8cff;
+      --cyan:     #00d4ff;
+      --green:    #00e5a0;
+      --green-bg: rgba(0,229,160,0.13);
+      --red:      #ff4d6d;
+      --red-bg:   rgba(255,77,109,0.13);
+      --yellow:   #ffcd47;
+      --yellow-bg:rgba(255,205,71,0.13);
+      --orange:   #ff9f43;
+      --orange-bg:rgba(255,159,67,0.13);
+      --purple:   #a855f7;
+      --purple-bg:rgba(168,85,247,0.13);
+      --sb-w:     300px;
+      --r:18px; --rs:12px; --rx:8px;
+    }
+    html { scroll-behavior:smooth; }
+    body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; overflow-x:hidden; }
+
+    /* BLOBS */
+    .bg-scene { position:fixed; inset:0; pointer-events:none; z-index:0; overflow:hidden; }
+    .blob { position:absolute; border-radius:50%; filter:blur(130px); opacity:.13; animation:fb 18s ease-in-out infinite; }
+    .b1{width:700px;height:700px;background:var(--accent);top:-200px;left:-150px;animation-delay:0s}
+    .b2{width:450px;height:450px;background:var(--cyan);bottom:-100px;right:-100px;animation-delay:7s}
+    .b3{width:320px;height:320px;background:var(--accent2);top:45%;left:55%;animation-delay:13s}
+    @keyframes fb{0%,100%{transform:translate(0,0) scale(1)}40%{transform:translate(40px,-40px) scale(1.06)}70%{transform:translate(-25px,25px) scale(.94)}}
+
+    /* HAMBURGER */
+    .hamburger {
+      position:fixed; top:18px; left:18px; z-index:200;
+      background:linear-gradient(135deg,var(--accent),var(--accent2));
+      border:none; border-radius:12px; color:#fff;
+      width:42px; height:42px; font-size:18px;
+      cursor:pointer; display:flex; align-items:center; justify-content:center;
+      box-shadow:0 4px 20px rgba(124,92,252,.45);
+      transition:transform .2s, box-shadow .2s;
+    }
+    .hamburger:hover { transform:scale(1.08); box-shadow:0 6px 28px rgba(124,92,252,.6); }
+
+    /* SIDEBAR BACKDROP */
+    .sb-backdrop {
+      position:fixed; inset:0; background:rgba(0,0,0,.55);
+      backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px);
+      z-index:149; opacity:0; pointer-events:none; transition:opacity .3s;
+    }
+    .sb-backdrop.open { opacity:1; pointer-events:auto; }
+
+    /* SIDEBAR */
+    .sidebar {
+      position:fixed; top:0; left:0; bottom:0; width:var(--sb-w);
+      background:rgba(9,9,22,0.98);
+      border-right:1px solid rgba(255,255,255,0.09);
+      backdrop-filter:blur(30px); -webkit-backdrop-filter:blur(30px);
+      z-index:150;
+      transform:translateX(-100%);
+      transition:transform .32s cubic-bezier(.4,0,.2,1);
+      display:flex; flex-direction:column; overflow:hidden;
+    }
+    .sidebar.open { transform:translateX(0); }
+
+    .sb-header {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:20px 18px 16px; border-bottom:1px solid var(--border); flex-shrink:0;
+    }
+    .sb-logo {
+      font-size:16px; font-weight:900; letter-spacing:-.4px;
+      background:linear-gradient(130deg,var(--accent),var(--cyan));
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+    }
+    .sb-close {
+      background:var(--surface2); border:1px solid var(--border);
+      color:var(--text2); width:28px; height:28px; border-radius:7px;
+      font-size:13px; cursor:pointer; display:flex; align-items:center; justify-content:center;
+      font-family:'Inter',sans-serif; transition:all .2s;
+    }
+    .sb-close:hover { background:var(--red-bg); border-color:var(--red); color:var(--red); }
+
+    .sb-body { flex:1; overflow-y:auto; padding:16px 14px 20px; }
+    .sb-body::-webkit-scrollbar { width:3px; }
+    .sb-body::-webkit-scrollbar-thumb { background:var(--border2); border-radius:3px; }
+
+    .sb-nav { display:flex; flex-direction:column; gap:3px; margin-bottom:16px; }
+    .sb-nav-item {
+      display:flex; align-items:center; gap:10px; padding:9px 12px;
+      border-radius:var(--rx); text-decoration:none; color:var(--text2);
+      font-size:13px; font-weight:600; transition:all .2s; border:1px solid transparent;
+    }
+    .sb-nav-item:hover { background:var(--surface2); color:var(--text); }
+    .sb-nav-item.sb-active { background:rgba(124,92,252,.15); border-color:rgba(124,92,252,.25); color:var(--accent); }
+    .sb-nav-icon { font-size:15px; flex-shrink:0; }
+
+    .sb-divider { height:1px; background:var(--border); margin:4px 0 14px; }
+    .sb-section-lbl { font-size:9px; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:.8px; margin-bottom:10px; }
+    .sb-mini-stats { display:grid; grid-template-columns:1fr 1fr; gap:7px; margin-bottom:10px; }
+    .sb-mini-chip { background:var(--surface); border:1px solid var(--border); border-radius:var(--rx); padding:10px 12px; }
+    .smc-lbl { font-size:9px; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:.6px; }
+    .smc-val { font-size:20px; font-weight:900; line-height:1; margin-top:3px; }
+    .smc-val.g{color:var(--green)}
+    .smc-val.y{color:var(--yellow)}
+    .smc-val.a{background:linear-gradient(135deg,var(--accent),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+
+    /* Sidebar progress bar */
+    .sb-prog-wrap { margin-bottom:12px; }
+    .sb-prog-track { height:4px; background:rgba(255,255,255,.06); border-radius:50px; overflow:hidden; }
+    .sb-prog-fill  { height:100%; border-radius:50px; background:linear-gradient(90deg,var(--accent),var(--cyan)); transition:width .4s; }
+    .sb-prog-label { font-size:10px; color:var(--text3); display:flex; justify-content:space-between; margin-bottom:4px; }
+
+    /* MAIN */
+    .app {
+      position:relative; z-index:1;
+      max-width:1100px; margin:0 auto;
+      padding:22px 18px 80px 72px;
+    }
+    .glass { background:var(--surface); border:1px solid var(--border); backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px); }
+
+    /* PAGE HEADER */
+    .page-header {
+      display:flex; align-items:center; justify-content:space-between;
+      flex-wrap:wrap; gap:14px; padding:18px 22px; border-radius:var(--r); margin-bottom:22px;
+    }
+    .logo-text { font-size:22px; font-weight:900; letter-spacing:-.6px; background:linear-gradient(130deg,var(--accent),var(--cyan)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .logo-sub { font-size:12px; color:var(--text2); margin-top:3px; }
+
+    /* YEAR SELECTOR */
+    .year-bar {
+      display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+      padding:14px 20px; border-radius:var(--rs); margin-bottom:16px;
+    }
+    .year-label { font-size:10px; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:.8px; flex-shrink:0; }
+    .year-pills { display:flex; gap:6px; flex-wrap:wrap; flex:1; }
+    .year-pill {
+      background:transparent; border:1px solid var(--border2); color:var(--text3);
+      font-family:'Inter',sans-serif; font-size:13px; font-weight:700;
+      padding:7px 18px; border-radius:50px; cursor:pointer; transition:all .18s; white-space:nowrap;
+    }
+    .year-pill:hover { border-color:var(--border3); color:var(--text2); }
+    .year-pill.yp-active { background:linear-gradient(135deg,var(--accent),var(--accent2)); border-color:transparent; color:#fff; box-shadow:0 4px 16px rgba(124,92,252,.3); }
+    .year-add-btn {
+      background:transparent; border:1px dashed var(--border2); color:var(--text3);
+      font-family:'Inter',sans-serif; font-size:12px; font-weight:700;
+      padding:7px 14px; border-radius:50px; cursor:pointer; transition:all .18s;
+    }
+    .year-add-btn:hover { border-color:var(--accent); color:var(--accent); }
+
+    /* GLOBAL SUMMARY ROW */
+    .summary-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:20px; }
+    .sum-card {
+      border-radius:var(--rs); padding:16px;
+      background:var(--surface); border:1px solid var(--border);
+      display:flex; flex-direction:column; gap:4px; transition:border-color .2s, transform .2s;
+    }
+    .sum-card:hover { border-color:var(--border2); transform:translateY(-2px); }
+    .sum-label { font-size:9px; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:.7px; }
+    .sum-val { font-size:28px; font-weight:900; line-height:1.1; }
+    .sum-val.sv-g { color:var(--green); }
+    .sum-val.sv-y { color:var(--yellow); }
+    .sum-val.sv-r { color:var(--red); }
+    .sum-val.sv-a { background:linear-gradient(135deg,var(--accent),var(--cyan)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .sum-hint { font-size:11px; color:var(--text3); }
+
+    /* OVERALL PROGRESS BAR */
+    .overall-prog {
+      padding:16px 20px; border-radius:var(--rs); margin-bottom:20px;
+    }
+    .prog-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+    .prog-top-label { font-size:12px; font-weight:700; color:var(--text2); }
+    .prog-top-pct { font-size:18px; font-weight:900; background:linear-gradient(135deg,var(--accent),var(--cyan)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .prog-track { height:8px; background:rgba(255,255,255,.05); border-radius:50px; overflow:hidden; }
+    .prog-fill  { height:100%; border-radius:50px; background:linear-gradient(90deg,var(--accent),var(--cyan)); transition:width .6s cubic-bezier(.4,0,.2,1); }
+
+    /* CONTROLS ROW: search + filter + add */
+    .controls-row {
+      display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:20px;
+    }
+    .search-wrap { position:relative; flex:1; min-width:180px; }
+    .search-input {
+      width:100%; background:var(--surface2); border:1px solid var(--border2); color:var(--text);
+      font-family:'Inter',sans-serif; font-size:13px; padding:10px 36px 10px 14px;
+      border-radius:var(--rs); outline:none; transition:border-color .2s;
+    }
+    .search-input:focus { border-color:var(--accent); }
+    .search-input::placeholder { color:var(--text3); }
+    .search-icon { position:absolute; right:12px; top:50%; transform:translateY(-50%); font-size:14px; color:var(--text3); pointer-events:none; }
+
+    .filter-status {
+      display:flex; gap:5px; flex-wrap:wrap;
+    }
+    .fs-btn {
+      background:transparent; border:1px solid var(--border2); color:var(--text3);
+      font-family:'Inter',sans-serif; font-size:11px; font-weight:700;
+      padding:7px 13px; border-radius:50px; cursor:pointer; transition:all .16s; white-space:nowrap;
+    }
+    .fs-btn:hover { border-color:var(--border3); color:var(--text2); }
+    .fs-btn.fs-active { background:rgba(124,92,252,.18); border-color:var(--accent); color:var(--accent); }
+    .fs-btn.fs-done   { background:var(--green-bg);  border-color:var(--green);  color:var(--green); }
+    .fs-btn.fs-partial{ background:var(--yellow-bg); border-color:var(--yellow); color:var(--yellow); }
+
+    .btn-add-goal {
+      background:linear-gradient(135deg,var(--accent),var(--accent2));
+      border:none; border-radius:var(--rs); color:#fff;
+      font-family:'Inter',sans-serif; font-size:13px; font-weight:700;
+      padding:10px 18px; cursor:pointer; transition:opacity .2s, transform .2s;
+      display:flex; align-items:center; gap:6px; white-space:nowrap;
+    }
+    .btn-add-goal:hover { opacity:.9; transform:translateY(-1px); }
+    .btn-add-cat {
+      background:transparent; border:1px solid var(--border2); color:var(--text2);
+      font-family:'Inter',sans-serif; font-size:13px; font-weight:700;
+      padding:10px 16px; border-radius:var(--rs); cursor:pointer; transition:all .2s;
+      display:flex; align-items:center; gap:6px; white-space:nowrap;
+    }
+    .btn-add-cat:hover { border-color:var(--accent); color:var(--accent); background:rgba(124,92,252,.07); }
+
+    /* CATEGORIES LAYOUT */
+    .categories-wrap { display:flex; flex-direction:column; gap:16px; }
+
+    /* CATEGORY CARD */
+    .cat-card {
+      border-radius:var(--r); overflow:hidden;
+      background:var(--surface); border:1px solid var(--border);
+      backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px);
+      transition:border-color .2s;
+    }
+    .cat-card:hover { border-color:var(--border2); }
+
+    .cat-header {
+      display:flex; align-items:center; gap:12px;
+      padding:14px 20px; cursor:pointer; user-select:none;
+      border-bottom:1px solid var(--border); transition:background .15s;
+    }
+    .cat-header:hover { background:rgba(255,255,255,.02); }
+
+    .cat-color-bar { width:4px; height:32px; border-radius:4px; flex-shrink:0; }
+    .cat-icon { font-size:20px; flex-shrink:0; }
+    .cat-info { flex:1; min-width:0; }
+    .cat-name { font-size:15px; font-weight:800; letter-spacing:-.3px; }
+    .cat-count { font-size:11px; color:var(--text3); margin-top:1px; }
+
+    .cat-prog-mini { display:flex; flex-direction:column; gap:4px; min-width:100px; }
+    .cat-prog-bar  { height:4px; background:rgba(255,255,255,.06); border-radius:50px; overflow:hidden; }
+    .cat-prog-fill { height:100%; border-radius:50px; transition:width .4s; }
+    .cat-prog-txt  { font-size:10px; font-weight:700; color:var(--text2); text-align:right; }
+
+    .cat-actions { display:flex; gap:4px; }
+    .cat-action-btn {
+      width:28px; height:28px; border-radius:6px; border:none;
+      background:transparent; cursor:pointer;
+      display:flex; align-items:center; justify-content:center;
+      font-size:13px; transition:all .15s; color:var(--text3);
+    }
+    .cat-action-btn:hover { background:var(--surface2); color:var(--text); }
+    .cat-action-btn.del:hover { background:var(--red-bg); color:var(--red); }
+    .cat-collapse-btn { font-size:12px; transition:transform .25s; }
+    .cat-card.collapsed .cat-collapse-btn { transform:rotate(-90deg); }
+
+    /* CATEGORY BODY */
+    .cat-body {
+      padding:16px 20px;
+      display:flex; flex-direction:column; gap:8px;
+    }
+    .cat-card.collapsed .cat-body { display:none; }
+
+    /* GOAL ITEM */
+    .goal-item {
+      display:flex; align-items:flex-start; gap:12px;
+      padding:12px 16px; border-radius:var(--rx);
+      background:rgba(255,255,255,.02); border:1px solid var(--border);
+      transition:border-color .18s, background .18s, transform .14s;
+      position:relative;
+    }
+    .goal-item::before {
+      content:''; position:absolute; left:0; top:0; bottom:0; width:3px;
+      border-radius:3px 0 0 3px; transition:background .2s;
+    }
+    .gi-done::before    { background:var(--green); }
+    .gi-partial::before { background:var(--yellow); }
+    .gi-pending::before { background:var(--border2); }
+    .goal-item:hover { border-color:var(--border2); transform:translateX(2px); }
+
+    .goal-check {
+      width:24px; height:24px; border-radius:6px; border:2px solid var(--border2);
+      background:transparent; cursor:pointer; display:flex; align-items:center; justify-content:center;
+      flex-shrink:0; transition:all .16s; font-size:12px; font-weight:800;
+      font-family:'Inter',sans-serif; color:transparent; margin-top:1px;
+    }
+    .goal-check:hover { border-color:var(--accent); }
+    .gc-done    { border-color:var(--green);  background:var(--green-bg);  color:var(--green); }
+    .gc-partial { border-color:var(--yellow); background:var(--yellow-bg); color:var(--yellow); }
+
+    .goal-body { flex:1; min-width:0; }
+    .goal-text {
+      font-size:14px; font-weight:500; color:var(--text);
+      word-break:break-word; line-height:1.5; display:block;
+    }
+    .goal-text.gt-done { text-decoration:line-through; color:var(--text2); opacity:.75; }
+    .goal-meta { display:flex; align-items:center; gap:6px; margin-top:5px; flex-wrap:wrap; }
+    .goal-tag {
+      font-size:10px; font-weight:700; padding:2px 8px; border-radius:50px;
+      background:var(--surface2); color:var(--text3); border:1px solid var(--border);
+    }
+    .goal-priority {
+      font-size:10px; font-weight:700; padding:2px 8px; border-radius:50px; border:1px solid;
+    }
+    .gp-high   { background:rgba(255,77,109,.1);   border-color:rgba(255,77,109,.4);   color:var(--red); }
+    .gp-medium { background:rgba(255,205,71,.1);   border-color:rgba(255,205,71,.4);   color:var(--yellow); }
+    .gp-low    { background:rgba(0,229,160,.1);    border-color:rgba(0,229,160,.4);    color:var(--green); }
+    .goal-note-inline { font-size:11px; color:var(--text3); font-style:italic; max-width:300px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+    .goal-right { display:flex; align-items:center; gap:6px; flex-shrink:0; }
+    .goal-status-btn {
+      font-size:10px; font-weight:700; padding:4px 10px; border-radius:50px;
+      cursor:pointer; border:1px solid; transition:all .16s; white-space:nowrap;
+      font-family:'Inter',sans-serif;
+    }
+    .gs-pending { background:var(--surface2); border-color:var(--border2); color:var(--text3); }
+    .gs-pending:hover { border-color:var(--accent); color:var(--accent); }
+    .gs-done    { background:var(--green-bg);  border-color:var(--green);  color:var(--green); }
+    .gs-partial { background:var(--yellow-bg); border-color:var(--yellow); color:var(--yellow); }
+
+    .goal-action-btn {
+      width:26px; height:26px; border-radius:6px; border:none;
+      background:transparent; cursor:pointer; display:flex; align-items:center;
+      justify-content:center; font-size:13px; transition:all .15s; color:var(--text3);
+      opacity:0;
+    }
+    .goal-item:hover .goal-action-btn { opacity:1; }
+    .goal-action-btn:hover { background:var(--surface2); color:var(--text); }
+    .goal-action-btn.del:hover { background:var(--red-bg); color:var(--red); }
+
+    /* ADD GOAL IN CATEGORY */
+    .cat-add-row {
+      display:flex; gap:8px; margin-top:4px;
+      padding-top:10px; border-top:1px solid var(--border);
+    }
+    .cat-goal-input {
+      flex:1; background:rgba(255,255,255,.04); border:1px solid var(--border2);
+      border-radius:var(--rx); color:var(--text); font-family:'Inter',sans-serif;
+      font-size:13px; padding:9px 14px; outline:none; transition:border-color .2s;
+    }
+    .cat-goal-input:focus { border-color:var(--accent); }
+    .cat-goal-input::placeholder { color:var(--text3); }
+    .cat-goal-add {
+      background:var(--surface2); border:1px solid var(--border2); color:var(--text2);
+      font-family:'Inter',sans-serif; font-size:18px; font-weight:900;
+      width:36px; height:36px; border-radius:var(--rx); cursor:pointer;
+      display:flex; align-items:center; justify-content:center; flex-shrink:0;
+      transition:all .2s;
+    }
+    .cat-goal-add:hover { background:linear-gradient(135deg,var(--accent),var(--accent2)); border-color:transparent; color:#fff; }
+
+    /* EMPTY STATE */
+    .goals-empty {
+      display:flex; flex-direction:column; align-items:center; gap:8px;
+      padding:28px 20px; text-align:center;
+      background:rgba(255,255,255,.01); border:1px dashed var(--border2);
+      border-radius:var(--rs);
+    }
+    .goals-empty-icon { font-size:28px; }
+    .goals-empty-title { font-size:13px; font-weight:700; color:var(--text2); }
+    .goals-empty-sub { font-size:12px; color:var(--text3); }
+
+    /* NO RESULTS */
+    .no-results {
+      text-align:center; padding:60px 20px;
+      color:var(--text3); font-size:14px;
+    }
+    .no-results-icon { font-size:40px; margin-bottom:10px; }
+
+    /* ══ MODALS ══ */
+    .overlay {
+      position:fixed; inset:0; background:rgba(0,0,0,.72);
+      backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+      z-index:300; display:flex; align-items:center; justify-content:center;
+      padding:14px; animation:ovIn .2s ease;
+    }
+    .overlay.hidden { display:none; }
+    @keyframes ovIn{from{opacity:0}to{opacity:1}}
+    @keyframes mdIn{from{opacity:0;transform:translateY(26px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
+    .modal {
+      background:#12122a; border:1px solid var(--border3); border-radius:22px;
+      padding:26px; width:100%; max-width:480px; position:relative;
+      animation:mdIn .24s ease; box-shadow:0 50px 100px rgba(0,0,0,.65);
+      max-height:90vh; overflow-y:auto;
+    }
+    .modal::-webkit-scrollbar{width:3px} .modal::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+    .modal-title { font-size:18px; font-weight:800; letter-spacing:-.4px; margin-bottom:4px; }
+    .modal-sub   { font-size:12px; color:var(--text2); margin-bottom:20px; }
+    .btn-x {
+      position:absolute; top:13px; right:13px; background:var(--surface2);
+      border:1px solid var(--border); color:var(--text2); width:28px; height:28px;
+      border-radius:7px; font-size:13px; cursor:pointer; display:flex;
+      align-items:center; justify-content:center; font-family:'Inter',sans-serif; transition:all .2s;
+    }
+    .btn-x:hover { background:var(--red-bg); border-color:var(--red); color:var(--red); }
+    .field { display:flex; flex-direction:column; gap:5px; margin-bottom:14px; }
+    .field-label { font-size:10px; font-weight:700; color:var(--text2); text-transform:uppercase; letter-spacing:.6px; }
+    .field-input {
+      background:rgba(255,255,255,.05); border:1px solid var(--border2); border-radius:var(--rs);
+      color:var(--text); font-family:'Inter',sans-serif; font-size:14px; padding:11px 13px;
+      width:100%; outline:none; transition:border-color .2s, box-shadow .2s; resize:vertical;
+    }
+    .field-input:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(124,92,252,.15); }
+    .field-input::placeholder { color:var(--text3); }
+    .field-select {
+      background:rgba(255,255,255,.05); border:1px solid var(--border2); border-radius:var(--rs);
+      color:var(--text); font-family:'Inter',sans-serif; font-size:14px; padding:11px 13px;
+      width:100%; outline:none; transition:border-color .2s; cursor:pointer;
+    }
+    .field-select option { background:#12122a; }
+    .field-select:focus { border-color:var(--accent); }
+
+    /* Color picker swatches */
+    .color-swatches { display:flex; gap:8px; flex-wrap:wrap; }
+    .color-swatch {
+      width:30px; height:30px; border-radius:8px; cursor:pointer;
+      border:2px solid transparent; transition:all .15s;
+    }
+    .color-swatch:hover { transform:scale(1.15); }
+    .color-swatch.sw-active { border-color:#fff; box-shadow:0 0 0 2px rgba(255,255,255,.3); }
+
+    /* Icon picker */
+    .icon-grid { display:grid; grid-template-columns:repeat(8,1fr); gap:6px; }
+    .icon-opt {
+      font-size:20px; width:36px; height:36px; border-radius:8px;
+      display:flex; align-items:center; justify-content:center;
+      cursor:pointer; background:var(--surface2); border:1px solid var(--border);
+      transition:all .15s;
+    }
+    .icon-opt:hover { background:rgba(124,92,252,.2); border-color:var(--accent); }
+    .icon-opt.io-active { background:rgba(124,92,252,.25); border-color:var(--accent); box-shadow:0 0 0 2px rgba(124,92,252,.3); }
+
+    .btn-primary {
+      width:100%; background:linear-gradient(135deg,var(--accent),var(--accent2));
+      color:#fff; border:none; border-radius:var(--rs); font-family:'Inter',sans-serif;
+      font-size:15px; font-weight:800; padding:13px; cursor:pointer;
+      transition:opacity .2s, transform .2s; margin-top:4px;
+    }
+    .btn-primary:hover { opacity:.9; transform:translateY(-1px); }
+    .btn-secondary {
+      width:100%; background:var(--surface2); border:1px solid var(--border2);
+      color:var(--text2); border-radius:var(--rs); font-family:'Inter',sans-serif;
+      font-size:14px; font-weight:700; padding:12px; cursor:pointer;
+      transition:all .2s; margin-top:6px;
+    }
+    .btn-secondary:hover { border-color:var(--red); color:var(--red); background:var(--red-bg); }
+
+    /* TOAST */
+    .toast {
+      position:fixed; bottom:22px; left:50%; transform:translateX(-50%) translateY(90px);
+      background:#1a1a36; border:1px solid var(--border3); border-radius:50px;
+      padding:10px 22px; font-size:13px; font-weight:700; color:var(--text); z-index:999;
+      pointer-events:none; white-space:nowrap; box-shadow:0 10px 40px rgba(0,0,0,.5);
+      transition:transform .35s cubic-bezier(.34,1.56,.64,1);
+    }
+    .toast.show { transform:translateX(-50%) translateY(0); }
+
+    @media(max-width:800px) {
+      .app { padding-left:64px; }
+      .summary-grid { grid-template-columns:1fr 1fr; }
+    }
+    @media(max-width:520px) {
+      .summary-grid { grid-template-columns:1fr 1fr; }
+      .controls-row { flex-direction:column; align-items:stretch; }
+      .filter-status { justify-content:flex-start; }
+      .icon-grid { grid-template-columns:repeat(6,1fr); }
+    }
+  </style>
+  <script type="module" src="firebase_sync.js"></script>
+</head>
+<body>
+
+<div class="bg-scene"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div></div>
+
+<!-- Hamburger -->
+<button class="hamburger" id="hamburger" onclick="toggleSidebar()" title="Menu">
+  <svg width="18" height="14" viewBox="0 0 18 14" fill="none">
+    <rect width="18" height="2" rx="1" fill="white"/>
+    <rect y="6" width="14" height="2" rx="1" fill="white"/>
+    <rect y="12" width="18" height="2" rx="1" fill="white"/>
+  </svg>
+</button>
+
+<!-- Sidebar backdrop -->
+<div class="sb-backdrop" id="sbBackdrop"></div>
+
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
+  <div class="sb-header">
+    <div class="sb-logo">&#128200; Gelisim Takibi</div>
+    <button class="sb-close" onclick="closeSidebar()">&#10005;</button>
+  </div>
+  <div class="sb-body">
+    <div class="sb-nav">
+      <a class="sb-nav-item" href="index.html"><span class="sb-nav-icon">&#128197;</span><span>Takvim</span></a>
+      <a class="sb-nav-item" href="chart.html"><span class="sb-nav-icon">&#128202;</span><span>Grafik Analizi</span></a>
+      <a class="sb-nav-item" href="planner.html"><span class="sb-nav-icon">&#128221;</span><span>Gunluk Planlama</span></a>
+      <a class="sb-nav-item" href="weekly.html"><span class="sb-nav-icon">&#127919;</span><span>Haftalik Hedefler</span></a>
+      <a class="sb-nav-item sb-active" href="yearly.html"><span class="sb-nav-icon">&#127882;</span><span>Yillik Hedefler</span></a>
+      <a class="sb-nav-item" href="journal.html"><span class="sb-nav-icon">&#128218;</span><span>Gunluk</span></a>
+    </div>
+
+    <div class="sb-divider"></div>
+    <div class="sb-section-lbl" id="sbYearLabel">2026 OZETI</div>
+
+    <div class="sb-mini-stats">
+      <div class="sb-mini-chip"><div class="smc-lbl">Toplam</div><div class="smc-val a" id="sms-total">0</div></div>
+      <div class="sb-mini-chip"><div class="smc-lbl">Tamamlandi</div><div class="smc-val g" id="sms-done">0</div></div>
+      <div class="sb-mini-chip"><div class="smc-lbl">Kategori</div><div class="smc-val y" id="sms-cats">0</div></div>
+      <div class="sb-mini-chip"><div class="smc-lbl">Basari %</div><div class="smc-val a" id="sms-pct">-</div></div>
+    </div>
+
+    <div class="sb-prog-wrap">
+      <div class="sb-prog-label">
+        <span>Yillik ilerleme</span>
+        <span id="sbProgPct">%0</span>
+      </div>
+      <div class="sb-prog-track">
+        <div class="sb-prog-fill" id="sbProgFill" style="width:0%"></div>
+      </div>
+    </div>
+
+    <div style="padding-top:10px; border-top:1px solid var(--border);">
+      <a class="sb-nav-item" href="#" onclick="doLogout()" style="color:var(--red);">
+        <span class="sb-nav-icon">&#128682;</span> Cikis Yap
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<main class="app">
+
+  <!-- Page Header -->
+  <header class="page-header glass">
+    <div>
+      <div class="logo-text">&#127882; Yillik Hedefler</div>
+      <div class="logo-sub" id="headerSub">Yilini kategorilere ayir, buyuk resmi gor</div>
+    </div>
+    <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+      <button class="btn-add-cat" onclick="openCatModal()">&#43; Kategori Ekle</button>
+      <button class="btn-add-goal" onclick="openGoalModal(null)">&#43; Hedef Ekle</button>
+    </div>
+  </header>
+
+  <!-- Year Selector -->
+  <div class="year-bar glass">
+    <span class="year-label">Yil:</span>
+    <div class="year-pills" id="yearPills"></div>
+    <button class="year-add-btn" onclick="addYear()">&#43; Yil Ekle</button>
+  </div>
+
+  <!-- Overall Progress -->
+  <div class="overall-prog glass">
+    <div class="prog-top">
+      <span class="prog-top-label" id="progLabel">Yillik Tamamlanma</span>
+      <span class="prog-top-pct" id="progPct">%0</span>
+    </div>
+    <div class="prog-track">
+      <div class="prog-fill" id="progFill" style="width:0%"></div>
+    </div>
+  </div>
+
+  <!-- Global summary -->
+  <div class="summary-grid">
+    <div class="sum-card"><div class="sum-label">Toplam Hedef</div><div class="sum-val sv-a" id="sumTotal">0</div><div class="sum-hint">bu yil eklenen</div></div>
+    <div class="sum-card"><div class="sum-label">Tamamlandi</div><div class="sum-val sv-g" id="sumDone">0</div><div class="sum-hint">&#10003; basariyla bitirildi</div></div>
+    <div class="sum-card"><div class="sum-label">Kismen</div><div class="sum-val sv-y" id="sumPartial">0</div><div class="sum-hint">&#9681; devam ediyor</div></div>
+    <div class="sum-card"><div class="sum-label">Kategori</div><div class="sum-val sv-a" id="sumCats">0</div><div class="sum-hint">aktif alan</div></div>
+  </div>
+
+  <!-- Controls: search + status filter -->
+  <div class="controls-row">
+    <div class="search-wrap">
+      <input type="text" id="searchInput" class="search-input" placeholder="Hedeflerde ara..." oninput="renderCategories()" />
+      <span class="search-icon">&#128269;</span>
+    </div>
+    <div class="filter-status">
+      <button class="fs-btn fs-active" data-status="all"    onclick="setFilter('all')">Tumü</button>
+      <button class="fs-btn"           data-status="pending" onclick="setFilter('pending')">Bekliyor</button>
+      <button class="fs-btn fs-partial" data-status="partial" onclick="setFilter('partial')">Kismen</button>
+      <button class="fs-btn fs-done"   data-status="done"   onclick="setFilter('done')">Tamam</button>
+    </div>
+  </div>
+
+  <!-- Categories + Goals -->
+  <div class="categories-wrap" id="categoriesWrap"></div>
+
+</main>
+
+<!-- ══ CATEGORY MODAL ══ -->
+<div class="overlay hidden" id="catOverlay">
+  <div class="modal">
+    <button class="btn-x" onclick="closeCatModal()">&#10005;</button>
+    <div class="modal-title" id="catModalTitle">Yeni Kategori</div>
+    <div class="modal-sub">Hedeflerini gruplayacak bir kategori olustur.</div>
+    <input type="hidden" id="catEditId" />
+
+    <div class="field">
+      <label class="field-label">Kategori Adi</label>
+      <input type="text" class="field-input" id="catName" placeholder="orn: Akademik, Is Hayati, Saglik..." />
+    </div>
+
+    <div class="field">
+      <label class="field-label">Simge</label>
+      <div class="icon-grid" id="iconGrid"></div>
+    </div>
+
+    <div class="field">
+      <label class="field-label">Renk</label>
+      <div class="color-swatches" id="colorSwatches"></div>
+    </div>
+
+    <button class="btn-primary" onclick="saveCat()">&#10003; Kaydet</button>
+    <button class="btn-secondary hidden" id="btnDeleteCat" onclick="deleteCat()">&#128465; Kategoriyi Sil</button>
+  </div>
+</div>
+
+<!-- ══ GOAL MODAL ══ -->
+<div class="overlay hidden" id="goalOverlay">
+  <div class="modal">
+    <button class="btn-x" onclick="closeGoalModal()">&#10005;</button>
+    <div class="modal-title" id="goalModalTitle">Yeni Hedef</div>
+    <div class="modal-sub">Yillik hedefinizi ekleyin veya guncelleyin.</div>
+    <input type="hidden" id="goalEditId" />
+    <input type="hidden" id="goalCatId" />
+
+    <div class="field">
+      <label class="field-label">Hedef</label>
+      <input type="text" class="field-input" id="goalText" placeholder="Bu yil gerceklestirmek istedigin hedef..." />
+    </div>
+
+    <div class="field">
+      <label class="field-label">Kategori</label>
+      <select class="field-select" id="goalCatSelect"></select>
+    </div>
+
+    <div class="field">
+      <label class="field-label">Oncelik</label>
+      <select class="field-select" id="goalPriority">
+        <option value="high">&#128308; Yuksek Oncelik</option>
+        <option value="medium" selected>&#128992; Orta Oncelik</option>
+        <option value="low">&#128994; Dusuk Oncelik</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label class="field-label">Not / Aciklama (opsiyonel)</label>
+      <textarea class="field-input" id="goalNote" rows="3" placeholder="Bu hedef hakkinda daha fazla bilgi..."></textarea>
+    </div>
+
+    <div class="field">
+      <label class="field-label">Etiket (opsiyonel)</label>
+      <input type="text" class="field-input" id="goalTag" placeholder="orn: kariyer, saglik, kitap..." />
+    </div>
+
+    <button class="btn-primary" onclick="saveGoal()">&#128190; Kaydet</button>
+    <button class="btn-secondary hidden" id="btnDeleteGoal" onclick="deleteGoal()">&#128465; Hedefi Sil</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ═══════════════════════════════════════
+   AUTH GUARD
+═══════════════════════════════════════ */
+const sessionUser = localStorage.getItem('gtk_session');
+
+function doLogout() {
+  if (window.doFirebaseLogout) window.doFirebaseLogout();
+  else {
+    localStorage.removeItem('gtk_session');
+    localStorage.removeItem('gtk_profile');
+    window.location.href = 'auth.html';
+  }
+}
+
+/* ═══════════════════════════════════════
+   CONSTANTS
+═══════════════════════════════════════ */
+const SK_YEARLY = 'gtk_yearly_' + sessionUser;
+const NOW_Y     = new Date().getFullYear();
+
+const CAT_ICONS = [
+  '&#127979;','&#128188;','&#128170;','&#127922;','&#128196;','&#128218;','&#127775;',
+  '&#128640;','&#127808;','&#127753;','&#128081;','&#128176;','&#129504;','&#127911;',
+  '&#127939;','&#128084;','&#128736;','&#128142;','&#127979;','&#129513;','&#128200;',
+  '&#128101;','&#127968;','&#128241;','&#127874;','&#128722;','&#127942;','&#128302;',
+  '&#128270;','&#9997;','&#128483;','&#127775;'
+];
+
+const CAT_COLORS = [
+  '#7c5cfc','#4e8cff','#00d4ff','#00e5a0',
+  '#ffcd47','#ff4d6d','#ff9f43','#a855f7',
+  '#26c6da','#ef5350','#66bb6a','#ffa726'
+];
+
+/* ═══════════════════════════════════════
+   STATE
+═══════════════════════════════════════ */
+let data = JSON.parse(localStorage.getItem(SK_YEARLY) || 'null');
+
+/* Init default structure */
+if(!data) {
+  data = {
+    years: [NOW_Y],
+    viewYear: NOW_Y,
+    yearData: {}
+  };
+}
+if(!data.years || !data.years.length) data.years = [NOW_Y];
+if(!data.viewYear) data.viewYear = data.years[data.years.length-1];
+if(!data.yearData) data.yearData = {};
+
+let selIcon  = CAT_ICONS[0];
+let selColor = CAT_COLORS[0];
+let filterStatus = 'all';
+
+/* ═══════════════════════════════════════
+   STORAGE
+═══════════════════════════════════════ */
+function saveData() { localStorage.setItem(SK_YEARLY, JSON.stringify(data)); }
+
+function getYearData(y) {
+  if(!data.yearData[y]) data.yearData[y] = { categories: [] };
+  return data.yearData[y];
+}
+
+/* ═══════════════════════════════════════
+   UTILS
+═══════════════════════════════════════ */
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._t);
+  t._t = setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function escHtml(s) {
+  if(!s)return'';
+  return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[m]));
+}
+
+/* ═══════════════════════════════════════
+   FILTER
+═══════════════════════════════════════ */
+function setFilter(status) {
+  filterStatus = status;
+  document.querySelectorAll('.fs-btn').forEach(b => {
+    b.classList.toggle('fs-active', b.dataset.status === status);
+  });
+  renderCategories();
+}
+
+/* ═══════════════════════════════════════
+   YEAR MANAGEMENT
+═══════════════════════════════════════ */
+function addYear() {
+  const y = parseInt(prompt('Yil ekle (ornek: 2027):') || '');
+  if(!y || isNaN(y) || y < 2000 || y > 2100) { showToast('Gecersiz yil'); return; }
+  if(data.years.includes(y)) { showToast('Bu yil zaten mevcut'); return; }
+  data.years.push(y);
+  data.years.sort((a,b) => a-b);
+  data.viewYear = y;
+  saveData();
+  renderAll();
+}
+
+function switchYear(y) {
+  data.viewYear = y;
+  saveData();
+  renderAll();
+}
+
+function renderYearPills() {
+  const wrap = document.getElementById('yearPills');
+  wrap.innerHTML = '';
+  data.years.forEach(y => {
+    const btn = document.createElement('button');
+    btn.className = 'year-pill' + (y === data.viewYear ? ' yp-active' : '');
+    btn.textContent = y;
+    btn.onclick = () => switchYear(y);
+    wrap.appendChild(btn);
+  });
+}
+
+/* ═══════════════════════════════════════
+   STATS CALCULATION
+═══════════════════════════════════════ */
+function calcStats(y) {
+  const yd  = getYearData(y);
+  const cats = yd.categories || [];
+  let total = 0, done = 0, partial = 0;
+  cats.forEach(c => {
+    (c.goals || []).forEach(g => {
+      total++;
+      if(g.status === 'done')    done++;
+      if(g.status === 'partial') partial++;
+    });
+  });
+  const pct = total > 0 ? Math.round((done/total)*100) : 0;
+  return { total, done, partial, cats: cats.length, pct };
+}
+
+/* ═══════════════════════════════════════
+   RENDER ALL
+═══════════════════════════════════════ */
+function renderAll() {
+  renderYearPills();
+  renderSummary();
+  renderCategories();
+  renderSidebar();
+}
+
+function renderSummary() {
+  const y = data.viewYear;
+  const s = calcStats(y);
+
+  document.getElementById('headerSub').textContent = y + ' yiliniza ait hedeflerinizi takip edin';
+  document.getElementById('sbYearLabel').textContent = y + ' OZETI';
+
+  const pct = s.pct;
+  document.getElementById('progFill').style.width  = pct + '%';
+  document.getElementById('progPct').textContent    = '%' + pct;
+  document.getElementById('progLabel').textContent  = y + ' Yillik Tamamlanma';
+
+  document.getElementById('sumTotal').textContent   = s.total;
+  document.getElementById('sumDone').textContent    = s.done;
+  document.getElementById('sumPartial').textContent = s.partial;
+  document.getElementById('sumCats').textContent    = s.cats;
+}
+
+function renderSidebar() {
+  const y = data.viewYear;
+  const s = calcStats(y);
+  document.getElementById('sms-total').textContent = s.total;
+  document.getElementById('sms-done').textContent  = s.done;
+  document.getElementById('sms-cats').textContent  = s.cats;
+  document.getElementById('sms-pct').textContent   = s.total > 0 ? '%' + s.pct : '-';
+  document.getElementById('sbProgFill').style.width = s.pct + '%';
+  document.getElementById('sbProgPct').textContent  = '%' + s.pct;
+  document.getElementById('sbYearLabel').textContent = y + ' OZETI';
+}
+
+/* ═══════════════════════════════════════
+   RENDER CATEGORIES
+═══════════════════════════════════════ */
+function renderCategories() {
+  const y    = data.viewYear;
+  const yd   = getYearData(y);
+  const cats = yd.categories || [];
+  const q    = (document.getElementById('searchInput').value || '').toLowerCase().trim();
+  const wrap = document.getElementById('categoriesWrap');
+  wrap.innerHTML = '';
+
+  if(cats.length === 0) {
+    wrap.innerHTML =
+      '<div class="goals-empty" style="padding:60px 20px;">' +
+        '<div class="goals-empty-icon">&#127882;</div>' +
+        '<div class="goals-empty-title">' + y + ' icin henuz kategori yok</div>' +
+        '<div class="goals-empty-sub">Hedeflerinizi siniflandirmak icin ilk kategorinizi ekleyin.</div>' +
+      '</div>';
+    return;
+  }
+
+  let anyVisible = false;
+
+  cats.forEach(cat => {
+    const goals = (cat.goals || []).filter(g => {
+      if(filterStatus !== 'all' && g.status !== filterStatus) return false;
+      if(q && !g.text.toLowerCase().includes(q)) return false;
+      return true;
+    });
+
+    /* If searching/filtering and no results in this cat, optionally hide or show empty */
+    const showCat = !q && filterStatus === 'all' ? true : goals.length > 0;
+    if(!showCat) return;
+    anyVisible = true;
+
+    const allGoals = cat.goals || [];
+    const doneCnt  = allGoals.filter(g => g.status==='done').length;
+    const catPct   = allGoals.length > 0 ? Math.round((doneCnt/allGoals.length)*100) : 0;
+
+    const card = document.createElement('div');
+    card.className = 'cat-card';
+    card.dataset.catId = cat.id;
+
+    /* Header */
+    const hdr = document.createElement('div');
+    hdr.className = 'cat-header';
+    hdr.onclick = () => toggleCatCollapse(card);
+    hdr.innerHTML =
+      '<div class="cat-color-bar" style="background:' + cat.color + '"></div>' +
+      '<div class="cat-icon">' + cat.icon + '</div>' +
+      '<div class="cat-info">' +
+        '<div class="cat-name">' + escHtml(cat.name) + '</div>' +
+        '<div class="cat-count">' + allGoals.length + ' hedef &middot; ' + doneCnt + ' tamamlandi</div>' +
+      '</div>' +
+      '<div class="cat-prog-mini">' +
+        '<div class="cat-prog-bar"><div class="cat-prog-fill" style="width:' + catPct + '%; background:' + cat.color + '"></div></div>' +
+        '<div class="cat-prog-txt">%' + catPct + '</div>' +
+      '</div>' +
+      '<div class="cat-actions">' +
+        '<button class="cat-action-btn" onclick="event.stopPropagation(); openCatModal(\'' + cat.id + '\')" title="Duzenle">&#9998;</button>' +
+        '<button class="cat-action-btn" onclick="event.stopPropagation(); openGoalModal(\'' + cat.id + '\')" title="Hedef Ekle">&#43;</button>' +
+        '<span class="cat-collapse-btn">&#9660;</span>' +
+      '</div>';
+
+    /* Body */
+    const body = document.createElement('div');
+    body.className = 'cat-body';
+
+    if(goals.length === 0 && (q || filterStatus !== 'all')) {
+      body.innerHTML = '<div class="goals-empty"><div class="goals-empty-title">Bu filtreye uyan hedef yok</div></div>';
+    } else if(allGoals.length === 0) {
+      body.innerHTML =
+        '<div class="goals-empty">' +
+          '<div class="goals-empty-icon">&#127919;</div>' +
+          '<div class="goals-empty-title">Henuz hedef eklenmedi</div>' +
+          '<div class="goals-empty-sub">Asagidan yeni hedef ekleyin</div>' +
+        '</div>';
+    } else {
+      goals.forEach(g => body.appendChild(buildGoalItem(g, cat.id)));
+    }
+
+    /* Add inline input */
+    const addRow = document.createElement('div');
+    addRow.className = 'cat-add-row';
+    addRow.innerHTML =
+      '<input type="text" class="cat-goal-input" placeholder="Hizlica hedef ekle..." data-catid="' + cat.id + '" />' +
+      '<button class="cat-goal-add" data-catid="' + cat.id + '" onclick="quickAddGoal(\'' + cat.id + '\')">&#43;</button>';
+    addRow.querySelector('.cat-goal-input').addEventListener('keydown', e => {
+      if(e.key === 'Enter') quickAddGoal(cat.id, e.target);
+    });
+    body.appendChild(addRow);
+
+    card.appendChild(hdr);
+    card.appendChild(body);
+    wrap.appendChild(card);
+  });
+
+  if(!anyVisible && (q || filterStatus !== 'all')) {
+    wrap.innerHTML =
+      '<div class="no-results">' +
+        '<div class="no-results-icon">&#128269;</div>' +
+        '<div>Aramanizla eslesen hedef bulunamadi</div>' +
+      '</div>';
+  }
+}
+
+function toggleCatCollapse(card) {
+  card.classList.toggle('collapsed');
+}
+
+function buildGoalItem(g, catId) {
+  const statusLabels = { pending: '&#9675; Bekliyor', done: '&#10003; Tamam', partial: '&#9681; Kismen' };
+  const statusClass  = { pending: 'gs-pending', done: 'gs-done', partial: 'gs-partial' };
+  const checkClass   = g.status==='done' ? 'gc-done' : g.status==='partial' ? 'gc-partial' : '';
+  const checkIcon    = g.status==='done' ? '&#10003;' : g.status==='partial' ? '&#9681;' : '';
+  const prioClass    = { high:'gp-high', medium:'gp-medium', low:'gp-low' };
+  const prioLabel    = { high:'&#128308; Yuksek', medium:'&#128992; Orta', low:'&#128994; Dusuk' };
+
+  const item = document.createElement('div');
+  item.className = 'goal-item gi-' + g.status;
+  item.dataset.id = g.id;
+
+  item.innerHTML =
+    '<button class="goal-check ' + checkClass + '" onclick="cycleStatus(\'' + catId + '\',\'' + g.id + '\')" title="Durumu degistir">' + checkIcon + '</button>' +
+    '<div class="goal-body">' +
+      '<span class="goal-text' + (g.status==='done' ? ' gt-done' : '') + '">' + escHtml(g.text) + '</span>' +
+      '<div class="goal-meta">' +
+        (g.priority ? '<span class="goal-priority ' + prioClass[g.priority] + '">' + prioLabel[g.priority] + '</span>' : '') +
+        (g.tag  ? '<span class="goal-tag">' + escHtml(g.tag) + '</span>' : '') +
+        (g.note ? '<span class="goal-note-inline" title="' + escHtml(g.note) + '">' + escHtml(g.note.slice(0,60)) + (g.note.length>60?'...':'') + '</span>' : '') +
+      '</div>' +
+    '</div>' +
+    '<div class="goal-right">' +
+      '<button class="goal-status-btn ' + statusClass[g.status] + '" onclick="cycleStatus(\'' + catId + '\',\'' + g.id + '\')">' + statusLabels[g.status] + '</button>' +
+      '<button class="goal-action-btn" onclick="openGoalModal(\'' + catId + '\',\'' + g.id + '\')" title="Duzenle">&#9998;</button>' +
+      '<button class="goal-action-btn del" onclick="deleteGoalById(\'' + catId + '\',\'' + g.id + '\')" title="Sil">&#10005;</button>' +
+    '</div>';
+
+  return item;
+}
+
+/* ═══════════════════════════════════════
+   GOAL ACTIONS
+═══════════════════════════════════════ */
+function cycleStatus(catId, goalId) {
+  const cat  = findCat(catId);
+  if(!cat) return;
+  const goal = cat.goals.find(g => g.id === goalId);
+  if(!goal) return;
+  const cycle = { pending:'done', done:'partial', partial:'pending' };
+  goal.status = cycle[goal.status] || 'done';
+  saveData();
+  renderAll();
+  const labels = { done:'Tamamlandi', partial:'Kismen tamamlandi', pending:'Beklemeye alindi' };
+  showToast(labels[goal.status]);
+}
+
+function quickAddGoal(catId, inputEl) {
+  if(!inputEl) inputEl = document.querySelector('.cat-goal-input[data-catid="' + catId + '"]');
+  const val = inputEl ? inputEl.value.trim() : '';
+  if(!val) return;
+  const cat = findCat(catId);
+  if(!cat) return;
+  if(!cat.goals) cat.goals = [];
+  cat.goals.push({ id:uid(), text:val, status:'pending', priority:'medium', note:'', tag:'' });
+  saveData();
+  if(inputEl) inputEl.value = '';
+  renderAll();
+  showToast('Hedef eklendi');
+}
+
+function deleteGoalById(catId, goalId) {
+  const cat = findCat(catId);
+  if(!cat) return;
+  cat.goals = cat.goals.filter(g => g.id !== goalId);
+  saveData();
+  renderAll();
+  showToast('Hedef silindi');
+}
+
+function findCat(catId) {
+  const yd = getYearData(data.viewYear);
+  return (yd.categories || []).find(c => c.id === catId) || null;
+}
+
+/* ═══════════════════════════════════════
+   CATEGORY MODAL
+═══════════════════════════════════════ */
+function buildIconGrid() {
+  const grid = document.getElementById('iconGrid');
+  grid.innerHTML = '';
+  CAT_ICONS.forEach(ic => {
+    const el = document.createElement('div');
+    el.className = 'icon-opt' + (ic === selIcon ? ' io-active' : '');
+    el.innerHTML = ic;
+    el.onclick = () => {
+      selIcon = ic;
+      grid.querySelectorAll('.icon-opt').forEach(x => x.classList.remove('io-active'));
+      el.classList.add('io-active');
+    };
+    grid.appendChild(el);
+  });
+}
+
+function buildColorSwatches() {
+  const wrap = document.getElementById('colorSwatches');
+  wrap.innerHTML = '';
+  CAT_COLORS.forEach(c => {
+    const el = document.createElement('div');
+    el.className = 'color-swatch' + (c === selColor ? ' sw-active' : '');
+    el.style.background = c;
+    el.onclick = () => {
+      selColor = c;
+      wrap.querySelectorAll('.color-swatch').forEach(x => x.classList.remove('sw-active'));
+      el.classList.add('sw-active');
+    };
+    wrap.appendChild(el);
+  });
+}
+
+function openCatModal(catId) {
+  const overlay = document.getElementById('catOverlay');
+  const editIdEl = document.getElementById('catEditId');
+  const delBtn = document.getElementById('btnDeleteCat');
+  document.getElementById('catModalTitle').textContent = catId ? 'Kategoriyi Duzenle' : 'Yeni Kategori';
+  delBtn.classList.toggle('hidden', !catId);
+
+  if(catId) {
+    const cat = findCat(catId);
+    editIdEl.value = catId;
+    document.getElementById('catName').value = cat ? cat.name : '';
+    selIcon  = cat ? cat.icon  : CAT_ICONS[0];
+    selColor = cat ? cat.color : CAT_COLORS[0];
+  } else {
+    editIdEl.value = '';
+    document.getElementById('catName').value = '';
+    selIcon  = CAT_ICONS[Math.floor(Math.random() * 8)];
+    selColor = CAT_COLORS[Math.floor(Math.random() * CAT_COLORS.length)];
+  }
+
+  buildIconGrid();
+  buildColorSwatches();
+  overlay.classList.remove('hidden');
+  setTimeout(() => document.getElementById('catName').focus(), 100);
+}
+
+function closeCatModal() { document.getElementById('catOverlay').classList.add('hidden'); }
+
+function saveCat() {
+  const name = document.getElementById('catName').value.trim();
+  if(!name) { showToast('Kategori adi bos birakilamaz'); return; }
+
+  const yd  = getYearData(data.viewYear);
+  if(!yd.categories) yd.categories = [];
+
+  const editId = document.getElementById('catEditId').value;
+  if(editId) {
+    const cat = findCat(editId);
+    if(cat) { cat.name = name; cat.icon = selIcon; cat.color = selColor; }
+  } else {
+    yd.categories.push({ id:uid(), name, icon:selIcon, color:selColor, goals:[] });
+  }
+
+  saveData();
+  closeCatModal();
+  renderAll();
+  showToast(editId ? 'Kategori guncellendi' : 'Kategori eklendi');
+}
+
+function deleteCat() {
+  const editId = document.getElementById('catEditId').value;
+  if(!editId) return;
+  const cat = findCat(editId);
+  const n = cat ? (cat.goals||[]).length : 0;
+  if(n > 0 && !confirm(n + ' hedef silinecek. Emin misiniz?')) return;
+  const yd = getYearData(data.viewYear);
+  yd.categories = yd.categories.filter(c => c.id !== editId);
+  saveData();
+  closeCatModal();
+  renderAll();
+  showToast('Kategori silindi');
+}
+
+document.getElementById('catOverlay').addEventListener('click', e => { if(e.target===e.currentTarget) closeCatModal(); });
+document.getElementById('catName').addEventListener('keydown', e => { if(e.key==='Enter') saveCat(); });
+
+/* ═══════════════════════════════════════
+   GOAL MODAL
+═══════════════════════════════════════ */
+function openGoalModal(catId, goalId) {
+  const yd   = getYearData(data.viewYear);
+  const cats = yd.categories || [];
+  const overlay = document.getElementById('goalOverlay');
+  const delBtn  = document.getElementById('btnDeleteGoal');
+
+  /* Populate category dropdown */
+  const sel = document.getElementById('goalCatSelect');
+  sel.innerHTML = '';
+  cats.forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c.id;
+    opt.textContent = c.icon.replace(/&#\d+;/g,'') + ' ' + c.name;
+    opt.innerHTML = c.icon + ' ' + escHtml(c.name);
+    sel.appendChild(opt);
+  });
+
+  if(catId) sel.value = catId;
+  document.getElementById('goalCatId').value = catId || '';
+
+  if(goalId) {
+    /* Edit mode */
+    const cat  = findCat(catId);
+    const goal = cat ? (cat.goals||[]).find(g => g.id===goalId) : null;
+    document.getElementById('goalModalTitle').textContent = 'Hedefi Duzenle';
+    document.getElementById('goalEditId').value   = goalId;
+    document.getElementById('goalText').value     = goal ? goal.text     : '';
+    document.getElementById('goalPriority').value = goal ? (goal.priority||'medium') : 'medium';
+    document.getElementById('goalNote').value     = goal ? (goal.note    || '') : '';
+    document.getElementById('goalTag').value      = goal ? (goal.tag     || '') : '';
+    delBtn.classList.remove('hidden');
+  } else {
+    /* Add mode */
+    document.getElementById('goalModalTitle').textContent = 'Yeni Hedef';
+    document.getElementById('goalEditId').value   = '';
+    document.getElementById('goalText').value     = '';
+    document.getElementById('goalPriority').value = 'medium';
+    document.getElementById('goalNote').value     = '';
+    document.getElementById('goalTag').value      = '';
+    delBtn.classList.add('hidden');
+  }
+
+  overlay.classList.remove('hidden');
+  setTimeout(() => document.getElementById('goalText').focus(), 100);
+}
+
+function closeGoalModal() { document.getElementById('goalOverlay').classList.add('hidden'); }
+
+function saveGoal() {
+  const text     = document.getElementById('goalText').value.trim();
+  const catId    = document.getElementById('goalCatSelect').value;
+  const priority = document.getElementById('goalPriority').value;
+  const note     = document.getElementById('goalNote').value.trim();
+  const tag      = document.getElementById('goalTag').value.trim();
+  const editId   = document.getElementById('goalEditId').value;
+
+  if(!text) { showToast('Hedef metni bos birakilamaz'); return; }
+  if(!catId) { showToast('Lutfen bir kategori secin'); return; }
+
+  const cat = findCat(catId);
+  if(!cat) return;
+  if(!cat.goals) cat.goals = [];
+
+  const oldCatId = document.getElementById('goalCatId').value;
+
+  if(editId) {
+    /* If category changed, move goal */
+    if(oldCatId && oldCatId !== catId) {
+      const oldCat = findCat(oldCatId);
+      if(oldCat) {
+        const gIdx = oldCat.goals.findIndex(g => g.id === editId);
+        if(gIdx > -1) { oldCat.goals.splice(gIdx, 1); }
+      }
+      cat.goals.push({ id:editId, text, priority, note, tag, status:'pending' });
+    } else {
+      const goal = cat.goals.find(g => g.id === editId);
+      if(goal) { goal.text = text; goal.priority = priority; goal.note = note; goal.tag = tag; }
+    }
+    showToast('Hedef guncellendi');
+  } else {
+    cat.goals.push({ id:uid(), text, priority, note, tag, status:'pending' });
+    showToast('Hedef eklendi');
+  }
+
+  saveData();
+  closeGoalModal();
+  renderAll();
+}
+
+function deleteGoal() {
+  const editId  = document.getElementById('goalEditId').value;
+  const catId   = document.getElementById('goalCatSelect').value;
+  if(!editId) return;
+  const cat = findCat(catId);
+  if(cat) { cat.goals = cat.goals.filter(g => g.id !== editId); }
+  saveData();
+  closeGoalModal();
+  renderAll();
+  showToast('Hedef silindi');
+}
+
+document.getElementById('goalOverlay').addEventListener('click', e => { if(e.target===e.currentTarget) closeGoalModal(); });
+document.getElementById('goalText').addEventListener('keydown', e => { if(e.key==='Enter') saveGoal(); });
+
+/* ═══════════════════════════════════════
+   SIDEBAR TOGGLE
+═══════════════════════════════════════ */
+let _sbOpen = false;
+function toggleSidebar() {
+  _sbOpen = !_sbOpen;
+  document.getElementById('sidebar').classList.toggle('open', _sbOpen);
+  document.getElementById('sbBackdrop').classList.toggle('open', _sbOpen);
+}
+function closeSidebar() {
+  _sbOpen = false;
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sbBackdrop').classList.remove('open');
+}
+document.getElementById('sbBackdrop').addEventListener('click', closeSidebar);
+
+/* ═══════════════════════════════════════
+   CROSS-TAB SYNC
+═══════════════════════════════════════ */
+window.addEventListener('storage', e => {
+  if(e.key === SK_YEARLY) {
+    data = JSON.parse(e.newValue || 'null') || data;
+    renderAll();
+  }
+});
+
+/* ═══════════════════════════════════════
+   INIT
+═══════════════════════════════════════ */
+renderAll();
+</script>
+</body>
+</html>

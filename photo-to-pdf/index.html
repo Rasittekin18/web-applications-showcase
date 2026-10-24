@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PhotoPDF — Sınırsız Fotoğraftan PDF Oluşturucu</title>
+  <meta name="description" content="Fotoğraflarınızı kolayca PDF'e dönüştürün. Sınırsız fotoğraf, ücretsiz, hızlı ve güvenli." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Background particles -->
+  <div class="bg-particles" id="bgParticles"></div>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-inner">
+      <div class="logo">
+        <div class="logo-icon">
+          <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="2" y="8" width="20" height="18" rx="3" fill="url(#g1)" opacity="0.9"/>
+            <path d="M10 6h8l2 2H8L10 6z" fill="url(#g1)"/>
+            <circle cx="12" cy="17" r="5" fill="none" stroke="white" stroke-width="1.5"/>
+            <circle cx="12" cy="17" r="2" fill="white"/>
+            <rect x="18" y="12" width="12" height="16" rx="2" fill="url(#g2)"/>
+            <path d="M26 12v-1a1 1 0 0 0-1-1h-2l-2 2h5z" fill="url(#g3)"/>
+            <line x1="21" y1="18" x2="27" y2="18" stroke="white" stroke-width="1.2" stroke-linecap="round"/>
+            <line x1="21" y1="21" x2="27" y2="21" stroke="white" stroke-width="1.2" stroke-linecap="round"/>
+            <line x1="21" y1="24" x2="25" y2="24" stroke="white" stroke-width="1.2" stroke-linecap="round"/>
+            <defs>
+              <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1" gradientUnits="objectBoundingBox">
+                <stop offset="0%" stop-color="#a78bfa"/>
+                <stop offset="100%" stop-color="#7c3aed"/>
+              </linearGradient>
+              <linearGradient id="g2" x1="0" y1="0" x2="1" y2="1" gradientUnits="objectBoundingBox">
+                <stop offset="0%" stop-color="#6d28d9"/>
+                <stop offset="100%" stop-color="#4c1d95"/>
+              </linearGradient>
+              <linearGradient id="g3" x1="0" y1="0" x2="1" y2="1" gradientUnits="objectBoundingBox">
+                <stop offset="0%" stop-color="#8b5cf6"/>
+                <stop offset="100%" stop-color="#5b21b6"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <span class="logo-text">Photo<span class="logo-accent">PDF</span></span>
+      </div>
+      <div class="header-badge">
+        <span class="badge-dot"></span>
+        <span>Ücretsiz &amp; Güvenli</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main class="main">
+
+    <!-- Hero -->
+    <section class="hero">
+      <h1 class="hero-title">
+        Fotoğraflarını <span class="gradient-text">PDF'e Dönüştür</span>
+      </h1>
+      <p class="hero-subtitle">Sınırsız fotoğraf • Sınırsız sayfa • Tamamen ücretsiz • Hızlı &amp; Güvenli</p>
+    </section>
+
+    <!-- Upload Zone -->
+    <section class="upload-section">
+      <div class="upload-zone" id="uploadZone">
+        <div class="upload-icon">
+          <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M32 8L20 24h8v20h8V24h8L32 8z" fill="url(#ug1)"/>
+            <path d="M8 44v8a4 4 0 0 0 4 4h40a4 4 0 0 0 4-4v-8" stroke="url(#ug1)" stroke-width="3" stroke-linecap="round"/>
+            <defs>
+              <linearGradient id="ug1" x1="8" y1="8" x2="56" y2="56" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#a78bfa"/>
+                <stop offset="100%" stop-color="#ec4899"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <h2 class="upload-title">Fotoğrafları Buraya Sürükle &amp; Bırak</h2>
+        <p class="upload-subtitle">veya dosya seçmek için tıkla</p>
+        <div class="upload-formats">JPG • PNG • WEBP • BMP • GIF • TIFF</div>
+        <button class="btn btn-primary" id="selectBtn">
+          <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M4 4h5l2 2h5a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1z" stroke="currentColor" stroke-width="1.5"/>
+          </svg>
+          Fotoğraf Seç
+        </button>
+        <input type="file" id="fileInput" multiple accept="image/*" hidden />
+      </div>
+    </section>
+
+    <!-- Controls (shown when images are added) -->
+    <section class="controls-section" id="controlsSection" style="display:none">
+      <div class="controls-bar">
+        <div class="controls-info">
+          <div class="info-chip" id="photoCount">
+            <svg viewBox="0 0 16 16" fill="none"><rect x="1" y="3" width="10" height="10" rx="1.5" fill="currentColor" opacity="0.3"/><rect x="5" y="1" width="10" height="10" rx="1.5" stroke="currentColor" stroke-width="1.5"/></svg>
+            <span id="photoCountText">0 fotoğraf</span>
+          </div>
+        </div>
+        <div class="controls-actions">
+          <button class="btn btn-ghost" id="addMoreBtn">
+            <svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/><path d="M10 6v8M6 10h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            Daha Fazla Ekle
+          </button>
+          <button class="btn btn-danger" id="clearAllBtn">
+            <svg viewBox="0 0 20 20" fill="none"><path d="M4 6h12M8 6V4h4v2M6 6l1 10h6l1-10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Temizle
+          </button>
+        </div>
+      </div>
+
+      <!-- PDF Settings -->
+      <div class="settings-panel">
+        <h3 class="settings-title">
+          <svg viewBox="0 0 20 20" fill="none"><path d="M10 3a7 7 0 1 0 0 14A7 7 0 0 0 10 3zM8 10h4M10 8v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          PDF Ayarları
+        </h3>
+        <div class="settings-grid">
+          <div class="setting-group">
+            <label class="setting-label" for="pageSize">Sayfa Boyutu</label>
+            <select id="pageSize" class="setting-select">
+              <option value="a4">A4 (210×297 mm)</option>
+              <option value="a3">A3 (297×420 mm)</option>
+              <option value="letter">Letter (216×279 mm)</option>
+              <option value="legal">Legal (216×356 mm)</option>
+            </select>
+          </div>
+          <div class="setting-group">
+            <label class="setting-label" for="pageOrientation">Yönlendirme</label>
+            <select id="pageOrientation" class="setting-select">
+              <option value="auto">Otomatik (fotoğrafa göre)</option>
+              <option value="portrait">Dikey (Portrait)</option>
+              <option value="landscape">Yatay (Landscape)</option>
+            </select>
+          </div>
+          <div class="setting-group">
+            <label class="setting-label" for="imageQuality">Görüntü Kalitesi</label>
+            <select id="imageQuality" class="setting-select">
+              <option value="1.0">En Yüksek (Büyük Dosya)</option>
+              <option value="0.9" selected>Yüksek (Önerilen)</option>
+              <option value="0.7">Orta</option>
+              <option value="0.5">Düşük (Küçük Dosya)</option>
+            </select>
+          </div>
+          <div class="setting-group">
+            <label class="setting-label" for="imageFit">Görüntü Yerleşimi</label>
+            <select id="imageFit" class="setting-select">
+              <option value="fit">Sayfaya Sığdır</option>
+              <option value="fill">Sayfayı Doldur</option>
+              <option value="center">Ortala (kenar boşluklu)</option>
+            </select>
+          </div>
+          <div class="setting-group">
+            <label class="setting-label" for="pdfFilename">Dosya Adı</label>
+            <input type="text" id="pdfFilename" class="setting-input" value="fotograf-pdf" placeholder="dosya-adi" />
+          </div>
+          <div class="setting-group">
+            <label class="setting-label" for="bgColor">Arka Plan Rengi</label>
+            <div class="color-row">
+              <input type="color" id="bgColor" class="setting-color" value="#ffffff" />
+              <span class="color-label" id="colorLabel">#ffffff</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Preview Grid -->
+    <section class="preview-section" id="previewSection" style="display:none">
+      <div class="preview-header">
+        <h3 class="preview-title">Fotoğraf Önizleme</h3>
+        <span class="preview-hint">
+          <svg viewBox="0 0 16 16" fill="none"><path d="M8 2L3 8l5 6 5-6-5-6z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Sıralamak için sürükle-bırak
+        </span>
+      </div>
+      <div class="photo-grid" id="photoGrid"></div>
+    </section>
+
+    <!-- Convert Button -->
+    <section class="convert-section" id="convertSection" style="display:none">
+      <div class="convert-card">
+        <div class="convert-info" id="convertInfo">
+          <span id="convertPhotoCount">0 fotoğraf</span> hazır
+        </div>
+        <button class="btn btn-convert" id="convertBtn">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z" stroke="currentColor" stroke-width="2"/><path d="M14 2v6h6" stroke="currentColor" stroke-width="2"/><path d="M9 15l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          PDF Oluştur &amp; İndir
+        </button>
+      </div>
+    </section>
+
+    <!-- Progress Overlay -->
+    <div class="progress-overlay" id="progressOverlay" style="display:none">
+      <div class="progress-card">
+        <div class="progress-icon">
+          <svg viewBox="0 0 64 64" fill="none" class="spin-svg">
+            <circle cx="32" cy="32" r="28" stroke="url(#pg1)" stroke-width="5" stroke-linecap="round" stroke-dasharray="44 132"/>
+            <defs>
+              <linearGradient id="pg1" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#a78bfa"/>
+                <stop offset="100%" stop-color="#ec4899"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <h3 class="progress-title">PDF Oluşturuluyor...</h3>
+        <div class="progress-bar-wrap">
+          <div class="progress-bar" id="progressBar"></div>
+        </div>
+        <p class="progress-text" id="progressText">Fotoğraflar işleniyor...</p>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Toast Notification -->
+  <div class="toast" id="toast"></div>
+
+  <!-- Lightbox -->
+  <div class="lightbox" id="lightbox" style="display:none">
+    <button class="lightbox-close" id="lightboxClose">✕</button>
+    <button class="lightbox-nav lightbox-prev" id="lightboxPrev">‹</button>
+    <img class="lightbox-img" id="lightboxImg" src="" alt="preview" />
+    <button class="lightbox-nav lightbox-next" id="lightboxNext">›</button>
+    <div class="lightbox-counter" id="lightboxCounter"></div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

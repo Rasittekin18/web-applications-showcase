@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Giris Yap — Gelisim Takibi</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    :root {
+      --bg:#080812; --surface:rgba(255,255,255,0.04); --surface2:rgba(255,255,255,0.08);
+      --border:rgba(255,255,255,0.08); --border2:rgba(255,255,255,0.14); --border3:rgba(255,255,255,0.24);
+      --text:#eaeaf8; --text2:#8888aa; --text3:#44446a;
+      --accent:#7c5cfc; --accent2:#4e8cff; --cyan:#00d4ff;
+      --green:#00e5a0; --red:#ff4d6d; --yellow:#ffcd47;
+      --r:18px; --rs:12px; --rx:8px;
+    }
+    html { scroll-behavior:smooth; }
+    body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; overflow-x:hidden; display:flex; align-items:center; justify-content:center; padding:20px; }
+
+    /* BLOBS */
+    .bg-scene{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+    .blob{position:absolute;border-radius:50%;filter:blur(130px);opacity:.13;animation:fb 18s ease-in-out infinite}
+    .b1{width:700px;height:700px;background:var(--accent);top:-200px;left:-150px;animation-delay:0s}
+    .b2{width:450px;height:450px;background:var(--cyan);bottom:-100px;right:-100px;animation-delay:7s}
+    .b3{width:320px;height:320px;background:var(--accent2);top:45%;left:55%;animation-delay:13s}
+    @keyframes fb{0%,100%{transform:translate(0,0) scale(1)}40%{transform:translate(40px,-40px) scale(1.06)}70%{transform:translate(-25px,25px) scale(.94)}}
+
+    /* CARD */
+    .auth-wrap{position:relative;z-index:1;width:100%;max-width:460px}
+    .auth-card{background:rgba(14,14,30,.92);border:1px solid var(--border2);border-radius:22px;padding:32px;box-shadow:0 40px 100px rgba(0,0,0,.6);backdrop-filter:blur(30px)}
+
+    /* LOGO */
+    .logo-area{text-align:center;margin-bottom:28px}
+    .logo-icon{font-size:40px;display:block;margin-bottom:10px;animation:float 3s ease-in-out infinite}
+    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+    .logo-title{font-size:26px;font-weight:900;background:linear-gradient(90deg,var(--accent),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:-.5px}
+    .logo-sub{font-size:13px;color:var(--text2);margin-top:4px}
+
+    /* TABS */
+    .auth-tabs{display:grid;grid-template-columns:1fr 1fr;gap:0;background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:var(--rs);padding:4px;margin-bottom:26px}
+    .auth-tab{text-align:center;padding:10px;cursor:pointer;font-weight:700;font-size:14px;color:var(--text2);transition:all .22s;border-radius:var(--rx);border:1px solid transparent}
+    .auth-tab:hover{color:var(--text)}
+    .auth-tab.active{background:var(--surface2);color:var(--text);border-color:var(--border2);box-shadow:0 2px 10px rgba(0,0,0,.3)}
+
+    /* FORM */
+    .form-section{display:none}
+    .form-section.active{display:block;animation:fadeIn .3s ease}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .form-group{margin-bottom:14px}
+    .form-group label{display:block;font-size:10px;font-weight:700;color:var(--text2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.6px}
+
+    .input-wrap{position:relative}
+    .input-wrap .input-icon{position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:15px;pointer-events:none}
+    .input-wrap .toggle-pw{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text3);cursor:pointer;font-size:14px;padding:2px;transition:color .2s}
+    .input-wrap .toggle-pw:hover{color:var(--text2)}
+
+    .form-group input{
+      width:100%;padding:13px 14px;
+      background:rgba(0,0,0,0.25);border:1px solid var(--border2);border-radius:var(--rs);
+      color:var(--text);font-family:'Inter',sans-serif;font-size:14px;outline:none;transition:border .2s,box-shadow .2s;
+    }
+    .form-group .has-icon input { padding-left: 40px; }
+    .form-group input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(124,92,252,.15)}
+    .form-group input::placeholder{color:var(--text3)}
+    .form-group input.input-error{border-color:var(--red);box-shadow:0 0 0 3px rgba(255,77,109,.12)}
+    .form-group input.input-ok{border-color:var(--green)}
+
+    /* PASSWORD STRENGTH */
+    .pw-strength{margin-top:7px}
+    .pw-bars{display:flex;gap:3px;height:3px}
+    .pw-bar{flex:1;background:var(--border);border-radius:3px;transition:background .25s}
+    .pw-bar.s1{background:var(--red)}
+    .pw-bar.s2{background:var(--yellow)}
+    .pw-bar.s3{background:var(--accent)}
+    .pw-bar.s4{background:var(--green)}
+    .pw-hint{font-size:11px;color:var(--text3);margin-top:5px;display:flex;justify-content:space-between}
+
+    /* FIELD HINT */
+    .field-hint{font-size:11px;color:var(--text3);margin-top:5px;font-style:italic}
+    .field-check{font-size:11px;margin-top:5px;min-height:16px;font-weight:600}
+    .fc-ok{color:var(--green)}
+    .fc-err{color:var(--red)}
+
+    /* DIVIDER */
+    .or-divider{display:flex;align-items:center;gap:12px;margin:18px 0;color:var(--text3);font-size:12px;font-weight:600}
+    .or-divider::before,.or-divider::after{content:'';flex:1;height:1px;background:var(--border)}
+
+    /* SUBMIT */
+    .btn-submit{width:100%;padding:15px;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:var(--rs);color:#fff;font-weight:800;font-size:15px;cursor:pointer;transition:transform .2s,box-shadow .2s,opacity .2s;margin-top:6px;font-family:'Inter',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px}
+    .btn-submit:hover{transform:scale(1.02);box-shadow:0 8px 28px rgba(124,92,252,.5)}
+    .btn-submit:disabled{opacity:.6;cursor:not-allowed;transform:none}
+
+    /* ERROR */
+    .error-msg{color:var(--red);font-size:13px;font-weight:600;margin-top:12px;text-align:center;min-height:20px;padding:8px;border-radius:var(--rx);background:var(--red-bg,rgba(255,77,109,.1));display:none}
+    .error-msg.show{display:block;animation:fadeIn .2s}
+
+    /* TERMS */
+    .terms-row{display:flex;align-items:flex-start;gap:8px;margin:12px 0}
+    .terms-check{width:16px;height:16px;flex-shrink:0;margin-top:2px;accent-color:var(--accent);cursor:pointer}
+    .terms-text{font-size:11px;color:var(--text3);line-height:1.6}
+    .terms-text a{color:var(--accent);text-decoration:none}
+    .terms-text a:hover{text-decoration:underline}
+
+    /* SUCCESS banner */
+    .success-banner{background:rgba(0,229,160,.1);border:1px solid rgba(0,229,160,.3);border-radius:var(--rs);padding:14px;text-align:center;color:var(--green);font-weight:700;font-size:14px;display:none;animation:fadeIn .3s}
+
+    /* Feature list */
+    .features{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:16px 0}
+    .feat{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text3)}
+    .feat-icon{font-size:14px}
+
+    @media(max-width:480px){.form-row{grid-template-columns:1fr}.features{grid-template-columns:1fr}}
+  </style>
+  <script type="module" src="firebase_sync.js"></script>
+</head>
+<body>
+
+<div class="bg-scene"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div></div>
+
+<div class="auth-wrap">
+  <div class="auth-card">
+    <div class="logo-area">
+      <span class="logo-icon">&#11088;</span>
+      <div class="logo-title">Gelisim Takibi</div>
+      <div class="logo-sub">Planla, takip et ve ilerle</div>
+    </div>
+
+    <div class="auth-tabs">
+      <div class="auth-tab active" id="tabLogin" onclick="switchTab('login')">Giris Yap</div>
+      <div class="auth-tab" id="tabRegister" onclick="switchTab('register')">Kayit Ol</div>
+    </div>
+
+    <!-- LOGIN -->
+    <div class="form-section active" id="formLogin">
+      <div class="form-group">
+        <label>E-posta</label>
+        <div class="input-wrap has-icon">
+          <span class="input-icon">&#128140;</span>
+          <input type="email" id="logUsername" placeholder="E-posta adresinizi girin" autocomplete="email" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Sifre</label>
+        <div class="input-wrap has-icon">
+          <span class="input-icon">&#128272;</span>
+          <input type="password" id="logPassword" placeholder="Sifrenizi girin" autocomplete="current-password" onkeydown="if(event.key==='Enter')handleLogin()" />
+          <button class="toggle-pw" onclick="togglePw('logPassword',this)" type="button">&#128065;</button>
+        </div>
+      </div>
+      <button class="btn-submit" id="loginBtn" onclick="handleLogin()">
+        <span>&#9889;</span> Giris Yap
+      </button>
+      <div class="error-msg" id="logError"></div>
+    </div>
+
+    <!-- REGISTER -->
+    <div class="form-section" id="formRegister">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Ad</label>
+          <input type="text" id="regName" placeholder="Adiniz" autocomplete="given-name" />
+        </div>
+        <div class="form-group">
+          <label>Soyad</label>
+          <input type="text" id="regSurname" placeholder="Soyadiniz" autocomplete="family-name" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label>E-posta</label>
+        <div class="input-wrap has-icon">
+          <span class="input-icon">&#128140;</span>
+          <input type="email" id="regEmail" placeholder="eposta@ornek.com" autocomplete="email" oninput="validateEmail()" />
+        </div>
+        <div class="field-check" id="emailCheck"></div>
+      </div>
+      <div class="form-group">
+        <label>Kullanici Adi</label>
+        <div class="input-wrap has-icon">
+          <span class="input-icon">&#64;</span>
+          <input type="text" id="regUsername" placeholder="benzersiz_kullanici_adi" autocomplete="username" oninput="validateUsername()" />
+        </div>
+        <div class="field-check" id="usernameCheck"></div>
+      </div>
+      <div class="form-group">
+        <label>Dogum Tarihi</label>
+        <input type="date" id="regDob" style="cursor:pointer;color:var(--text2)" />
+      </div>
+      <div class="form-group">
+        <label>Sifre</label>
+        <div class="input-wrap has-icon">
+          <span class="input-icon">&#128272;</span>
+          <input type="password" id="regPassword" placeholder="En az 6 karakter" autocomplete="new-password" oninput="onRegPwInput()" />
+          <button class="toggle-pw" onclick="togglePw('regPassword',this)" type="button">&#128065;</button>
+        </div>
+        <div class="pw-strength">
+          <div class="pw-bars">
+            <div class="pw-bar" id="rb1"></div><div class="pw-bar" id="rb2"></div>
+            <div class="pw-bar" id="rb3"></div><div class="pw-bar" id="rb4"></div>
+          </div>
+          <div class="pw-hint"><span id="pwStrLabel"></span><span id="pwStrPct"></span></div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Sifre Tekrar</label>
+        <div class="input-wrap has-icon">
+          <span class="input-icon">&#128275;</span>
+          <input type="password" id="regConfirm" placeholder="Sifreyi tekrar girin" autocomplete="new-password" oninput="validateConfirm()" />
+          <button class="toggle-pw" onclick="togglePw('regConfirm',this)" type="button">&#128065;</button>
+        </div>
+        <div class="field-check" id="confirmCheck"></div>
+      </div>
+      <div class="terms-row">
+        <input type="checkbox" class="terms-check" id="termsCheck" />
+        <label for="termsCheck" class="terms-text">Hizmeti kullanarak <a href="#">Kullanim Sartlarini</a> kabul etmis olursunuz. Verileriniz yalnizca bu cihazda saklanir.</label>
+      </div>
+      <button class="btn-submit" id="registerBtn" onclick="handleRegister()">
+        <span>&#127775;</span> Hesap Olustur
+      </button>
+      <div class="error-msg" id="regError"></div>
+
+      <div class="features">
+        <div class="feat"><span class="feat-icon">&#128197;</span> Takvim takibi</div>
+        <div class="feat"><span class="feat-icon">&#127919;</span> Haftalik hedefler</div>
+        <div class="feat"><span class="feat-icon">&#127882;</span> Yillik planlama</div>
+        <div class="feat"><span class="feat-icon">&#128218;</span> Kisisel gunluk</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+
+  function switchTab(tab) {
+    ['login','register'].forEach(t => {
+      document.getElementById('tab'+capitalize(t)).classList.toggle('active', t===tab);
+      document.getElementById('form'+capitalize(t)).classList.toggle('active', t===tab);
+    });
+    document.getElementById('logError').classList.remove('show');
+    document.getElementById('regError').classList.remove('show');
+  }
+  function capitalize(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
+
+  /* Toggle password visibility */
+  function togglePw(id, btn) {
+    const el = document.getElementById(id);
+    const show = el.type === 'password';
+    el.type = show ? 'text' : 'password';
+    btn.textContent = show ? '&#128683;' : '&#128065;';
+    btn.innerHTML   = show ? '&#128683;' : '&#128065;';
+  }
+
+  /* Email validation */
+  function validateEmail() {
+    const val = document.getElementById('regEmail').value.trim();
+    const chk = document.getElementById('emailCheck');
+    if(!val) { chk.textContent=''; return; }
+    const ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
+    chk.className = 'field-check ' + (ok ? 'fc-ok' : 'fc-err');
+    chk.textContent = ok ? '✓ Gecerli e-posta' : '✗ Gecerli bir e-posta girin';
+  }
+
+  /* Username validation */
+  function validateUsername() {
+    const val = document.getElementById('regUsername').value.trim().toLowerCase();
+    const chk = document.getElementById('usernameCheck');
+    if(!val) { chk.textContent=''; return; }
+    if(val.length < 3) { chk.className='field-check fc-err'; chk.textContent='✗ En az 3 karakter olmali'; return; }
+    if(!/^[a-z0-9_]+$/.test(val)) { chk.className='field-check fc-err'; chk.textContent='✗ Sadece harf, rakam ve alt cizgi'; return; }
+    const users = JSON.parse(localStorage.getItem('gtk_users')||'{}');
+    if(users[val]) { chk.className='field-check fc-err'; chk.textContent='✗ Bu kullanici adi alinmis'; return; }
+    chk.className='field-check fc-ok'; chk.textContent='✓ Kullanilabilir';
+  }
+
+  /* Password strength */
+  function onRegPwInput() {
+    const pw = document.getElementById('regPassword').value;
+    let score = 0;
+    if(pw.length>=6) score++;
+    if(pw.length>=10) score++;
+    if(/[A-Z]/.test(pw)&&/[0-9]/.test(pw)) score++;
+    if(/[^A-Za-z0-9]/.test(pw)) score++;
+    const cls   = ['','s1','s2','s3','s4'];
+    const names = ['','Zayif','Orta','Iyi','Guclu'];
+    const pcts  = ['','25%','50%','75%','100%'];
+    ['rb1','rb2','rb3','rb4'].forEach((id,i) => {
+      document.getElementById(id).className = 'pw-bar' + (i<score?' '+cls[score]:'');
+    });
+    document.getElementById('pwStrLabel').textContent = pw.length>0 ? (names[score]||'') : '';
+    document.getElementById('pwStrPct').textContent   = pw.length>0 ? (pcts[score]||'')  : '';
+    validateConfirm();
+  }
+
+  /* Confirm password */
+  function validateConfirm() {
+    const pw  = document.getElementById('regPassword').value;
+    const pw2 = document.getElementById('regConfirm').value;
+    const chk = document.getElementById('confirmCheck');
+    if(!pw2) { chk.textContent=''; return; }
+    if(pw===pw2) { chk.className='field-check fc-ok'; chk.textContent='✓ Sifreler eslesiyor'; }
+    else          { chk.className='field-check fc-err'; chk.textContent='✗ Sifreler eslesmiyor'; }
+  }
+
+  function showErr(id, msg) {
+    const el = document.getElementById(id);
+    el.textContent = msg; el.classList.add('show');
+  }
+  function hideErr(id) { document.getElementById(id).classList.remove('show'); }
+
+  /* REGISTER */
+  async function handleRegister() {
+    hideErr('regError');
+    const name     = document.getElementById('regName').value.trim();
+    const surname  = document.getElementById('regSurname').value.trim();
+    const email    = document.getElementById('regEmail').value.trim();
+    const username = document.getElementById('regUsername').value.trim().toLowerCase();
+    const dob      = document.getElementById('regDob').value;
+    const password = document.getElementById('regPassword').value;
+    const confirm  = document.getElementById('regConfirm').value;
+    const terms    = document.getElementById('termsCheck').checked;
+
+    if(!name||!surname)     { showErr('regError','Ad ve soyad alanlari bos birakilamaz.'); return; }
+    if(!email)              { showErr('regError','E-posta adresi gereklidir.'); return; }
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showErr('regError','Gecerli bir e-posta adresi girin.'); return; }
+    if(!username||username.length<3) { showErr('regError','Kullanici adi en az 3 karakter olmali.'); return; }
+    if(!/^[a-z0-9_]+$/.test(username)) { showErr('regError','Kullanici adi sadece harf, rakam ve _ icerabilir.'); return; }
+    if(password.length<6)  { showErr('regError','Sifre en az 6 karakter olmali.'); return; }
+    if(password!==confirm)  { showErr('regError','Sifreler eslesmiyor.'); return; }
+    if(!terms)              { showErr('regError','Kullanim sartlarini kabul etmelisiniz.'); return; }
+
+    const btn = document.getElementById('registerBtn');
+    btn.disabled = true; btn.innerHTML = '&#8987; Olusturuluyor...';
+
+    try {
+        await window.createUserWithEmailAndPassword(window.firebaseAuth, email, password);
+        // Save initial profile to localStorage so firebase_sync will push it to Firestore
+        localStorage.setItem('gtk_session', username);
+        localStorage.setItem('gtk_profile', JSON.stringify({ fn: name, ln: surname, email, bd: dob }));
+        window.location.href = 'index.html';
+    } catch (error) {
+        btn.disabled = false; btn.innerHTML = '<span>&#127775;</span> Hesap Olustur';
+        let msg = 'Bir hata olustu.';
+        if (error.code === 'auth/email-already-in-use') msg = 'Bu e-posta adresi zaten kullanimda.';
+        else if (error.code === 'auth/weak-password') msg = 'Sifre cok zayif.';
+        showErr('regError', msg);
+    }
+  }
+
+  /* LOGIN */
+  async function handleLogin() {
+    hideErr('logError');
+    const email = document.getElementById('logUsername').value.trim();
+    const password = document.getElementById('logPassword').value;
+    if(!email||!password) { showErr('logError','E-posta ve sifre gereklidir.'); return; }
+
+    const btn = document.getElementById('loginBtn');
+    btn.disabled = true; btn.innerHTML = '&#8987; Giris yapiliyor...';
+
+    try {
+        await window.signInWithEmailAndPassword(window.firebaseAuth, email, password);
+        window.location.href = 'index.html';
+    } catch (error) {
+        btn.disabled = false; btn.innerHTML = '<span>&#9889;</span> Giris Yap';
+        let msg = 'Giris basarisiz.';
+        if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+            msg = 'E-posta veya sifre hatali.';
+        }
+        showErr('logError', msg);
+    }
+  }
+
+  /* Enter key on login */
+  document.getElementById('logPassword').addEventListener('keydown', e => {
+    if(e.key==='Enter') handleLogin();
+  });
+</script>
+</body>
+</html>

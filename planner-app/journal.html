@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gunluk — Gelisim Takibi</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:        #080812;
+      --surface:   rgba(255,255,255,0.035);
+      --surface2:  rgba(255,255,255,0.07);
+      --border:    rgba(255,255,255,0.07);
+      --border2:   rgba(255,255,255,0.13);
+      --border3:   rgba(255,255,255,0.22);
+      --text:      #eaeaf8;
+      --text2:     #8888aa;
+      --text3:     #44446a;
+      --accent:    #7c5cfc;
+      --accent2:   #4e8cff;
+      --cyan:      #00d4ff;
+      --green:     #00e5a0;
+      --green-bg:  rgba(0,229,160,0.13);
+      --red:       #ff4d6d;
+      --red-bg:    rgba(255,77,109,0.13);
+      --yellow:    #ffcd47;
+      --yellow-bg: rgba(255,205,71,0.13);
+      /* Journal warm palette */
+      --warm:      #f59e0b;
+      --warm2:     #fb923c;
+      --warm3:     #fde68a;
+      --warm-bg:   rgba(245,158,11,0.10);
+      --warm-bg2:  rgba(245,158,11,0.05);
+      --paper:     rgba(255,248,230,0.04);
+      --paper2:    rgba(255,248,230,0.07);
+      --ink:       #f5f0e8;
+      --sb-w:      300px;
+      --r:18px; --rs:12px; --rx:8px;
+    }
+    html { scroll-behavior:smooth; }
+    body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; overflow-x:hidden; }
+
+    /* BLOBS — warmer tones for journal */
+    .bg-scene { position:fixed; inset:0; pointer-events:none; z-index:0; overflow:hidden; }
+    .blob { position:absolute; border-radius:50%; filter:blur(130px); opacity:.10; animation:fb 20s ease-in-out infinite; }
+    .b1{width:650px;height:650px;background:#f59e0b;top:-180px;left:-120px;animation-delay:0s}
+    .b2{width:420px;height:420px;background:#7c5cfc;bottom:-80px;right:-80px;animation-delay:8s}
+    .b3{width:300px;height:300px;background:#fb923c;top:50%;left:58%;animation-delay:14s}
+    @keyframes fb{0%,100%{transform:translate(0,0) scale(1)}40%{transform:translate(35px,-35px) scale(1.05)}70%{transform:translate(-20px,20px) scale(.95)}}
+
+    /* HAMBURGER */
+    .hamburger {
+      position:fixed; top:18px; left:18px; z-index:200;
+      background:linear-gradient(135deg,var(--warm),var(--warm2));
+      border:none; border-radius:12px; color:#fff;
+      width:42px; height:42px; font-size:18px;
+      cursor:pointer; display:flex; align-items:center; justify-content:center;
+      box-shadow:0 4px 20px rgba(245,158,11,.4);
+      transition:transform .2s, box-shadow .2s;
+    }
+    .hamburger:hover { transform:scale(1.08); box-shadow:0 6px 28px rgba(245,158,11,.6); }
+
+    /* SIDEBAR BACKDROP */
+    .sb-backdrop {
+      position:fixed; inset:0; background:rgba(0,0,0,.55);
+      backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px);
+      z-index:149; opacity:0; pointer-events:none; transition:opacity .3s;
+    }
+    .sb-backdrop.open { opacity:1; pointer-events:auto; }
+
+    /* SIDEBAR */
+    .sidebar {
+      position:fixed; top:0; left:0; bottom:0; width:var(--sb-w);
+      background:rgba(9,9,22,0.98);
+      border-right:1px solid rgba(255,255,255,0.09);
+      backdrop-filter:blur(30px); -webkit-backdrop-filter:blur(30px);
+      z-index:150; transform:translateX(-100%);
+      transition:transform .32s cubic-bezier(.4,0,.2,1);
+      display:flex; flex-direction:column; overflow:hidden;
+    }
+    .sidebar.open { transform:translateX(0); }
+
+    .sb-header {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:20px 18px 16px; border-bottom:1px solid var(--border); flex-shrink:0;
+    }
+    .sb-logo {
+      font-size:16px; font-weight:900; letter-spacing:-.4px;
+      background:linear-gradient(130deg,var(--warm),var(--warm2));
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+    }
+    .sb-close {
+      background:var(--surface2); border:1px solid var(--border);
+      color:var(--text2); width:28px; height:28px; border-radius:7px;
+      font-size:13px; cursor:pointer; display:flex; align-items:center; justify-content:center;
+      font-family:'Inter',sans-serif; transition:all .2s;
+    }
+    .sb-close:hover { background:var(--red-bg); border-color:var(--red); color:var(--red); }
+
+    .sb-body { flex:1; overflow-y:auto; padding:16px 14px 20px; }
+    .sb-body::-webkit-scrollbar { width:3px; }
+    .sb-body::-webkit-scrollbar-thumb { background:var(--border2); border-radius:3px; }
+
+    .sb-nav { display:flex; flex-direction:column; gap:3px; margin-bottom:16px; }
+    .sb-nav-item {
+      display:flex; align-items:center; gap:10px; padding:9px 12px;
+      border-radius:var(--rx); text-decoration:none; color:var(--text2);
+      font-size:13px; font-weight:600; transition:all .2s; border:1px solid transparent;
+    }
+    .sb-nav-item:hover { background:var(--surface2); color:var(--text); }
+    .sb-nav-item.sb-active { background:rgba(245,158,11,.15); border-color:rgba(245,158,11,.3); color:var(--warm); }
+    .sb-nav-icon { font-size:15px; flex-shrink:0; }
+
+    .sb-divider { height:1px; background:var(--border); margin:4px 0 14px; }
+    .sb-section-lbl { font-size:9px; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:.8px; margin-bottom:10px; }
+
+    /* Sidebar streak display */
+    .sb-streak-card {
+      background:var(--warm-bg); border:1px solid rgba(245,158,11,.2);
+      border-radius:var(--rs); padding:14px 16px; margin-bottom:12px;
+      display:flex; align-items:center; gap:12px;
+    }
+    .sb-streak-flame { font-size:28px; line-height:1; animation:flicker 2s ease-in-out infinite; }
+    @keyframes flicker{0%,100%{transform:scale(1) rotate(0deg)}30%{transform:scale(1.08) rotate(-2deg)}60%{transform:scale(.95) rotate(2deg)}}
+    .sb-streak-info { flex:1; }
+    .sb-streak-num  { font-size:26px; font-weight:900; color:var(--warm); line-height:1; }
+    .sb-streak-lbl  { font-size:10px; color:var(--text2); font-weight:600; margin-top:2px; }
+
+    .sb-mini-stats { display:grid; grid-template-columns:1fr 1fr; gap:7px; }
+    .sb-mini-chip { background:var(--surface); border:1px solid var(--border); border-radius:var(--rx); padding:10px 12px; }
+    .smc-lbl { font-size:9px; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:.6px; }
+    .smc-val { font-size:18px; font-weight:900; line-height:1; margin-top:3px; }
+    .smc-val.w { color:var(--warm); }
+    .smc-val.g { color:var(--green); }
+    .smc-val.r { color:var(--red); }
+
+    /* MAIN LAYOUT */
+    .app {
+      position:relative; z-index:1;
+      max-width:860px; margin:0 auto;
+      padding:22px 18px 80px 72px;
+    }
+
+    /* PAGE HEADER */
+    .page-header {
+      display:flex; align-items:center; justify-content:space-between;
+      flex-wrap:wrap; gap:14px; padding:18px 22px; border-radius:var(--r); margin-bottom:24px;
+      background:var(--paper); border:1px solid rgba(245,158,11,.12);
+      backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px);
+    }
+    .logo-area { display:flex; flex-direction:column; gap:2px; }
+    .logo-text {
+      font-size:22px; font-weight:900; letter-spacing:-.6px;
+      background:linear-gradient(130deg,var(--warm),var(--warm2));
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+      font-family:'Lora', serif;
+    }
+    .logo-sub { font-size:12px; color:var(--text2); margin-top:2px; font-style:italic; font-family:'Lora',serif; }
+
+    /* DATE NAVIGATOR */
+    .date-nav {
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+      background:var(--paper); border:1px solid rgba(245,158,11,.14);
+      border-radius:var(--r); padding:14px 20px; margin-bottom:20px;
+      backdrop-filter:blur(24px);
+    }
+    .dnav-btn {
+      background:var(--surface2); border:1px solid var(--border2); color:var(--text2);
+      font-family:'Inter',sans-serif; font-size:12px; font-weight:700;
+      padding:9px 16px; border-radius:var(--rs); cursor:pointer; transition:all .2s;
+    }
+    .dnav-btn:hover { border-color:var(--warm); color:var(--warm); background:var(--warm-bg); }
+    .dnav-btn:disabled { opacity:.35; cursor:default; pointer-events:none; }
+
+    .date-center { display:flex; flex-direction:column; align-items:center; gap:5px; flex:1; }
+    .date-main {
+      font-size:20px; font-weight:700; letter-spacing:-.3px; color:var(--ink);
+      font-family:'Lora', serif;
+    }
+    .date-sub  { font-size:12px; color:var(--text2); font-family:'Lora',serif; font-style:italic; }
+    .date-badge {
+      font-size:10px; font-weight:700; padding:3px 10px; border-radius:50px;
+      background:var(--warm-bg); color:var(--warm); border:1px solid rgba(245,158,11,.3);
+    }
+    .date-badge.today-badge { background:rgba(0,229,160,.12); color:var(--green); border-color:rgba(0,229,160,.3); }
+    .date-badge.future-badge { background:var(--surface2); color:var(--text3); border-color:var(--border2); }
+
+    /* Date picker wrapper */
+    .dnav-picker-wrap {
+      position:relative; width:36px; height:36px;
+      background:var(--surface2); border:1px solid var(--border2); border-radius:10px;
+      display:flex; align-items:center; justify-content:center; cursor:pointer;
+      transition:all .2s; flex-shrink:0;
+    }
+    .dnav-picker-wrap:hover { border-color:var(--warm); background:var(--warm-bg); }
+    .dnav-picker-wrap input[type="date"] { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; }
+
+    /* MOOD STRIP */
+    .mood-strip {
+      display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+      background:var(--paper); border:1px solid rgba(245,158,11,.10);
+      border-radius:var(--rs); padding:12px 18px; margin-bottom:20px;
+    }
+    .mood-label { font-size:10px; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:.8px; flex-shrink:0; }
+    .mood-opts  { display:flex; gap:8px; flex-wrap:wrap; }
+    .mood-opt {
+      display:flex; align-items:center; gap:5px; padding:6px 13px;
+      border-radius:50px; border:1px solid var(--border2); background:transparent;
+      cursor:pointer; font-family:'Inter',sans-serif; font-size:12px; font-weight:700;
+      color:var(--text3); transition:all .18s; white-space:nowrap;
+    }
+    .mood-opt:hover { border-color:var(--border3); color:var(--text2); }
+    .mood-opt.mo-active { transform:scale(1.06); }
+    .mood-opt[data-mood="harika"].mo-active      { background:rgba(0,229,160,.15);  border-color:var(--green);  color:var(--green); }
+    .mood-opt[data-mood="iyi"].mo-active         { background:rgba(245,158,11,.15); border-color:var(--warm);   color:var(--warm);  }
+    .mood-opt[data-mood="orta"].mo-active        { background:rgba(78,140,255,.15); border-color:var(--accent2);color:var(--accent2); }
+    .mood-opt[data-mood="zor"].mo-active         { background:rgba(255,205,71,.15); border-color:var(--yellow); color:var(--yellow); }
+    .mood-opt[data-mood="cok-zor"].mo-active     { background:rgba(255,77,109,.15); border-color:var(--red);    color:var(--red);   }
+
+    /* THE JOURNAL CARD — notebook feel */
+    .journal-card {
+      border-radius:var(--r); overflow:hidden;
+      background:var(--paper); border:1px solid rgba(245,158,11,.14);
+      backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px);
+      box-shadow:0 20px 60px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,248,230,.04);
+      margin-bottom:24px; position:relative;
+    }
+
+    /* Top binding line */
+    .journal-card::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:3px;
+      background:linear-gradient(90deg, var(--warm), var(--warm2), var(--warm));
+      opacity:.6;
+    }
+
+    .journal-header {
+      padding:20px 28px 16px;
+      border-bottom:1px solid rgba(245,158,11,.1);
+      display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;
+    }
+    .journal-title-area { display:flex; align-items:center; gap:10px; }
+    .journal-pen-icon { font-size:22px; }
+    .journal-entry-date {
+      font-size:16px; font-weight:600; color:var(--ink);
+      font-family:'Lora',serif; letter-spacing:-.2px;
+    }
+    .journal-word-count { font-size:11px; color:var(--text3); font-style:italic; }
+
+    .journal-save-btn {
+      background:linear-gradient(135deg,var(--warm),var(--warm2));
+      border:none; border-radius:var(--rs); color:#fff;
+      font-family:'Inter',sans-serif; font-size:13px; font-weight:700;
+      padding:9px 20px; cursor:pointer; transition:opacity .2s, transform .2s;
+      display:flex; align-items:center; gap:6px; box-shadow:0 4px 16px rgba(245,158,11,.3);
+    }
+    .journal-save-btn:hover { opacity:.9; transform:translateY(-1px); }
+    .journal-save-btn.saved { background:linear-gradient(135deg,var(--green),#00c486); box-shadow:0 4px 16px rgba(0,229,160,.25); }
+
+    /* The writing area */
+    .journal-writing-area { padding:24px 28px 20px; }
+
+    /* Lined paper effect */
+    .journal-textarea-wrap {
+      position:relative;
+      background:repeating-linear-gradient(
+        transparent,
+        transparent 31px,
+        rgba(245,158,11,.06) 31px,
+        rgba(245,158,11,.06) 32px
+      );
+      border-radius:var(--rx);
+      padding:4px 0;
+    }
+    /* Red margin line */
+    .journal-textarea-wrap::before {
+      content:''; position:absolute; left:44px; top:0; bottom:0; width:1px;
+      background:rgba(255,100,100,.2); z-index:1;
+    }
+
+    .journal-textarea {
+      width:100%; min-height:280px; resize:vertical;
+      background:transparent; border:none; outline:none;
+      color:var(--ink); font-family:'Lora', serif;
+      font-size:16px; line-height:32px;
+      padding:4px 16px 16px 60px;
+      caret-color:var(--warm);
+      letter-spacing:.01em;
+    }
+    .journal-textarea::placeholder {
+      color:rgba(255,248,230,.2);
+      font-style:italic;
+    }
+    .journal-textarea::-webkit-scrollbar { width:4px; }
+    .journal-textarea::-webkit-scrollbar-thumb { background:rgba(245,158,11,.2); border-radius:4px; }
+
+    .journal-footer-row {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:12px 28px 20px; border-top:1px solid rgba(245,158,11,.08);
+      flex-wrap:wrap; gap:10px;
+    }
+    .journal-tags-input {
+      flex:1; min-width:180px; background:transparent; border:none; outline:none;
+      color:var(--text2); font-family:'Inter',sans-serif; font-size:12px;
+      padding:4px 0;
+    }
+    .journal-tags-input::placeholder { color:var(--text3); }
+    .jf-hint { font-size:11px; color:var(--text3); font-style:italic; }
+
+    /* PAST ENTRIES */
+    .entries-section { margin-top:8px; }
+    .entries-header {
+      display:flex; align-items:center; justify-content:space-between;
+      margin-bottom:16px; flex-wrap:wrap; gap:10px;
+    }
+    .entries-title {
+      font-size:16px; font-weight:800; letter-spacing:-.3px; color:var(--ink);
+      font-family:'Lora',serif; display:flex; align-items:center; gap:8px;
+    }
+    .entries-count {
+      font-size:11px; font-weight:700; padding:3px 10px; border-radius:50px;
+      background:var(--warm-bg); color:var(--warm); border:1px solid rgba(245,158,11,.25);
+    }
+
+    /* Search bar */
+    .entries-search-wrap { position:relative; min-width:220px; }
+    .entries-search {
+      width:100%; background:var(--surface2); border:1px solid var(--border2);
+      color:var(--text); font-family:'Inter',sans-serif; font-size:13px;
+      padding:9px 36px 9px 14px; border-radius:var(--rs); outline:none;
+      transition:border-color .2s;
+    }
+    .entries-search:focus { border-color:var(--warm); }
+    .entries-search::placeholder { color:var(--text3); }
+    .entries-search-icon { position:absolute; right:12px; top:50%; transform:translateY(-50%); color:var(--text3); pointer-events:none; font-size:14px; }
+
+    /* Timeline */
+    .timeline { display:flex; flex-direction:column; gap:12px; }
+
+    .entry-card {
+      border-radius:var(--r); overflow:hidden;
+      background:var(--paper2); border:1px solid rgba(245,158,11,.10);
+      transition:border-color .2s, transform .15s, box-shadow .2s;
+      cursor:pointer; position:relative;
+    }
+    .entry-card::before {
+      content:''; position:absolute; left:0; top:0; bottom:0; width:3px; border-radius:3px 0 0 3px;
+    }
+    .entry-card.ec-harika::before   { background:var(--green); }
+    .entry-card.ec-iyi::before      { background:var(--warm); }
+    .entry-card.ec-orta::before     { background:var(--accent2); }
+    .entry-card.ec-zor::before      { background:var(--yellow); }
+    .entry-card.ec-cok-zor::before  { background:var(--red); }
+
+    .entry-card:hover {
+      border-color:rgba(245,158,11,.25);
+      transform:translateX(3px);
+      box-shadow:0 8px 30px rgba(0,0,0,.2);
+    }
+    .entry-card.ec-active {
+      border-color:rgba(245,158,11,.35);
+      background:var(--warm-bg2);
+    }
+
+    .entry-top {
+      display:flex; align-items:flex-start; justify-content:space-between;
+      padding:16px 20px 12px 20px; gap:12px;
+    }
+    .entry-date-col { display:flex; flex-direction:column; gap:3px; }
+    .entry-date-main { font-size:14px; font-weight:700; color:var(--ink); font-family:'Lora',serif; }
+    .entry-date-sub  { font-size:11px; color:var(--text3); font-style:italic; }
+    .entry-mood-badge {
+      font-size:11px; font-weight:700; padding:4px 10px; border-radius:50px; border:1px solid; white-space:nowrap;
+    }
+    .eb-harika  { background:rgba(0,229,160,.12);  border-color:rgba(0,229,160,.3);  color:var(--green);  }
+    .eb-iyi     { background:rgba(245,158,11,.12); border-color:rgba(245,158,11,.3); color:var(--warm);   }
+    .eb-orta    { background:rgba(78,140,255,.12); border-color:rgba(78,140,255,.3); color:var(--accent2); }
+    .eb-zor     { background:rgba(255,205,71,.12); border-color:rgba(255,205,71,.3); color:var(--yellow); }
+    .eb-cok-zor { background:rgba(255,77,109,.12); border-color:rgba(255,77,109,.3); color:var(--red);    }
+
+    .entry-right { display:flex; align-items:center; gap:8px; flex-shrink:0; }
+    .entry-wc    { font-size:10px; color:var(--text3); white-space:nowrap; }
+    .entry-del-btn {
+      width:26px; height:26px; border-radius:6px; border:none; background:transparent;
+      color:var(--text3); cursor:pointer; display:flex; align-items:center; justify-content:center;
+      font-size:13px; transition:all .15s; opacity:0;
+    }
+    .entry-card:hover .entry-del-btn { opacity:1; }
+    .entry-del-btn:hover { background:var(--red-bg); color:var(--red); }
+
+    .entry-preview {
+      padding:0 20px 10px;
+      font-size:13px; color:var(--text2); font-family:'Lora',serif; font-style:italic;
+      line-height:1.7; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+    }
+    .entry-tags-row { padding:0 20px 14px; display:flex; gap:5px; flex-wrap:wrap; }
+    .entry-tag {
+      font-size:10px; font-weight:700; padding:2px 8px; border-radius:50px;
+      background:rgba(245,158,11,.1); color:rgba(245,158,11,.7); border:1px solid rgba(245,158,11,.2);
+    }
+
+    /* Expanded body */
+    .entry-full-body {
+      padding:0 20px 18px 20px;
+      font-size:14px; color:var(--ink); font-family:'Lora',serif;
+      line-height:1.85; border-top:1px solid rgba(245,158,11,.08);
+      margin-top:2px; padding-top:14px;
+      white-space:pre-wrap;
+      display:none;
+    }
+    .entry-card.ec-expanded .entry-preview { display:none; }
+    .entry-card.ec-expanded .entry-full-body { display:block; }
+
+    /* Month separator */
+    .month-sep {
+      display:flex; align-items:center; gap:12px; margin:20px 0 10px;
+    }
+    .month-sep-line { flex:1; height:1px; background:rgba(245,158,11,.12); }
+    .month-sep-label {
+      font-size:11px; font-weight:700; color:var(--warm); text-transform:uppercase;
+      letter-spacing:.8px; font-family:'Lora',serif;
+    }
+
+    /* Empty state */
+    .entries-empty {
+      display:flex; flex-direction:column; align-items:center; gap:12px;
+      padding:60px 20px; text-align:center;
+    }
+    .entries-empty-icon { font-size:48px; animation:float 3s ease-in-out infinite; }
+    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+    .entries-empty-title { font-size:18px; font-weight:700; color:var(--text2); font-family:'Lora',serif; }
+    .entries-empty-sub   { font-size:13px; color:var(--text3); line-height:1.7; max-width:320px; font-style:italic; }
+
+    /* TOAST */
+    .toast {
+      position:fixed; bottom:22px; left:50%; transform:translateX(-50%) translateY(90px);
+      background:#1a1505; border:1px solid rgba(245,158,11,.35); border-radius:50px;
+      padding:10px 22px; font-size:13px; font-weight:700; color:var(--warm); z-index:999;
+      pointer-events:none; white-space:nowrap; box-shadow:0 10px 40px rgba(0,0,0,.5);
+      transition:transform .35s cubic-bezier(.34,1.56,.64,1);
+    }
+    .toast.show { transform:translateX(-50%) translateY(0); }
+
+    /* GLASS */
+    .glass { background:var(--surface); border:1px solid var(--border); backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px); }
+
+    @media(max-width:640px){
+      .app { padding-left:64px; }
+      .journal-textarea-wrap::before { display:none; }
+      .journal-textarea { padding:4px 12px 16px; }
+    }
+    @media(max-width:480px){
+      .mood-opts { gap:5px; }
+      .mood-opt  { font-size:11px; padding:5px 10px; }
+    }
+  </style>
+  <script type="module" src="firebase_sync.js"></script>
+</head>
+<body>
+
+<div class="bg-scene"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div></div>
+
+<!-- Hamburger -->
+<button class="hamburger" id="hamburger" onclick="toggleSidebar()" title="Menu">
+  <svg width="18" height="14" viewBox="0 0 18 14" fill="none">
+    <rect width="18" height="2" rx="1" fill="white"/>
+    <rect y="6" width="14" height="2" rx="1" fill="white"/>
+    <rect y="12" width="18" height="2" rx="1" fill="white"/>
+  </svg>
+</button>
+
+<!-- Sidebar backdrop -->
+<div class="sb-backdrop" id="sbBackdrop"></div>
+
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
+  <div class="sb-header">
+    <div class="sb-logo">&#128218; Gelisim Takibi</div>
+    <button class="sb-close" onclick="closeSidebar()">&#10005;</button>
+  </div>
+  <div class="sb-body">
+    <div class="sb-nav">
+      <a class="sb-nav-item" href="index.html"><span class="sb-nav-icon">&#128197;</span><span>Takvim</span></a>
+      <a class="sb-nav-item" href="chart.html"><span class="sb-nav-icon">&#128202;</span><span>Grafik Analizi</span></a>
+      <a class="sb-nav-item" href="planner.html"><span class="sb-nav-icon">&#128221;</span><span>Gunluk Planlama</span></a>
+      <a class="sb-nav-item" href="weekly.html"><span class="sb-nav-icon">&#127919;</span><span>Haftalik Hedefler</span></a>
+      <a class="sb-nav-item" href="yearly.html"><span class="sb-nav-icon">&#127882;</span><span>Yillik Hedefler</span></a>
+      <a class="sb-nav-item sb-active" href="journal.html"><span class="sb-nav-icon">&#128218;</span><span>Gunluk</span></a>
+    </div>
+
+    <div class="sb-divider"></div>
+    <div class="sb-section-lbl">YAZMA SERiSi</div>
+
+    <div class="sb-streak-card">
+      <div class="sb-streak-flame">&#128293;</div>
+      <div class="sb-streak-info">
+        <div class="sb-streak-num" id="sbStreakNum">0</div>
+        <div class="sb-streak-lbl">gun ust uste</div>
+      </div>
+    </div>
+
+    <div class="sb-mini-stats">
+      <div class="sb-mini-chip"><div class="smc-lbl">Toplam</div><div class="smc-val w" id="sms-total">0</div></div>
+      <div class="sb-mini-chip"><div class="smc-lbl">Bu Ay</div><div class="smc-val w" id="sms-month">0</div></div>
+      <div class="sb-mini-chip"><div class="smc-lbl">Iyi Gun</div><div class="smc-val g" id="sms-good">0</div></div>
+      <div class="sb-mini-chip"><div class="smc-lbl">Zor Gun</div><div class="smc-val r" id="sms-hard">0</div></div>
+    </div>
+
+    <div style="margin-top:16px; padding-top:14px; border-top:1px solid var(--border);">
+      <a class="sb-nav-item" href="#" onclick="doLogout()" style="color:var(--red);">
+        <span class="sb-nav-icon">&#128682;</span> Cikis Yap
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<main class="app">
+
+  <!-- Header -->
+  <header class="page-header">
+    <div class="logo-area">
+      <div class="logo-text">&#128218; Gunluğum</div>
+      <div class="logo-sub">Her gunu kelimelerle dondur, gelisimini izle</div>
+    </div>
+    <div id="headerStreakBadge" style="display:flex;align-items:center;gap:6px;background:var(--warm-bg);border:1px solid rgba(245,158,11,.25);border-radius:50px;padding:8px 16px;">
+      <span style="font-size:16px;">&#128293;</span>
+      <span style="font-size:13px;font-weight:700;color:var(--warm);" id="headerStreak">0 gun</span>
+    </div>
+  </header>
+
+  <!-- Date Navigator -->
+  <div class="date-nav">
+    <button class="dnav-btn" id="btnPrev" onclick="shiftDay(-1)">&larr; Onceki</button>
+    <div class="date-center">
+      <div class="date-main" id="dateMain">Bugun</div>
+      <div class="date-sub"  id="dateSub">10 Eylul 2026, Carsamba</div>
+      <span class="date-badge today-badge" id="dateBadge">Bugun</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <div class="dnav-picker-wrap" title="Tarih Sec">
+        <span style="font-size:17px;pointer-events:none;">&#128197;</span>
+        <input type="date" id="datePicker" />
+      </div>
+      <button class="dnav-btn" id="btnToday" onclick="goToday()" style="font-size:11px;">Bugun</button>
+    </div>
+    <button class="dnav-btn" id="btnNext" onclick="shiftDay(1)">Sonraki &rarr;</button>
+  </div>
+
+  <!-- Mood selector -->
+  <div class="mood-strip">
+    <span class="mood-label">Ruh Hali:</span>
+    <div class="mood-opts" id="moodOpts">
+      <button class="mood-opt" data-mood="harika"   onclick="selectMood('harika')">  &#127775; Harika</button>
+      <button class="mood-opt" data-mood="iyi"      onclick="selectMood('iyi')">     &#128578; Iyi</button>
+      <button class="mood-opt" data-mood="orta"     onclick="selectMood('orta')">    &#128528; Orta</button>
+      <button class="mood-opt" data-mood="zor"      onclick="selectMood('zor')">     &#128533; Zor</button>
+      <button class="mood-opt" data-mood="cok-zor"  onclick="selectMood('cok-zor')"> &#128542; Cok Zor</button>
+    </div>
+  </div>
+
+  <!-- Journal writing card -->
+  <div class="journal-card">
+    <div class="journal-header">
+      <div class="journal-title-area">
+        <span class="journal-pen-icon">&#9997;</span>
+        <span class="journal-entry-date" id="journalEntryDate">10 Eylul 2026</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <span class="journal-word-count" id="wordCount">0 kelime</span>
+        <button class="journal-save-btn" id="saveBtn" onclick="saveEntry()">
+          &#128190; Kaydet
+        </button>
+      </div>
+    </div>
+
+    <div class="journal-writing-area">
+      <div class="journal-textarea-wrap">
+        <textarea
+          id="journalTextarea"
+          class="journal-textarea"
+          placeholder="Bugun nasil gecti? Duygularini, dusuncelerini, yasadikllarini buraya dokebilirsin... Bu sayfa sadece senin."
+          oninput="onTextareaInput()"
+        ></textarea>
+      </div>
+    </div>
+
+    <div class="journal-footer-row">
+      <input type="text" id="tagsInput" class="journal-tags-input" placeholder="Etiketler: spor, is, aile..." />
+      <span class="jf-hint">Enter ile kaydet &middot; Her gun yeni bir sayfa</span>
+    </div>
+  </div>
+
+  <!-- Past entries -->
+  <div class="entries-section">
+    <div class="entries-header">
+      <div class="entries-title">
+        &#128196; Gecmis Sayfalar
+        <span class="entries-count" id="entriesCount">0 kayit</span>
+      </div>
+      <div class="entries-search-wrap">
+        <input type="text" id="entriesSearch" class="entries-search" placeholder="Sayfalarda ara..." oninput="renderEntries()" />
+        <span class="entries-search-icon">&#128269;</span>
+      </div>
+    </div>
+    <div class="timeline" id="timeline"></div>
+  </div>
+
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ═══════════════════════════════════════
+   AUTH GUARD
+═══════════════════════════════════════ */
+const sessionUser = localStorage.getItem('gtk_session');
+
+function doLogout() {
+  if (window.doFirebaseLogout) window.doFirebaseLogout();
+  else {
+    localStorage.removeItem('gtk_session');
+    localStorage.removeItem('gtk_profile');
+    window.location.href = 'auth.html';
+  }
+}
+
+/* ═══════════════════════════════════════
+   CONSTANTS
+═══════════════════════════════════════ */
+const SK_JOURNAL = 'gtk_journal_' + sessionUser;
+
+const TR_MONTHS = ['Ocak','Subat','Mart','Nisan','Mayis','Haziran',
+                   'Temmuz','Agustos','Eylul','Ekim','Kasim','Aralik'];
+const TR_DAYS   = ['Pazar','Pazartesi','Sali','Carsamba','Persembe','Cuma','Cumartesi'];
+
+const MOOD_META = {
+  'harika':  { label:'Harika',  icon:'&#127775;', cls:'harika'  },
+  'iyi':     { label:'Iyi',     icon:'&#128578;', cls:'iyi'     },
+  'orta':    { label:'Orta',    icon:'&#128528;', cls:'orta'    },
+  'zor':     { label:'Zor',     icon:'&#128533;', cls:'zor'     },
+  'cok-zor': { label:'Cok Zor', icon:'&#128542;', cls:'cok-zor' }
+};
+
+/* ═══════════════════════════════════════
+   STATE
+═══════════════════════════════════════ */
+let journal = JSON.parse(localStorage.getItem(SK_JOURNAL) || '{}');
+// journal structure: { "YYYY-MM-DD": { text, mood, tags, savedAt, wordCount } }
+
+let currentDate = todayDate();
+let currentMood = null;
+let isDirty     = false;
+
+/* ═══════════════════════════════════════
+   DATE UTILS
+═══════════════════════════════════════ */
+function todayDate() {
+  const d = new Date(); d.setHours(0,0,0,0); return d;
+}
+
+function dateKey(d) {
+  return d.getFullYear() + '-' +
+    String(d.getMonth()+1).padStart(2,'0') + '-' +
+    String(d.getDate()).padStart(2,'0');
+}
+
+function parseKey(k) {
+  const p = k.split('-');
+  return new Date(+p[0], +p[1]-1, +p[2]);
+}
+
+function fmtLong(d) {
+  return d.getDate() + ' ' + TR_MONTHS[d.getMonth()] + ' ' + d.getFullYear();
+}
+
+function isSameDay(a,b) {
+  return a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate();
+}
+
+function isToday(d) { return isSameDay(d, todayDate()); }
+function isFuture(d){ return d > todayDate(); }
+
+/* ═══════════════════════════════════════
+   STORAGE
+═══════════════════════════════════════ */
+function saveJournal() {
+  localStorage.setItem(SK_JOURNAL, JSON.stringify(journal));
+}
+
+/* ═══════════════════════════════════════
+   UTILS
+═══════════════════════════════════════ */
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._t);
+  t._t = setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+function countWords(text) {
+  return text.trim() ? text.trim().split(/\s+/).length : 0;
+}
+
+function escHtml(s) {
+  if(!s)return'';
+  return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[m]));
+}
+
+/* ═══════════════════════════════════════
+   MOOD SELECTION
+═══════════════════════════════════════ */
+function selectMood(mood) {
+  currentMood = mood;
+  document.querySelectorAll('.mood-opt').forEach(btn => {
+    btn.classList.toggle('mo-active', btn.dataset.mood === mood);
+  });
+  isDirty = true;
+}
+
+function setMoodUI(mood) {
+  currentMood = mood || null;
+  document.querySelectorAll('.mood-opt').forEach(btn => {
+    btn.classList.toggle('mo-active', mood && btn.dataset.mood === mood);
+  });
+}
+
+/* ═══════════════════════════════════════
+   NAVIGATION
+═══════════════════════════════════════ */
+function shiftDay(dir) {
+  if(isDirty) { autoSave(); }
+  const d = new Date(currentDate);
+  d.setDate(d.getDate() + dir);
+  if(d > todayDate()) { showToast('Gelecege gidemezsin!'); return; }
+  currentDate = d;
+  loadDay();
+}
+
+function goToday() {
+  if(isDirty) autoSave();
+  currentDate = todayDate();
+  loadDay();
+}
+
+document.getElementById('datePicker').addEventListener('change', (e) => {
+  if(!e.target.value) return;
+  const p = e.target.value.split('-');
+  const d = new Date(+p[0], +p[1]-1, +p[2]);
+  if(d > todayDate()) { showToast('Gelecege gidemezsin!'); e.target.value=''; return; }
+  if(isDirty) autoSave();
+  currentDate = d;
+  loadDay();
+});
+
+/* ═══════════════════════════════════════
+   LOAD DAY
+═══════════════════════════════════════ */
+function loadDay() {
+  const key     = dateKey(currentDate);
+  const entry   = journal[key] || null;
+  const future  = isFuture(currentDate);
+  const today   = isToday(currentDate);
+
+  /* Date display */
+  document.getElementById('dateMain').textContent = today ? 'Bugun' :
+    fmtLong(currentDate);
+  document.getElementById('dateSub').textContent  =
+    fmtLong(currentDate) + ', ' + TR_DAYS[currentDate.getDay()];
+  document.getElementById('journalEntryDate').textContent = fmtLong(currentDate);
+
+  const badge = document.getElementById('dateBadge');
+  badge.textContent  = today ? 'Bugun' : future ? 'Gelecek' : 'Gecmis';
+  badge.className    = 'date-badge ' + (today ? 'today-badge' : future ? 'future-badge' : '');
+
+  /* Date picker */
+  document.getElementById('datePicker').value = key;
+
+  /* Buttons */
+  document.getElementById('btnNext').disabled = today;
+  document.getElementById('btnToday').style.display = today ? 'none' : '';
+
+  /* Load entry */
+  const ta = document.getElementById('journalTextarea');
+  ta.value = entry ? (entry.text || '') : '';
+  setMoodUI(entry ? entry.mood : null);
+  document.getElementById('tagsInput').value = entry ? (entry.tags || '') : '';
+  document.getElementById('wordCount').textContent = countWords(ta.value) + ' kelime';
+
+  /* Textarea disabled for future */
+  ta.disabled = future;
+  ta.style.opacity = future ? '.4' : '1';
+  document.getElementById('saveBtn').style.display = future ? 'none' : '';
+
+  isDirty = false;
+  updateSaveBtnState(false);
+  renderEntries();
+  updateSidebarStats();
+}
+
+/* ═══════════════════════════════════════
+   TEXTAREA INPUT
+═══════════════════════════════════════ */
+function onTextareaInput() {
+  const val = document.getElementById('journalTextarea').value;
+  document.getElementById('wordCount').textContent = countWords(val) + ' kelime';
+  isDirty = true;
+  updateSaveBtnState(false);
+}
+
+function updateSaveBtnState(saved) {
+  const btn = document.getElementById('saveBtn');
+  if(saved) {
+    btn.className = 'journal-save-btn saved';
+    btn.innerHTML = '&#10003; Kaydedildi';
+    setTimeout(() => {
+      btn.className = 'journal-save-btn';
+      btn.innerHTML = '&#128190; Kaydet';
+    }, 1800);
+  }
+}
+
+/* ═══════════════════════════════════════
+   SAVE ENTRY
+═══════════════════════════════════════ */
+function saveEntry() {
+  const key  = dateKey(currentDate);
+  const text = document.getElementById('journalTextarea').value.trim();
+  const tags = document.getElementById('tagsInput').value.trim();
+
+  if(!text && !currentMood) { showToast('Bir sey yaz ya da ruh halini sec'); return; }
+
+  if(!journal[key]) journal[key] = {};
+  journal[key].text      = text;
+  journal[key].mood      = currentMood;
+  journal[key].tags      = tags;
+  journal[key].savedAt   = Date.now();
+  journal[key].wordCount = countWords(text);
+  journal[key].date      = key;
+
+  saveJournal();
+  isDirty = false;
+  updateSaveBtnState(true);
+  renderEntries();
+  updateSidebarStats();
+  showToast('&#128218; Sayfa kaydedildi');
+}
+
+function autoSave() {
+  const text = document.getElementById('journalTextarea').value.trim();
+  if(!text && !currentMood) { isDirty = false; return; }
+  saveEntry();
+}
+
+/* Ctrl+S shortcut */
+document.addEventListener('keydown', e => {
+  if((e.ctrlKey || e.metaKey) && e.key === 's') {
+    e.preventDefault();
+    if(!isFuture(currentDate)) saveEntry();
+  }
+});
+
+/* Enter in tags = save */
+document.getElementById('tagsInput').addEventListener('keydown', e => {
+  if(e.key === 'Enter') saveEntry();
+});
+
+/* ═══════════════════════════════════════
+   RENDER ENTRIES TIMELINE
+═══════════════════════════════════════ */
+function renderEntries() {
+  const q    = (document.getElementById('entriesSearch').value || '').toLowerCase().trim();
+  const all  = Object.values(journal).sort((a,b) => (b.date||'').localeCompare(a.date||''));
+  const filtered = q ? all.filter(e =>
+    (e.text||'').toLowerCase().includes(q) ||
+    (e.tags||'').toLowerCase().includes(q) ||
+    (e.date||'').includes(q)
+  ) : all;
+
+  document.getElementById('entriesCount').textContent = filtered.length + ' kayit';
+
+  const tl = document.getElementById('timeline');
+  tl.innerHTML = '';
+
+  if(filtered.length === 0) {
+    tl.innerHTML =
+      '<div class="entries-empty">' +
+        '<div class="entries-empty-icon">&#128196;</div>' +
+        '<div class="entries-empty-title">' + (q ? 'Arama sonucu yok' : 'Henuz hic yazi yazmadin') + '</div>' +
+        '<div class="entries-empty-sub">' +
+          (q ? 'Farkli bir anahtar kelime dene.' :
+               'Bugunun duygularini, dusuncelerini yukari yaz.\nHer gece bir sayfa, zamanla bir kitap olur.') +
+        '</div>' +
+      '</div>';
+    return;
+  }
+
+  let lastMonth = null;
+
+  filtered.forEach(entry => {
+    if(!entry.date) return;
+    const d = parseKey(entry.date);
+    const monthKey = entry.date.slice(0,7);
+
+    if(monthKey !== lastMonth) {
+      lastMonth = monthKey;
+      const sep = document.createElement('div');
+      sep.className = 'month-sep';
+      sep.innerHTML =
+        '<div class="month-sep-line"></div>' +
+        '<div class="month-sep-label">' + TR_MONTHS[d.getMonth()] + ' ' + d.getFullYear() + '</div>' +
+        '<div class="month-sep-line"></div>';
+      tl.appendChild(sep);
+    }
+
+    tl.appendChild(buildEntryCard(entry, d));
+  });
+}
+
+function buildEntryCard(entry, d) {
+  const today   = isToday(d);
+  const viewing = isSameDay(d, currentDate);
+  const mood    = entry.mood || null;
+  const mm      = mood ? MOOD_META[mood] : null;
+  const tags    = (entry.tags || '').split(',').map(t => t.trim()).filter(Boolean);
+  const wc      = entry.wordCount || countWords(entry.text || '');
+  const preview = (entry.text || '').slice(0, 140).trim();
+
+  const card = document.createElement('div');
+  card.className = 'entry-card' +
+    (mood  ? ' ec-' + mood  : '') +
+    (today || viewing ? ' ec-active' : '');
+  card.dataset.key = entry.date;
+
+  card.innerHTML =
+    '<div class="entry-top">' +
+      '<div class="entry-date-col">' +
+        '<div class="entry-date-main">' + fmtLong(d) + (today ? ' &bull; Bugun' : '') + '</div>' +
+        '<div class="entry-date-sub">'  + TR_DAYS[d.getDay()] + (entry.savedAt ? ' &middot; ' + fmtTime(entry.savedAt) : '') + '</div>' +
+      '</div>' +
+      '<div class="entry-right">' +
+        (mm ? '<span class="entry-mood-badge eb-' + mm.cls + '">' + mm.icon + ' ' + mm.label + '</span>' : '') +
+        '<span class="entry-wc">' + wc + ' kelime</span>' +
+        '<button class="entry-del-btn" onclick="deleteEntry(event,\'' + entry.date + '\')" title="Sil">&#10005;</button>' +
+      '</div>' +
+    '</div>' +
+    (preview ? '<div class="entry-preview">' + escHtml(preview) + (entry.text && entry.text.length > 140 ? '...' : '') + '</div>' : '') +
+    '<div class="entry-full-body">' + escHtml(entry.text || '') + '</div>' +
+    (tags.length ? '<div class="entry-tags-row">' + tags.map(t => '<span class="entry-tag">#' + escHtml(t) + '</span>').join('') + '</div>' : '');
+
+  card.addEventListener('click', (e) => {
+    if(e.target.closest('.entry-del-btn')) return;
+    const isExpanded = card.classList.contains('ec-expanded');
+    if(isExpanded) {
+      card.classList.remove('ec-expanded');
+    } else {
+      /* Also load this day into editor */
+      if(isDirty) autoSave();
+      const p = entry.date.split('-');
+      currentDate = new Date(+p[0], +p[1]-1, +p[2]);
+      loadDay();
+      /* Scroll to top */
+      document.querySelector('.journal-card').scrollIntoView({behavior:'smooth',block:'start'});
+    }
+  });
+
+  return card;
+}
+
+function fmtTime(ts) {
+  if(!ts) return '';
+  const d = new Date(ts);
+  return String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+}
+
+function deleteEntry(event, key) {
+  event.stopPropagation();
+  if(!confirm('Bu gunluk sayfasini silmek istediğine emin misin?')) return;
+  delete journal[key];
+  saveJournal();
+  if(dateKey(currentDate) === key) {
+    document.getElementById('journalTextarea').value = '';
+    setMoodUI(null);
+    document.getElementById('tagsInput').value = '';
+    document.getElementById('wordCount').textContent = '0 kelime';
+    isDirty = false;
+  }
+  renderEntries();
+  updateSidebarStats();
+  showToast('Sayfa silindi');
+}
+
+/* ═══════════════════════════════════════
+   SIDEBAR STATS
+═══════════════════════════════════════ */
+function updateSidebarStats() {
+  const all    = Object.values(journal);
+  const total  = all.length;
+  const now    = new Date();
+  const monthPfx = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0');
+  const thisMonth = all.filter(e => (e.date||'').startsWith(monthPfx)).length;
+  const goodDays  = all.filter(e => e.mood === 'harika' || e.mood === 'iyi').length;
+  const hardDays  = all.filter(e => e.mood === 'zor' || e.mood === 'cok-zor').length;
+
+  document.getElementById('sms-total').textContent = total;
+  document.getElementById('sms-month').textContent = thisMonth;
+  document.getElementById('sms-good').textContent  = goodDays;
+  document.getElementById('sms-hard').textContent  = hardDays;
+
+  const streak = calcStreak();
+  document.getElementById('sbStreakNum').textContent   = streak;
+  document.getElementById('headerStreak').textContent  = streak + ' gun';
+}
+
+function calcStreak() {
+  let streak = 0;
+  const d = new Date(); d.setHours(0,0,0,0);
+  while(true) {
+    const k = dateKey(d);
+    if(journal[k] && journal[k].text) { streak++; }
+    else { break; }
+    d.setDate(d.getDate() - 1);
+  }
+  return streak;
+}
+
+/* ═══════════════════════════════════════
+   SIDEBAR TOGGLE
+═══════════════════════════════════════ */
+let _sbOpen = false;
+function toggleSidebar() {
+  _sbOpen = !_sbOpen;
+  document.getElementById('sidebar').classList.toggle('open', _sbOpen);
+  document.getElementById('sbBackdrop').classList.toggle('open', _sbOpen);
+}
+function closeSidebar() {
+  _sbOpen = false;
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sbBackdrop').classList.remove('open');
+}
+document.getElementById('sbBackdrop').addEventListener('click', closeSidebar);
+
+/* ═══════════════════════════════════════
+   CROSS-TAB SYNC
+═══════════════════════════════════════ */
+window.addEventListener('storage', e => {
+  if(e.key === SK_JOURNAL) {
+    journal = JSON.parse(e.newValue || '{}');
+    loadDay();
+  }
+});
+
+/* ═══════════════════════════════════════
+   BEFORE UNLOAD — auto save
+═══════════════════════════════════════ */
+window.addEventListener('beforeunload', () => {
+  if(isDirty) autoSave();
+});
+
+/* ═══════════════════════════════════════
+   INIT
+═══════════════════════════════════════ */
+loadDay();
+</script>
+</body>
+</html>

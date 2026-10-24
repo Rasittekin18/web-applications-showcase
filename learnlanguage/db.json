@@ -1,0 +1,130 @@
+{
+  "english": [
+    {
+      "id": "1",
+      "word": "Example",
+      "translation": "Örnek",
+      "sentence": "This is an example sentence.",
+      "srsStage": 1,
+      "nextReviewDate": "2026-09-14T22:40:28.294Z"
+    },
+    {
+      "word": "hi",
+      "translation": "merhaba",
+      "sentence": "",
+      "category": "",
+      "id": "hH8j0s-IZT0",
+      "createdAt": "2026-09-13T22:35:18.578Z",
+      "srsStage": 1,
+      "nextReviewDate": "2026-09-14T22:40:25.596Z"
+    },
+    {
+      "word": "paper",
+      "translation": "kağıt",
+      "sentence": "",
+      "category": "a1",
+      "id": "JG7tWAzoUw4",
+      "createdAt": "2026-09-13T22:35:30.950Z",
+      "srsStage": 1,
+      "nextReviewDate": "2026-09-14T22:40:27.092Z"
+    },
+    {
+      "word": "hallo ",
+      "translation": "merhaba",
+      "sentence": "",
+      "category": "",
+      "id": "aAvA4rAXyDc",
+      "createdAt": "2026-09-13T22:57:45.005Z"
+    },
+    {
+      "word": "explain",
+      "translation": "açıklamak",
+      "sentence": "",
+      "category": "",
+      "id": "aaYyNSlPqVs",
+      "createdAt": "2026-09-13T22:58:00.330Z"
+    },
+    {
+      "word": "fare",
+      "translation": "fare",
+      "sentence": "",
+      "category": "",
+      "id": "88iT8X6Rs1g",
+      "createdAt": "2026-09-13T22:58:31.648Z"
+    },
+    {
+      "word": "de",
+      "translation": "de",
+      "sentence": "",
+      "category": "",
+      "id": "5GzT1spTUlU",
+      "createdAt": "2026-09-13T22:58:37.412Z"
+    },
+    {
+      "word": "a",
+      "translation": "a",
+      "sentence": "",
+      "category": "",
+      "id": "lk9oh_mZUDY",
+      "createdAt": "2026-09-13T22:58:41.552Z"
+    }
+  ],
+  "german": [
+    {
+      "word": "hallo ",
+      "translation": "merhaba",
+      "sentence": "",
+      "id": "NsLTG2vu7Xw",
+      "category": "a1"
+    }
+  ],
+  "journals": [
+    {
+      "date": "2026-09-13",
+      "content": "fdefre",
+      "language": "english",
+      "id": "UAp7Q8Pjox8"
+    }
+  ],
+  "stats": {
+    "xp": 210,
+    "streak": 1,
+    "lastLoginDate": "2026-09-13",
+    "quests": [
+      {
+        "id": "q1",
+        "title": "5 Kelime Ekle",
+        "target": 5,
+        "progress": 5,
+        "completed": true,
+        "type": "words_added"
+      },
+      {
+        "id": "q2",
+        "title": "Quizde 5 Doğru Yap",
+        "target": 5,
+        "progress": 0,
+        "completed": false,
+        "type": "quiz_score"
+      },
+      {
+        "id": "q3",
+        "title": "1 Günlük Yazısı Yaz",
+        "target": 1,
+        "progress": 0,
+        "completed": false,
+        "type": "journal_entries"
+      }
+    ],
+    "lastQuestDate": "2026-09-13"
+  },
+  "languages": [
+    {
+      "id": "NGebg7sL34U",
+      "name": "İngilizce",
+      "color": "#3b82f6"
+    }
+  ],
+  "stories": [],
+  "$schema": "./node_modules/json-server/schema.json"
+}
