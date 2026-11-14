@@ -6,8 +6,10 @@ Fotoğraflarınızı kolayca PDF'e dönüştürün. Sınırsız fotoğraf, tamam
 
 ## ✨ Özellikler
 
-- 📁 Sınırsız fotoğraf yükleme (JPG, PNG, WEBP, BMP, GIF, TIFF)
-- 🖱️ Sürükle-bırak ile sıralama
+- 📁 Sınırsız fotoğraf ve klasör yükleme (sürükle-bırak veya butonla seçim; alt klasörler dahil)
+- 🔢 Otomatik doğal sıralama: klasördeki numaralı dosyaları küçükten büyüğe sıralar (atlamalı sıralar dahil, örn. `1, 2, 3, 5, 6, 7, 10`)
+- ↕️ Sıralama seçenekleri: Doğal Sıra (`1 → 2 → 10`), Ters Sıra (`10 → 2 → 1`), Tarihe Göre ve Özel Sıra
+- 🖱️ Sürükle-bırak ile manuel sıralama
 - ⚙️ PDF ayarları: sayfa boyutu, yönlendirme, kalite, yerleşim
 - 🎨 Arka plan rengi seçimi
 - 🔍 Fotoğraf önizleme (lightbox)
@@ -16,8 +18,8 @@ Fotoğraflarınızı kolayca PDF'e dönüştürün. Sınırsız fotoğraf, tamam
 
 ## 🚀 Kullanım
 
-1. Fotoğrafları sürükle-bırak ya da "Fotoğraf Seç" butonuna tıkla
-2. İstersen sıralamayı değiştir
+1. Fotoğrafları ya da bir klasörü sürükle-bırak yapın, veya "Fotoğraf Seç" / "Klasör Seç" butonuna tıklayın
+2. Klasör içindeki fotoğraflar otomatik olarak doğal sıraya (`1, 2, 3, 5, ..., 10`) göre dizilir; isterseniz sıralama menüsünden veya sürükle-bırak ile düzenleyin
 3. PDF ayarlarını düzenle
 4. "PDF Oluştur & İndir" butonuna bas
 
