@@ -3,6 +3,9 @@ import type { Word } from '../types';
 import { getWords, updateWord, getStats, updateStats, advanceQuest } from '../api';
 import { BrainCircuit, Check, X, RotateCcw, Keyboard, List, Layers, Volume2, Mic } from 'lucide-react';
 import { useLanguages } from '../context/LanguageContext';
+import { calculateSRSNextReview, isWordDueForReview, isWordFromDate } from '../utils/srs';
+import { generateQuizOptions, isAnswerCorrect } from '../utils/quiz';
+import { calculateNewStreak } from '../utils/stats';
 
 type QuizMode = 'all' | 'today' | 'category' | 'srs';
 type QuizType = 'flashcard' | 'multiple_choice' | 'typing' | 'speaking';
@@ -48,18 +51,6 @@ export const Quiz = () => {
   // XP Earned in this session
   const [xpEarned, setXpEarned] = useState(0);
 
-  useEffect(() => {
-    if (languages.length > 0 && !language) {
-      setLanguage(languages[0].id);
-    }
-  }, [languages]);
-
-  useEffect(() => {
-    if (quizState === 'setup' && language) {
-      fetchWordsForSetup();
-    }
-  }, [language, quizState]);
-
   const fetchWordsForSetup = async () => {
     try {
       setLoading(true);
@@ -78,38 +69,27 @@ export const Quiz = () => {
     }
   };
 
-  const isWordFromToday = (word: Word) => {
-    const today = new Date().toISOString().split('T')[0];
-    if (word.createdAt) {
-      return word.createdAt.startsWith(today);
+  useEffect(() => {
+    if (languages.length > 0 && !language) {
+      setLanguage(languages[0].id);
     }
-    const timestamp = parseInt(word.id);
-    if (!isNaN(timestamp) && timestamp > 1000000000000) {
-      return new Date(timestamp).toISOString().split('T')[0] === today;
+  }, [languages, language]);
+
+  useEffect(() => {
+    if (quizState === 'setup' && language) {
+      fetchWordsForSetup();
     }
-    return false;
-  };
-
-  const isWordDueForReview = (word: Word) => {
-    if (!word.nextReviewDate) return true; // Never reviewed
-    return new Date(word.nextReviewDate).getTime() <= Date.now();
-  };
-
-  const generateOptions = (correctTranslation: string, all: Word[]): string[] => {
-    const others = all.filter(w => w.translation !== correctTranslation).sort(() => 0.5 - Math.random()).slice(0, 3);
-    const options = [correctTranslation, ...others.map(w => w.translation)];
-    return options.sort(() => 0.5 - Math.random());
-  };
+  }, [language, quizState]);
 
   const startQuiz = () => {
     let filtered = [...allWords];
     
     if (mode === 'today') {
-      filtered = filtered.filter(isWordFromToday);
+      filtered = filtered.filter(w => isWordFromDate(w));
     } else if (mode === 'category' && selectedCategory) {
       filtered = filtered.filter(w => w.category === selectedCategory);
     } else if (mode === 'srs') {
-      filtered = filtered.filter(isWordDueForReview);
+      filtered = filtered.filter(w => isWordDueForReview(w));
     }
 
     if (filtered.length === 0) {
@@ -124,7 +104,7 @@ export const Quiz = () => {
 
     const generatedQuestions: QuizQuestion[] = selectedWords.map(word => ({
       word,
-      options: quizType === 'multiple_choice' ? generateOptions(word.translation, allWords) : undefined
+      options: quizType === 'multiple_choice' ? generateQuizOptions(word.translation, allWords) : undefined
     }));
     
     setQuestions(generatedQuestions);
@@ -151,29 +131,12 @@ export const Quiz = () => {
   };
 
   const processSRS = async (word: Word, isCorrect: boolean) => {
-    const currentStage = word.srsStage || 0;
-    let newStage = isCorrect ? currentStage + 1 : 0;
-    if (newStage > 5) newStage = 5;
-
-    // Calculate next review date based on stage
-    const now = new Date();
-    let addDays = 0;
-    switch(newStage) {
-      case 0: addDays = 0; break; // Review immediately/tomorrow
-      case 1: addDays = 1; break; // 1 day
-      case 2: addDays = 3; break; // 3 days
-      case 3: addDays = 7; break; // 1 week
-      case 4: addDays = 14; break; // 2 weeks
-      case 5: addDays = 30; break; // 1 month
-    }
-    
-    now.setDate(now.getDate() + addDays);
-    
-    const updatedWord = { ...word, srsStage: newStage, nextReviewDate: now.toISOString() };
+    const { newStage, nextReviewDate } = calculateSRSNextReview(word.srsStage, isCorrect);
+    const updatedWord = { ...word, srsStage: newStage, nextReviewDate };
     await updateWord(language, updatedWord);
   };
 
-  const handleNext = () => {
+  const handleNext = (overrideScore?: number) => {
     if (currentIndex + 1 < questions.length) {
       setCurrentIndex(currentIndex + 1);
       setIsFlipped(false);
@@ -184,13 +147,14 @@ export const Quiz = () => {
       setSpeakingFeedback('none');
       setSpokenText('');
     } else {
-      finishQuiz();
+      finishQuiz(typeof overrideScore === 'number' ? overrideScore : score);
     }
   };
 
   const handleAnswer = async (isCorrect: boolean) => {
+    const nextScore = isCorrect ? score + 1 : score;
     if (isCorrect) {
-      setScore(s => s + 1);
+      setScore(nextScore);
       advanceQuest('quiz_score', 1);
     } else {
       setWrongWords(w => [...w, questions[currentIndex].word]);
@@ -201,31 +165,20 @@ export const Quiz = () => {
     
     // If flashcard, go next immediately. Otherwise, show feedback and wait.
     if (quizType === 'flashcard') {
-      handleNext();
+      handleNext(nextScore);
     }
   };
 
-  const finishQuiz = async () => {
+  const finishQuiz = async (finalScore: number) => {
     setQuizState('results');
     try {
       // Calculate XP: 10 XP per correct answer
-      const earned = score * 10;
+      const earned = finalScore * 10;
       if (earned > 0) {
         setXpEarned(earned);
         const currentStats = await getStats();
-        
-        // Streak logic
         const today = new Date().toISOString().split('T')[0];
-        let newStreak = currentStats.streak;
-        if (currentStats.lastLoginDate !== today) {
-          const yesterday = new Date();
-          yesterday.setDate(yesterday.getDate() - 1);
-          if (currentStats.lastLoginDate === yesterday.toISOString().split('T')[0]) {
-            newStreak += 1; // Logged in yesterday, increment
-          } else {
-            newStreak = 1; // Broken streak
-          }
-        }
+        const { newStreak } = calculateNewStreak(currentStats.lastLoginDate, currentStats.streak, today);
 
         await updateStats({
           xp: currentStats.xp + earned,
@@ -333,7 +286,7 @@ export const Quiz = () => {
         </div>
 
         {mcFeedback !== 'none' && (
-          <button className="btn btn-primary mt-6" style={{ width: '100%', maxWidth: '500px', padding: '1rem' }} onClick={handleNext}>
+          <button className="btn btn-primary mt-6" style={{ width: '100%', maxWidth: '500px', padding: '1rem' }} onClick={() => handleNext()}>
             Sıradaki
           </button>
         )}
@@ -346,7 +299,7 @@ export const Quiz = () => {
       e.preventDefault();
       if (typingFeedback !== 'none' || !typingInput.trim()) return;
       
-      const isCorrect = typingInput.trim().toLowerCase() === word.translation.toLowerCase();
+      const isCorrect = isAnswerCorrect(typingInput, word.translation);
       setTypingFeedback(isCorrect ? 'correct' : 'wrong');
       handleAnswer(isCorrect);
     };
@@ -380,7 +333,7 @@ export const Quiz = () => {
               {typingFeedback === 'wrong' && (
                 <p style={{ color: 'var(--danger)', marginBottom: '0.5rem', fontWeight: 600 }}>Doğru Cevap: {word.translation}</p>
               )}
-              <button type="button" className="btn btn-primary mt-2" onClick={handleNext}>Sıradaki</button>
+              <button type="button" className="btn btn-primary mt-2" onClick={() => handleNext()}>Sıradaki</button>
             </div>
           )}
         </form>
@@ -410,10 +363,10 @@ export const Quiz = () => {
         setSpokenText(transcript);
         
         // Remove punctuation and lowercase for comparison
-        const cleanTarget = word.word.toLowerCase().replace(/[.,/#!$%^&*;:{}=\-_`~()]/g,"");
-        const cleanTranscript = transcript.toLowerCase().replace(/[.,/#!$%^&*;:{}=\-_`~()]/g,"");
+        const cleanTarget = word.word.toLowerCase().replace(/[.,/#!$%^&*;:{}=\-_`~()]/g, '').trim();
+        const cleanTranscript = transcript.toLowerCase().replace(/[.,/#!$%^&*;:{}=\-_`~()]/g, '').trim();
         
-        if (cleanTranscript.includes(cleanTarget) || cleanTarget.includes(cleanTranscript)) {
+        if (cleanTranscript.length > 0 && (cleanTranscript.includes(cleanTarget) || cleanTarget.includes(cleanTranscript))) {
           setSpeakingFeedback('correct');
           handleAnswer(true);
         } else {
@@ -428,9 +381,7 @@ export const Quiz = () => {
       };
 
       recognition.onend = () => {
-        if (speakingFeedback === 'listening') {
-          setSpeakingFeedback('none');
-        }
+        setSpeakingFeedback(prev => (prev === 'listening' ? 'none' : prev));
       };
 
       recognition.start();
@@ -471,7 +422,7 @@ export const Quiz = () => {
                {speakingFeedback === 'wrong' && (
                  <p style={{ color: 'var(--danger)', marginBottom: '1rem', fontWeight: 600 }}>Yanlış telaffuz. Hedef: {word.word}</p>
                )}
-               <button className="btn btn-primary" onClick={handleNext}>Sıradaki</button>
+               <button className="btn btn-primary" onClick={() => handleNext()}>Sıradaki</button>
              </div>
           )}
         </div>

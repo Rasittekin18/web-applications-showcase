@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, Navigate } from 'react-router-dom';
 import { WordCard } from '../components/WordCard';
 import { WordForm } from '../components/WordForm';
 import type { Word } from '../types';
 import { getWords, addWord, updateWord, deleteWord, advanceQuest } from '../api';
-import { Plus } from 'lucide-react';
+import { Plus, Search } from 'lucide-react';
 import { useLanguages } from '../context/LanguageContext';
 
 export const WordList = () => {
@@ -16,26 +16,26 @@ export const WordList = () => {
   const [showForm, setShowForm] = useState(false);
   const [editingWord, setEditingWord] = useState<Word | undefined>();
   const [filterCategory, setFilterCategory] = useState<string>('all');
+  const [searchQuery, setSearchQuery] = useState<string>('');
 
   const currentLang = languages.find(l => l.id === langId);
 
-  useEffect(() => {
-    if (langId) {
-      fetchWords();
-    }
-  }, [langId]);
-
-  const fetchWords = async () => {
+  const fetchWords = useCallback(async () => {
+    if (!langId) return;
     try {
       setLoading(true);
-      const data = await getWords(langId!);
+      const data = await getWords(langId);
       setWords(data);
     } catch (error) {
       console.error('Error fetching words:', error);
     } finally {
       setLoading(false);
     }
-  };
+  }, [langId]);
+
+  useEffect(() => {
+    fetchWords();
+  }, [fetchWords]);
 
   const handleAdd = async (wordData: Omit<Word, 'id'>) => {
     try {
@@ -78,9 +78,15 @@ export const WordList = () => {
   };
 
   const categories = Array.from(new Set(words.map(w => w.category).filter(Boolean))) as string[];
-  const filteredWords = filterCategory === 'all' 
-    ? words 
-    : words.filter(w => w.category === filterCategory);
+  const normalizedQuery = searchQuery.trim().toLowerCase();
+  const filteredWords = words.filter(w => {
+    const matchesCategory = filterCategory === 'all' || w.category === filterCategory;
+    const matchesSearch = !normalizedQuery ||
+      w.word.toLowerCase().includes(normalizedQuery) ||
+      w.translation.toLowerCase().includes(normalizedQuery) ||
+      (w.sentence && w.sentence.toLowerCase().includes(normalizedQuery));
+    return matchesCategory && matchesSearch;
+  });
 
   if (langsLoading) return <div className="container page-enter">Yükleniyor...</div>;
   if (!currentLang) return <Navigate to="/" />;
@@ -96,25 +102,44 @@ export const WordList = () => {
         )}
       </div>
 
-      {!loading && words.length > 0 && categories.length > 0 && (
-        <div className="flex gap-2 mb-6" style={{ flexWrap: 'wrap' }}>
-          <button 
-            className={`btn ${filterCategory === 'all' ? 'btn-primary' : 'btn-outline'}`}
-            style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem' }}
-            onClick={() => setFilterCategory('all')}
-          >
-            Tümü
-          </button>
-          {categories.map(cat => (
-            <button 
-              key={cat}
-              className={`btn ${filterCategory === cat ? 'btn-primary' : 'btn-outline'}`}
-              style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem' }}
-              onClick={() => setFilterCategory(cat)}
-            >
-              {cat}
-            </button>
-          ))}
+      {!loading && words.length > 0 && (
+        <div className="mb-6">
+          <div className="relative mb-4">
+            <Search
+              size={18}
+              style={{ position: 'absolute', left: '0.9rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }}
+            />
+            <input
+              type="text"
+              className="input-field"
+              style={{ paddingLeft: '2.5rem' }}
+              placeholder="Kelime, çeviri veya cümle ara..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+
+          {categories.length > 0 && (
+            <div className="flex gap-2" style={{ flexWrap: 'wrap' }}>
+              <button 
+                className={`btn ${filterCategory === 'all' ? 'btn-primary' : 'btn-outline'}`}
+                style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem' }}
+                onClick={() => setFilterCategory('all')}
+              >
+                Tümü
+              </button>
+              {categories.map(cat => (
+                <button 
+                  key={cat}
+                  className={`btn ${filterCategory === cat ? 'btn-primary' : 'btn-outline'}`}
+                  style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem' }}
+                  onClick={() => setFilterCategory(cat)}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       )}
 

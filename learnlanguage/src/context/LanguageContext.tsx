@@ -1,6 +1,7 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import type { Language } from '../types';
-import { getLanguages } from '../api';
+import { getLanguages, addLanguage } from '../api';
+import { useAuth } from './AuthContext';
 
 interface LanguageContextType {
   languages: Language[];
@@ -17,20 +18,26 @@ const LanguageContext = createContext<LanguageContextType>({
 export const useLanguages = () => useContext(LanguageContext);
 
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { currentUser } = useAuth();
   const [languages, setLanguages] = useState<Language[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchLangs = async () => {
+  const fetchLangs = useCallback(async () => {
+    if (!currentUser) {
+      setLanguages([]);
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
       let data = await getLanguages();
       
-      // Varsayılan dilleri kontrol et ve yoksa ekle
+      // Check default languages and add if empty
       if (data.length === 0) {
-        const { addLanguage } = await import('../api');
         await addLanguage({ id: 'english', name: 'İngilizce', color: '#3b82f6', locale: 'en-US' });
         await addLanguage({ id: 'german', name: 'Almanca', color: '#eab308', locale: 'de-DE' });
-        data = await getLanguages(); // Yeniden çek
+        data = await getLanguages();
       }
       
       setLanguages(data);
@@ -39,11 +46,11 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentUser]);
 
   useEffect(() => {
     fetchLangs();
-  }, []);
+  }, [fetchLangs]);
 
   return (
     <LanguageContext.Provider value={{ languages, loading, refreshLanguages: fetchLangs }}>

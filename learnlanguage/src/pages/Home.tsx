@@ -4,6 +4,7 @@ import { BookOpen, Globe2, BrainCircuit, Flame, Star, Trophy, Gamepad2, Target, 
 import { getStats, getWords, updateStats } from '../api';
 import type { UserStats, Quest } from '../types';
 import { useLanguages } from '../context/LanguageContext';
+import { calculateNewStreak } from '../utils/stats';
 
 export const Home = () => {
   const { languages, loading: langsLoading } = useLanguages();
@@ -26,11 +27,23 @@ export const Home = () => {
       try {
         let userStats = await getStats();
         
-        // Quest Logic
+        // Quest & Streak Logic
         const today = new Date().toISOString().split('T')[0];
+        let needsUpdate = false;
+
         if (userStats.lastQuestDate !== today || !userStats.quests) {
           const newQuests = generateDailyQuests();
           userStats = { ...userStats, quests: newQuests, lastQuestDate: today };
+          needsUpdate = true;
+        }
+
+        const streakResult = calculateNewStreak(userStats.lastLoginDate, userStats.streak, today);
+        if (streakResult.isNewDay) {
+          userStats = { ...userStats, streak: streakResult.newStreak, lastLoginDate: today };
+          needsUpdate = true;
+        }
+
+        if (needsUpdate) {
           await updateStats(userStats);
         }
 

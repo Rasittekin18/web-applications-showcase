@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import type { JournalEntry } from '../types';
 import { getJournals, addJournal, deleteJournal, updateJournal, advanceQuest } from '../api';
 import { Plus, Trash2, Edit2 } from 'lucide-react';
@@ -15,17 +15,7 @@ export const Journal = () => {
   const [language, setLanguage] = useState<string>('all');
   const [date, setDate] = useState(() => new Date().toISOString().split('T')[0]);
 
-  useEffect(() => {
-    if (languages.length > 0 && language === 'english') {
-      setLanguage('all');
-    }
-  }, [languages]);
-
-  useEffect(() => {
-    fetchJournals();
-  }, []);
-
-  const fetchJournals = async () => {
+  const fetchJournals = useCallback(async () => {
     try {
       setLoading(true);
       const data = await getJournals();
@@ -33,12 +23,15 @@ export const Journal = () => {
       setJournals(data.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
     } catch (error) {
       console.error('Error fetching journals:', error);
-      // If endpoint doesn't exist yet, json-server might throw 404, we can handle it gracefully.
       setJournals([]);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchJournals();
+  }, [fetchJournals]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -29,7 +29,7 @@ Her proje kendi alt klasöründe tüm kaynak kodları, bileşenleri ve stil dosy
 
 | # | Proje Adı | Açıklama | Teknoloji Yığını | Klasör Linki |
 | :-: | :--- | :--- | :--- | :-: |
-| 01 | **LearnLanguage App** | İnteraktif alıştırmalar, kelime kartları, günlük tutma ve ilerleme takip modülleri sunan modern dil öğrenme platformu. | React 18, TypeScript, Vite, Firebase Auth/Firestore | [`/learnlanguage`](./learnlanguage) |
+| 01 | **LearnLanguage App** | İnteraktif alıştırmalar, kelime kartları, günlük tutma ve ilerleme takip modülleri sunan modern dil öğrenme platformu. | React 19, TypeScript, Vite, Vitest, Firebase Auth/Firestore | [`/learnlanguage`](./learnlanguage) |
 | 02 | **Photo to PDF Converter** | Kullanıcı fotoğraflarını hiçbir sunucuya göndermeden, tamamen istemci tarafında (tarayıcıda) yüksek çözünürlüklü PDF dokümanlarına dönüştüren yerel araç. | Vanilla JavaScript, HTML5 Canvas, jsPDF, CSS3 | [`/photo-to-pdf`](./photo-to-pdf) |
 | 03 | **Planner & Habit Tracker** | Günlük, haftalık ve yıllık hedeflerin takip edildiği, grafiksel analiz panelleri ve kullanıcı kimlik doğrulama sistemini içeren kişisel gelişim planlayıcısı. | HTML5, CSS3, JavaScript, Firebase Auth / Firestore | [`/planner-app`](./planner-app) |
 

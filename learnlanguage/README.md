@@ -35,7 +35,8 @@ Uygulamayı hemen test etmek için aşağıdaki linke tıklayabilirsiniz:
 - **Frontend:** React, TypeScript, Vite
 - **Styling:** CSS
 - **Backend & Database:** Firebase (Authentication, Firestore)
-- **Routing:** React Router v6
+- **Routing:** React Router v7
+- **Testing:** Vitest
 - **Deployment:** Vercel
 
 ## 🚀 Kurulum (Local'de Çalıştırma)
@@ -54,7 +55,11 @@ Projeyi kendi bilgisayarınızda çalıştırmak isterseniz:
    ```bash
    npm install
    ```
-4. Geliştirme sunucusunu başlatın:
+4. Testleri çalıştırın:
+   ```bash
+   npm run test
+   ```
+5. Geliştirme sunucusunu başlatın:
    ```bash
    npm run dev
    ```

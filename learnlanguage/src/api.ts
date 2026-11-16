@@ -1,6 +1,7 @@
 import { collection, doc, getDocs, getDoc, setDoc, addDoc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { db, auth } from './firebase';
 import type { Word, JournalEntry, UserStats, Language, Story } from './types';
+import { advanceQuestsProgress } from './utils/stats';
 
 const getUserId = () => {
   const uid = auth.currentUser?.uid;
@@ -82,26 +83,16 @@ export const updateStats = async (stats: Partial<UserStats>): Promise<UserStats>
 export const advanceQuest = async (type: 'words_added' | 'quiz_score' | 'journal_entries', amount: number = 1) => {
   try {
     const stats = await getStats();
-    if (!stats.quests) return;
+    if (!stats.quests || stats.quests.length === 0) return;
 
-    let updated = false;
-    const newQuests = stats.quests.map(q => {
-      if (q.type === type && !q.completed) {
-        updated = true;
-        const newProgress = Math.min(q.target, q.progress + amount);
-        const completed = newProgress >= q.target;
-        return { ...q, progress: newProgress, completed };
-      }
-      return q;
-    });
+    const { updatedQuests, xpBonus, hasChanged } = advanceQuestsProgress(stats.quests, type, amount);
 
-    if (updated) {
-      let xpBonus = 0;
-      newQuests.forEach((q, i) => {
-        if (q.completed && !stats.quests![i].completed) xpBonus += 50;
+    if (hasChanged) {
+      await updateStats({
+        ...stats,
+        xp: (stats.xp || 0) + xpBonus,
+        quests: updatedQuests
       });
-
-      await updateStats({ ...stats, xp: (stats.xp || 0) + xpBonus, quests: newQuests });
     }
   } catch (e) {
     console.error('Error advancing quest:', e);
@@ -145,10 +136,32 @@ export const deleteStory = async (id: string): Promise<void> => {
 };
 
 // --- SYSTEM RESET / INIT ---
+const clearCollection = async (path: string) => {
+  const snapshot = await getDocs(collection(db, path));
+  await Promise.all(snapshot.docs.map(d => deleteDoc(d.ref)));
+};
+
 export const factoryReset = async (overrideUid?: string): Promise<void> => {
   const uid = overrideUid || auth.currentUser?.uid;
   if (!uid) throw new Error("Kullanıcı girişi yapılmamış.");
-  
+
+  // Delete all words in every language, then delete language docs
+  const langsSnapshot = await getDocs(collection(db, `users/${uid}/languages`));
+  await Promise.all(
+    langsSnapshot.docs.map(async (langDoc) => {
+      await clearCollection(`users/${uid}/${langDoc.id}`);
+      await deleteDoc(langDoc.ref);
+    })
+  );
+
+  // Also ensure default language collections are cleared even if language doc was missing
+  await Promise.all([
+    clearCollection(`users/${uid}/english`),
+    clearCollection(`users/${uid}/german`),
+    clearCollection(`users/${uid}/journals`),
+    clearCollection(`users/${uid}/stories`),
+  ]);
+
   await setDoc(doc(db, `users/${uid}/stats`, 'main'), {
     xp: 0, streak: 0, lastLoginDate: '', quests: [], lastQuestDate: ''
   });

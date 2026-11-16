@@ -71,8 +71,10 @@ export const Header = () => {
 
         <button 
           onClick={handleLogout} 
-          className="shrink-0 p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors ml-auto" 
+          className="btn-icon danger shrink-0 ml-auto" 
+          style={{ borderRadius: '50%', padding: '0.6rem' }}
           title="Çıkış Yap"
+          aria-label="Çıkış Yap"
         >
           <LogOut size={24} />
         </button>

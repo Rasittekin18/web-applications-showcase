@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { getWords, addWord, addLanguage, factoryReset } from '../api';
 import { Download, Upload, Settings as SettingsIcon, AlertCircle, CheckCircle2, Plus, Loader2, AlertTriangle } from 'lucide-react';
 import { useLanguages } from '../context/LanguageContext';
+import { parseWordCSV } from '../utils/csv';
 
 export const Settings = () => {
   const { languages, refreshLanguages } = useLanguages();
@@ -23,7 +24,7 @@ export const Settings = () => {
     if (languages.length > 0 && !importLang) {
       setImportLang(languages[0].id);
     }
-  }, [languages]);
+  }, [languages, importLang]);
 
   const exportData = async () => {
     try {
@@ -65,38 +66,18 @@ export const Settings = () => {
     reader.onload = async (e) => {
       try {
         const text = e.target?.result as string;
-        const lines = text.split('\n');
+        const parsedWords = parseWordCSV(text);
         
         let successCount = 0;
-        
-        let startIndex = 0;
-        if (lines[0].toLowerCase().includes('word') || lines[0].toLowerCase().includes('kelime')) {
-          startIndex = 1;
-        }
-
-        for (let i = startIndex; i < lines.length; i++) {
-          const line = lines[i].trim();
-          if (!line) continue;
-          
-          const parts = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-          
-          if (parts.length >= 2) {
-            const word = parts[0].replace(/^"|"$/g, '').trim();
-            const translation = parts[1].replace(/^"|"$/g, '').trim();
-            const category = parts.length > 2 ? parts[2].replace(/^"|"$/g, '').trim() : '';
-            const sentence = parts.length > 3 ? parts[3].replace(/^"|"$/g, '').trim() : '';
-            
-            if (word && translation) {
-              await addWord(importLang, {
-                word,
-                translation,
-                category,
-                sentence,
-                srsStage: 0
-              });
-              successCount++;
-            }
-          }
+        for (const item of parsedWords) {
+          await addWord(importLang, {
+            word: item.word,
+            translation: item.translation,
+            category: item.category || '',
+            sentence: item.sentence || '',
+            srsStage: 0
+          });
+          successCount++;
         }
         
         const langObj = languages.find(l => l.id === importLang);
@@ -247,7 +228,7 @@ export const Settings = () => {
             className="input-field" 
             value={apiKey} 
             onChange={e => setApiKey(e.target.value)} 
-            placeholder="Enter your Gemini API Key..."
+            placeholder="AIzaSy..."
           />
         </div>
         <button 
@@ -328,7 +309,7 @@ export const Settings = () => {
                   setStatus({ type: 'success', message: 'Sistem başarıyla sıfırlandı!' });
                   await refreshLanguages();
                   setTimeout(() => window.location.reload(), 1500);
-                } catch (e) {
+                } catch {
                   setStatus({ type: 'error', message: 'Sıfırlama sırasında hata oluştu.' });
                 } finally {
                   setResetting(false);

@@ -119,6 +119,10 @@ export const Games = () => {
   }, [selectedForeign, selectedNative]);
 
   // --- HANGMAN LOGIC ---
+  const isHangmanWon = hangmanWord ? hangmanWord.word.toLowerCase().split('').every(char => 
+    !char.match(/[a-zäöüßğüşöç]/i) || guessedLetters.has(char)
+  ) : false;
+
   const setupHangmanGame = (allWords: Word[]) => {
     const random = allWords[Math.floor(Math.random() * allWords.length)];
     setHangmanWord(random);
@@ -154,11 +158,7 @@ export const Games = () => {
       window.addEventListener('keydown', handleKeyDown);
       return () => window.removeEventListener('keydown', handleKeyDown);
     }
-  }, [mode, lives, guessedLetters, hangmanWord]);
-
-  const isHangmanWon = hangmanWord ? hangmanWord.word.toLowerCase().split('').every(char => 
-    !char.match(/[a-zäöüßğüşöç]/i) || guessedLetters.has(char)
-  ) : false;
+  }, [mode, lives, guessedLetters, hangmanWord, isHangmanWon]);
 
   useEffect(() => {
     if (isHangmanWon && hangmanScore === 0) {
@@ -166,7 +166,7 @@ export const Games = () => {
       setHangmanScore(xp);
       addXp(xp);
     }
-  }, [isHangmanWon]);
+  }, [isHangmanWon, hangmanScore, lives]);
 
 
   // --- RENDERS ---

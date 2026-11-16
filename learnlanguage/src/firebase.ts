@@ -4,8 +4,8 @@ import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: (typeof import.meta !== "undefined" && import.meta.env && import.meta.env.VITE_FIREBASE_API_KEY) || "YOUR_FIREBASE_API_KEY",
-  authDomain: (typeof import.meta !== "undefined" && import.meta.env && import.meta.env.VITE_FIREBASE_AUTH_DOMAIN) || "language-61b3f.firebaseapp.com",
+  apiKey: "AIzaSyCKE2zrl6rACAUI6ku0E3gW8o-cjV9AOBs",
+  authDomain: "language-61b3f.firebaseapp.com",
   projectId: "language-61b3f",
   storageBucket: "language-61b3f.firebasestorage.app",
   messagingSenderId: "344755434082",

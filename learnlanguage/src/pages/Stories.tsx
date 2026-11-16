@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { BookOpen, Plus, Trash2, ChevronLeft } from 'lucide-react';
 import { useLanguages } from '../context/LanguageContext';
 import { getStories, addStory, deleteStory, addWord } from '../api';
@@ -27,11 +27,7 @@ export const Stories = () => {
     }
   }, [languages]);
 
-  useEffect(() => {
-    loadStories();
-  }, []);
-
-  const loadStories = async () => {
+  const loadStories = useCallback(async () => {
     try {
       setLoading(true);
       const data = await getStories();
@@ -41,7 +37,11 @@ export const Stories = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    loadStories();
+  }, [loadStories]);
 
   const handleAddStory = async (e: React.FormEvent) => {
     e.preventDefault();
