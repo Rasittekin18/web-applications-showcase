@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Gelişim Takibi</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="app_common.js"></script>
   <script type="module" src="firebase_sync.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <style>
@@ -67,8 +67,8 @@
     /* ══ SIDEBAR ══ */
     .sidebar {
       position:fixed; top:0; left:0; bottom:0; width:var(--sb-w);
-      background:rgba(9,9,22,0.98);
-      border-right:1px solid rgba(255,255,255,0.09);
+      background:var(--sb-bg, rgba(9,9,22,0.98));
+      border-right:1px solid var(--sb-border, rgba(255,255,255,0.09));
       backdrop-filter:blur(30px); -webkit-backdrop-filter:blur(30px);
       z-index:150;
       transform:translateX(-100%);
@@ -145,7 +145,7 @@
     /* Chart tooltip */
     .chart-tooltip {
       position:absolute; pointer-events:none;
-      background:rgba(18,18,42,.95); border:1px solid var(--border3);
+      background:var(--tooltip-bg, rgba(18,18,42,.95)); border:1px solid var(--border3);
       border-radius:10px; padding:9px 12px; display:none;
       white-space:nowrap; z-index:10;
       box-shadow:0 8px 24px rgba(0,0,0,.5);
@@ -291,13 +291,13 @@
     .overlay.hidden{display:none}
     @keyframes ovIn{from{opacity:0}to{opacity:1}}
     @keyframes mdIn{from{opacity:0;transform:translateY(26px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
-    .modal{background:#12122a;border:1px solid var(--border3);border-radius:22px;padding:26px;width:100%;max-width:460px;position:relative;animation:mdIn .24s ease;box-shadow:0 50px 100px rgba(0,0,0,.65);max-height:94vh;overflow-y:auto}
+    .modal{background:var(--modal-bg, #12122a);border:1px solid var(--border3);border-radius:22px;padding:26px;width:100%;max-width:460px;position:relative;animation:mdIn .24s ease;box-shadow:0 50px 100px rgba(0,0,0,.65);max-height:94vh;overflow-y:auto}
     .modal::-webkit-scrollbar{width:3px}.modal::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
     .modal-title{font-size:18px;font-weight:800;letter-spacing:-.4px;margin-bottom:4px}
     .modal-sub{font-size:12px;color:var(--text2);margin-bottom:20px;line-height:1.5}
     .field{display:flex;flex-direction:column;gap:5px;margin-bottom:13px}
     .field-label{font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.6px}
-    .field-input{background:rgba(255,255,255,.05);border:1px solid var(--border2);border-radius:var(--rs);color:var(--text);font-family:'Inter',sans-serif;font-size:14px;padding:11px 13px;width:100%;outline:none;transition:border-color .2s,box-shadow .2s}
+    .field-input{background:var(--input-bg, rgba(255,255,255,.05));border:1px solid var(--border2);border-radius:var(--rs);color:var(--text);font-family:'Inter',sans-serif;font-size:14px;padding:11px 13px;width:100%;outline:none;transition:border-color .2s,box-shadow .2s}
     .field-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(124,92,252,.15)}
     .field-input::placeholder{color:var(--text3)}
     .btn-primary{width:100%;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;border-radius:var(--rs);font-family:'Inter',sans-serif;font-size:15px;font-weight:800;padding:13px;cursor:pointer;margin-top:6px;transition:opacity .2s,transform .2s}
@@ -318,7 +318,7 @@
     .score-opt:hover.opt-zero .score-opt-icon,.score-opt.active.opt-zero .score-opt-icon{color:var(--yellow)}
     .score-opt:hover.opt-minus .score-opt-icon,.score-opt.active.opt-minus .score-opt-icon{color:var(--red)}
     .note-lbl{font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px;display:block}
-    .note-ta{background:rgba(255,255,255,.05);border:1px solid var(--border2);border-radius:var(--rx);color:var(--text);font-family:'Inter',sans-serif;font-size:13px;padding:9px 11px;width:100%;height:60px;resize:none;outline:none;transition:border-color .2s}
+    .note-ta{background:var(--input-bg, rgba(255,255,255,.05));border:1px solid var(--border2);border-radius:var(--rx);color:var(--text);font-family:'Inter',sans-serif;font-size:13px;padding:9px 11px;width:100%;height:60px;resize:none;outline:none;transition:border-color .2s}
     .note-ta:focus{border-color:var(--accent)}.note-ta::placeholder{color:var(--text3)}
     .tasks-section{border-top:1px solid var(--border);margin-top:14px;padding-top:14px}
     .tasks-hrow{display:flex;justify-content:space-between;align-items:center;margin-bottom:9px}
@@ -326,7 +326,7 @@
     .tasks-ratio{font-size:12px;font-weight:800}
     .tr-full{color:var(--green)}.tr-partial{color:var(--yellow)}.tr-empty{color:var(--text3)}
     .task-add-row{display:flex;gap:6px;margin-bottom:8px}
-    .task-input{flex:1;background:rgba(255,255,255,.05);border:1px solid var(--border2);border-radius:var(--rx);color:var(--text);font-family:'Inter',sans-serif;font-size:13px;padding:7px 10px;outline:none;transition:border-color .2s}
+    .task-input{flex:1;background:var(--input-bg, rgba(255,255,255,.05));border:1px solid var(--border2);border-radius:var(--rx);color:var(--text);font-family:'Inter',sans-serif;font-size:13px;padding:7px 10px;outline:none;transition:border-color .2s}
     .task-input:focus{border-color:var(--accent)}.task-input::placeholder{color:var(--text3)}
     .task-add-btn{background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:var(--rx);color:#fff;font-size:17px;font-weight:900;width:34px;height:34px;cursor:pointer;transition:opacity .2s;display:flex;align-items:center;justify-content:center;flex-shrink:0}
     .task-add-btn:hover{opacity:.85}
@@ -349,7 +349,7 @@
     .btn-save-sc:hover{opacity:.9;transform:translateY(-1px)}
 
     /* TOAST */
-    .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(90px);background:#1a1a36;border:1px solid var(--border3);border-radius:50px;padding:10px 22px;font-size:13px;font-weight:700;color:var(--text);z-index:999;pointer-events:none;white-space:nowrap;box-shadow:0 10px 40px rgba(0,0,0,.5);transition:transform .35s cubic-bezier(.34,1.56,.64,1)}
+    .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(90px);background:var(--toast-bg, #1a1a36);border:1px solid var(--border3);border-radius:50px;padding:10px 22px;font-size:13px;font-weight:700;color:var(--text);z-index:999;pointer-events:none;white-space:nowrap;box-shadow:0 10px 40px rgba(0,0,0,.5);transition:transform .35s cubic-bezier(.34,1.56,.64,1)}
     .toast.show{transform:translateX(-50%) translateY(0)}
 
     /* FIRST RUN */
@@ -362,20 +362,20 @@
     .btn-start:hover{opacity:.9;transform:translateY(-2px)}
 
     @media(max-width:640px){
-      .app{padding-left:64px}
-      .header{padding:14px 14px 14px 8px}
+      .app{padding:70px 14px 60px 14px}
+      .header{padding:14px}
       .month-card{padding:14px 10px}
       .dc{min-height:34px}
     }
   </style>
 </head>
 <body>
-<script>!function(){var u=localStorage.getItem('gtk_session');if(!u)return;var t=JSON.parse(localStorage.getItem('gtk_theme_'+u)||'null');if(!t||!t.vars)return;var r=document.documentElement;Object.keys(t.vars).forEach(function(k){r.style.setProperty(k,t.vars[k]);});if(t.fontSize==='lg')r.style.fontSize='17px';else if(t.fontSize==='sm')r.style.fontSize='13px';}();</script>
+<script>if(window.GTK)GTK.applyTheme();</script>
 
 <div class="bg-scene"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div></div>
 
 <!-- Hamburger -->
-<button class="hamburger" id="hamburger" onclick="toggleSidebar()" title="Grafik Paneli">
+<button class="hamburger" id="hamburger" onclick="toggleSidebar()" title="Menü &amp; Grafik Paneli">
   <svg width="18" height="14" viewBox="0 0 18 14" fill="none">
     <rect width="18" height="2" rx="1" fill="white"/>
     <rect y="6" width="14" height="2" rx="1" fill="white"/>
@@ -393,19 +393,13 @@
     <button class="sb-close" onclick="closeSidebar()">✕</button>
   </div>
   <div class="sb-body">
-    
-    <div style="margin-top:auto;">
-      <a class="sb-nav-item" href="#" onclick="doLogout()" style="color:var(--red);">
-        <span class="sb-nav-icon">🚪</span> Çıkış Yap
-      </a>
-    </div>
-<!-- Navigation -->
+    <!-- Navigation -->
     <div class="sb-nav">
       <a class="sb-nav-item sb-active" href="index.html">
         <span class="sb-nav-icon">📅</span><span>Takvim</span>
       </a>
       <a class="sb-nav-item" href="chart.html">
-        <span class="sb-nav-icon">📈</span><span>Grafik Analizi</span>
+        <span class="sb-nav-icon">📊</span><span>Grafik Analizi</span>
       </a>
       <a class="sb-nav-item" href="planner.html">
         <span class="sb-nav-icon">✅</span><span>Günlük Planlama</span>
@@ -461,6 +455,12 @@
       <div class="sb-mini-chip"><div class="smc-lbl">Normal</div><div class="smc-val y" id="sms-zero">0</div></div>
       <div class="sb-mini-chip"><div class="smc-lbl">🔥 Seri</div><div class="smc-val a" id="sms-streak">0</div></div>
     </div>
+
+    <div style="margin-top:16px; padding-top:14px; border-top:1px solid var(--border);">
+      <a class="sb-nav-item" href="#" onclick="doLogout(); return false;" style="color:var(--red);">
+        <span class="sb-nav-icon">🚪</span> Çıkış Yap
+      </a>
+    </div>
   </div>
 </div>
 
@@ -484,7 +484,7 @@
   <div class="modal">
     <button class="btn-x" id="btnCloseScore">✕</button>
     <div class="modal-title">Günü Yönet</div>
-    <div class="score-day-lbl"><span id="scDate"></span><span class="day-type-badge" id="scDayBadge"></span></div>
+    <div class="score-day-lbl"><span id="scDate"></span><span class="day-type-badge" id="scDayBadge"></span><button type="button" class="btn-edit" onclick="openDayInPlanner()" style="margin-left:auto;font-size:10px;padding:4px 9px;">📝 Planlayıcıda Aç →</button></div>
     <div class="score-trio">
       <button class="score-opt opt-plus"  id="optPlus"  onclick="pickScore('+')"><span class="score-opt-icon">＋</span><span class="score-opt-label">İyi Gün</span></button>
       <button class="score-opt opt-zero"  id="optZero"  onclick="pickScore('0')"><span class="score-opt-icon">○</span><span class="score-opt-label">Normal</span></button>
@@ -513,12 +513,13 @@
 <div class="toast" id="toast"></div>
 
 <script>
-function escHtml(s){if(!s)return'';return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[m]));}
-const sessionUser = localStorage.getItem('gtk_session');
+function escHtml(s){return window.GTK?GTK.escHtml(s):String(s||'');}
+const sessionUser = window.GTK ? GTK.getSessionUser() : localStorage.getItem('gtk_session');
   function doLogout() {
     if (window.doFirebaseLogout) window.doFirebaseLogout();
     else {
       localStorage.removeItem('gtk_session');
+      localStorage.removeItem('gtk_guest_mode');
       localStorage.removeItem('gtk_profile');
       window.location.href = 'auth.html';
     }
@@ -558,7 +559,7 @@ function defaultMonths(y){
   return [0,1,2,3,4,5,6,7,8,9,10,11];
 }
 
-let profile    = JSON.parse(localStorage.getItem(SK_PROF)   || 'null');
+let profile    = window.GTK ? GTK.getProfile() : JSON.parse(localStorage.getItem(SK_PROF) || 'null');
 let scores     = JSON.parse(localStorage.getItem(SK_SC)     || '{}');
 let availYears = JSON.parse(localStorage.getItem(SK_YEARS)  || 'null');
 let yearMonths = JSON.parse(localStorage.getItem(SK_MONTHS) || 'null');
@@ -603,6 +604,8 @@ function getGlobalStats(){
   }
   let streak=0;
   const cd=new Date(TODAY);
+  const todayKey=dk(cd.getFullYear(),cd.getMonth(),cd.getDate());
+  if(scores[todayKey]?.score!=='+'){ cd.setDate(cd.getDate()-1); }
   while(true){
     const k=dk(cd.getFullYear(),cd.getMonth(),cd.getDate());
     if(scores[k]?.score==='+'){streak++;cd.setDate(cd.getDate()-1);}else break;
@@ -679,14 +682,19 @@ function drawChart(hoveredIdx){
   ctx.clearRect(0,0,W,H);
 
   _chartData=prepareChartData();
+  const cs=getComputedStyle(document.documentElement);
+  const cEmpty=cs.getPropertyValue('--canvas-empty').trim()||'rgba(255,255,255,.14)';
+  const cGrid=cs.getPropertyValue('--canvas-grid').trim()||'rgba(255,255,255,.03)';
+  const cZero=cs.getPropertyValue('--canvas-zero').trim()||'rgba(255,255,255,.12)';
+  const cAxis=cs.getPropertyValue('--canvas-axis').trim()||'rgba(255,255,255,.22)';
+  const cDotBorder=cs.getPropertyValue('--canvas-dot-border').trim()||'rgba(9,9,22,.85)';
 
   if(_chartData.length===0){
-    ctx.fillStyle='rgba(255,255,255,.12)';
+    ctx.fillStyle=cEmpty;
     ctx.font='12px Inter,sans-serif';
     ctx.textAlign='center'; ctx.textBaseline='middle';
     ctx.fillText('Henüz puanlanmış gün yok',W/2,H/2-10);
     ctx.font='10px Inter,sans-serif';
-    ctx.fillStyle='rgba(255,255,255,.05)';
     ctx.fillText('Takvimde bir güne tıklayarak başla',W/2,H/2+14);
     if(!_chartReady){ attachChartEvents(); _chartReady=true; }
     return;
@@ -709,7 +717,7 @@ function drawChart(hoveredIdx){
   const zY=yOf(0);
 
   // Grid
-  ctx.strokeStyle='rgba(255,255,255,.03)'; ctx.lineWidth=1;
+  ctx.strokeStyle=cGrid; ctx.lineWidth=1;
   for(let i=0;i<=4;i++){
     const gy=PAD.top+(CH/4)*i;
     ctx.beginPath();ctx.moveTo(PAD.left,gy);ctx.lineTo(PAD.left+CW,gy);ctx.stroke();
@@ -717,10 +725,10 @@ function drawChart(hoveredIdx){
 
   // Zero line
   if(zY>=PAD.top&&zY<=PAD.top+CH){
-    ctx.strokeStyle='rgba(255,255,255,.12)';ctx.setLineDash([4,5]);ctx.lineWidth=1;
+    ctx.strokeStyle=cZero;ctx.setLineDash([4,5]);ctx.lineWidth=1;
     ctx.beginPath();ctx.moveTo(PAD.left,zY);ctx.lineTo(PAD.left+CW,zY);ctx.stroke();
     ctx.setLineDash([]);
-    ctx.fillStyle='rgba(255,255,255,.18)';ctx.font='9px Inter,sans-serif';
+    ctx.fillStyle=cAxis;ctx.font='9px Inter,sans-serif';
     ctx.textAlign='right';ctx.textBaseline='middle';
     ctx.fillText('0',PAD.left-5,zY);
   }
@@ -761,19 +769,19 @@ function drawChart(hoveredIdx){
     const dc=p.score==='+'?'#00e5a0':p.score==='-'?'#ff4d6d':'#ffcd47';
     ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);
     ctx.fillStyle=dc;ctx.fill();
-    ctx.strokeStyle='rgba(9,9,22,.8)';ctx.lineWidth=isHov?2:1.5;ctx.stroke();
+    ctx.strokeStyle=cDotBorder;ctx.lineWidth=isHov?2:1.5;ctx.stroke();
   });
 
   // Crosshair on hover
   if(hoveredIdx!==null&&hoveredIdx>=0&&hoveredIdx<_chartData.length){
     const xi=hoveredIdx+1,x=xOf(xi);
-    ctx.strokeStyle='rgba(255,255,255,.1)';ctx.lineWidth=1;ctx.setLineDash([3,3]);
+    ctx.strokeStyle=cZero;ctx.lineWidth=1;ctx.setLineDash([3,3]);
     ctx.beginPath();ctx.moveTo(x,PAD.top);ctx.lineTo(x,PAD.top+CH);ctx.stroke();
     ctx.setLineDash([]);
   }
 
   // X-axis labels
-  ctx.fillStyle='rgba(255,255,255,.2)';ctx.font='9px Inter,sans-serif';
+  ctx.fillStyle=cAxis;ctx.font='9px Inter,sans-serif';
   ctx.textAlign='center';ctx.textBaseline='top';
   const step=Math.max(1,Math.ceil(_chartData.length/5));
   _chartData.forEach((p,i)=>{
@@ -790,7 +798,7 @@ function drawChart(hoveredIdx){
   yVals.forEach(v=>{
     const y=yOf(v);
     if(y<PAD.top||y>PAD.top+CH)return;
-    ctx.fillStyle='rgba(255,255,255,.18)';
+    ctx.fillStyle=cAxis;
     ctx.fillText(v>0?'+'+v:String(v),PAD.left-5,y);
   });
 
@@ -888,10 +896,11 @@ function render(){
     return;
   }
 
-  const fnStr = profile.fn || profile.name || '';
+  const fnStr = profile.fn || '';
   const lnStr = profile.ln || '';
-  const ini=(fnStr[0]||'')+(lnStr[0]||'');
-  const bdStr = profile.bd || profile.dob || '';
+  const ini = window.GTK ? GTK.getProfileInitials(profile) : ((fnStr[0]||'')+(lnStr[0]||'')).toUpperCase() || '?';
+  const dispName = window.GTK ? GTK.getProfileDisplayName(profile) : ((fnStr+' '+lnStr).trim() || 'Kullanıcı');
+  const bdStr = profile.bd || '';
   const age=calcAge(bdStr);
   const st=getGlobalStats();
   const activeMths=getActiveMonths(selectedYear);
@@ -903,19 +912,20 @@ function render(){
 
   app.innerHTML=`
     <header class="header glass">
-      <div><div class="logo-text">📈 Gelişim Takibi</div><div class="logo-sub">Geçmişe & geleceğe serbestçe kayıt ekle</div></div>
+      <div><div class="logo-text">📈 Gelişim Takibi</div><div class="logo-sub">Geçmişe &amp; geleceğe serbestçe kayıt ekle</div></div>
       <div class="profile-cluster">
         ${age?`<div class="age-row">
           <div class="age-chip"><span class="age-n" id="aY">${age.Y}</span><span class="age-l">Yıl</span></div>
           <div class="age-chip"><span class="age-n" id="aM">${age.M}</span><span class="age-l">Ay</span></div>
           <div class="age-chip"><span class="age-n" id="aD">${age.D}</span><span class="age-l">Gün</span></div>
         </div>`:''}
-        <div class="avatar" onclick="openProfileModal()">${ini.toUpperCase()}</div>
+        <div class="avatar" onclick="openProfileModal()">${escHtml(ini)}</div>
         <div class="profile-meta">
-          <div class="profile-name-txt">${profile.fn} ${profile.ln}</div>
+          <div class="profile-name-txt">${escHtml(dispName)}</div>
           <div class="profile-age-sub">${age?`${age.Y} yaşında`:'—'}</div>
         </div>
         <button class="btn-edit" onclick="openProfileModal()">✏️ Düzenle</button>
+        <button class="btn-edit" onclick="openTodayModal()" style="border-color:rgba(0,212,255,.35);color:var(--cyan);">⚡ Bugünü Yönet</button>
       </div>
     </header>
 
@@ -987,7 +997,7 @@ function renderMonth(year,{m,label,emoji}){
     let th='';
     if(ts){const tc=ts.done===ts.total?'tc-full':ts.done>0?'tc-partial':'tc-zero';th=`<span class="dc-tc ${tc}">${ts.done}/${ts.total}</span>`;}
     const icon=sc?(sc==='+'?'＋':sc==='-'?'−':'○'):'';
-    const tip=entry?.note?`title="${entry.note.replace(/"/g,'&quot;')}"`:entry?.tasks?.length?`title="${entry.tasks.length} görev"`:'' ;
+    const tip=entry?.note?`title="${escHtml(entry.note)}"`:entry?.tasks?.length?`title="${entry.tasks.length} görev"`:'' ;
     cells+=`<div class="${cls}" onclick="openScoreModal(${year},${m},${d})" ${tip}>
       <span class="dc-num">${d}</span>
       ${sc?`<span class="dc-icon">${icon}</span>`:''}
@@ -1090,10 +1100,27 @@ document.getElementById('btnSaveProfile').addEventListener('click',()=>{
   const ln=document.getElementById('iLastName').value.trim();
   const bd=document.getElementById('iBirth').value;
   if(!fn||!ln){toast('❗ Ad ve soyad zorunlu!');return;}
-  profile={fn,ln,bd};saveProf();
+  profile = window.GTK ? GTK.saveProfile({fn,ln,bd}) : Object.assign({}, profile||{}, {fn,ln,bd});
+  if(!window.GTK) saveProf();
   document.getElementById('profileOverlay').classList.add('hidden');
   render();toast('✅ Profil kaydedildi!');
 });
+
+function openTodayModal(){
+  const y=TODAY.getFullYear(), m=TODAY.getMonth(), d=TODAY.getDate();
+  if(!availYears.includes(y)){
+    availYears.push(y); availYears.sort((a,b)=>a-b); saveYears();
+  }
+  if(!yearMonths[y]) yearMonths[y]=defaultMonths(y);
+  if(!yearMonths[y].includes(m)){ yearMonths[y]=[...yearMonths[y],m].sort((a,b)=>a-b); saveMonths(); }
+  selectedYear=y; render();
+  openScoreModal(y,m,d);
+}
+function openDayInPlanner(){
+  if(!_scKey) return;
+  sessionStorage.setItem('gtk_planner_date', _scKey);
+  window.location.href = 'planner.html';
+}
 
 /* ════════════════════════════════════
    SCORE + TASK MODAL
@@ -1118,7 +1145,7 @@ function openScoreModal(y,m,d){
   renderTaskList();
   document.getElementById('scoreOverlay').classList.remove('hidden');
 }
-function pickScore(v){_pickedScore=v;_setActive(v);}
+function pickScore(v){_pickedScore = (_pickedScore===v ? null : v); _setActive(_pickedScore);}
 function _setActive(v){
   ['optPlus','optZero','optMinus'].forEach(id=>document.getElementById(id).classList.remove('active'));
   const mp={'+':'optPlus','0':'optZero','-':'optMinus'};
@@ -1155,10 +1182,10 @@ function commitEntry(){
   const note=document.getElementById('scNote').value.trim();
   if(!_pickedScore&&!note&&_tasks.length===0){toast('❗ En az bir şey ekle!');return;}
   const ex=scores[_scKey]||{};
-  scores[_scKey]={...ex,score:_pickedScore||ex.score||null,note,tasks:_tasks,ts:Date.now()};
+  scores[_scKey]={...ex,score:_pickedScore||null,note,tasks:_tasks,ts:Date.now()};
   saveSc();
   document.getElementById('scoreOverlay').classList.add('hidden');
-  const msgs={'+':'✅ İyi gün!','0':'🟡 Normal gün.','−':'🔴 Kötü gün.',null:'💾 Kaydedildi!'};
+  const msgs={'+':'✅ İyi gün!','0':'🟡 Normal gün.','-':'🔴 Kötü gün.',null:'💾 Kaydedildi!'};
   toast(msgs[_pickedScore]||'💾 Kaydedildi!');
   render();
 }
@@ -1190,11 +1217,15 @@ window.addEventListener('storage', (e) => {
         scores = JSON.parse(e.newValue || '{}');
         render();
         if(!document.getElementById('scoreOverlay').classList.contains('hidden') && _scKey) {
-            _tasks = scores[_scKey]?.tasks || [];
+            _tasks = (scores[_scKey]?.tasks || []).map(t=>({...t}));
             _pickedScore = scores[_scKey]?.score || null;
             renderTaskList();
-            renderTrio();
+            _setActive(_pickedScore);
         }
+    }
+    if(e.key === SK_PROF) {
+        profile = window.GTK ? GTK.getProfile() : JSON.parse(e.newValue || 'null');
+        render();
     }
 });
 

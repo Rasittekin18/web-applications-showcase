@@ -3,17 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Giris Yap — Gelisim Takibi</title>
+  <title>Giriş Yap — Gelişim Takibi</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <script src="app_common.js"></script>
   <style>
     *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
     :root {
       --bg:#080812; --surface:rgba(255,255,255,0.04); --surface2:rgba(255,255,255,0.08);
       --border:rgba(255,255,255,0.08); --border2:rgba(255,255,255,0.14); --border3:rgba(255,255,255,0.24);
-      --text:#eaeaf8; --text2:#8888aa; --text3:#44446a;
+      --text:#eaeaf8; --text2:#8888aa; --text3:#5a5a82;
       --accent:#7c5cfc; --accent2:#4e8cff; --cyan:#00d4ff;
       --green:#00e5a0; --red:#ff4d6d; --yellow:#ffcd47;
+      --modal-bg:#12122a;
       --r:18px; --rs:12px; --rx:8px;
     }
     html { scroll-behavior:smooth; }
@@ -29,20 +31,24 @@
 
     /* CARD */
     .auth-wrap{position:relative;z-index:1;width:100%;max-width:460px}
-    .auth-card{background:rgba(14,14,30,.92);border:1px solid var(--border2);border-radius:22px;padding:32px;box-shadow:0 40px 100px rgba(0,0,0,.6);backdrop-filter:blur(30px)}
+    .auth-card{background:var(--modal-bg);border:1px solid var(--border2);border-radius:22px;padding:32px;box-shadow:0 40px 100px rgba(0,0,0,.55);backdrop-filter:blur(30px)}
 
     /* LOGO */
-    .logo-area{text-align:center;margin-bottom:28px}
+    .logo-area{text-align:center;margin-bottom:26px}
     .logo-icon{font-size:40px;display:block;margin-bottom:10px;animation:float 3s ease-in-out infinite}
     @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
     .logo-title{font-size:26px;font-weight:900;background:linear-gradient(90deg,var(--accent),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:-.5px}
     .logo-sub{font-size:13px;color:var(--text2);margin-top:4px}
 
+    /* NOTICE BANNER */
+    .config-banner{display:none;margin-bottom:18px;padding:11px 14px;border-radius:var(--rs);background:rgba(255,205,71,.1);border:1px solid rgba(255,205,71,.28);color:var(--yellow);font-size:12px;line-height:1.5;font-weight:600}
+    .config-banner.show{display:block}
+
     /* TABS */
-    .auth-tabs{display:grid;grid-template-columns:1fr 1fr;gap:0;background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:var(--rs);padding:4px;margin-bottom:26px}
-    .auth-tab{text-align:center;padding:10px;cursor:pointer;font-weight:700;font-size:14px;color:var(--text2);transition:all .22s;border-radius:var(--rx);border:1px solid transparent}
+    .auth-tabs{display:grid;grid-template-columns:1fr 1fr;gap:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--rs);padding:4px;margin-bottom:24px}
+    .auth-tab{text-align:center;padding:10px;cursor:pointer;font-weight:700;font-size:14px;color:var(--text2);transition:all .22s;border-radius:var(--rx);border:1px solid transparent;background:transparent;font-family:inherit}
     .auth-tab:hover{color:var(--text)}
-    .auth-tab.active{background:var(--surface2);color:var(--text);border-color:var(--border2);box-shadow:0 2px 10px rgba(0,0,0,.3)}
+    .auth-tab.active{background:var(--surface2);color:var(--text);border-color:var(--border2);box-shadow:0 2px 10px rgba(0,0,0,.2)}
 
     /* FORM */
     .form-section{display:none}
@@ -55,19 +61,21 @@
 
     .input-wrap{position:relative}
     .input-wrap .input-icon{position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:15px;pointer-events:none}
-    .input-wrap .toggle-pw{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text3);cursor:pointer;font-size:14px;padding:2px;transition:color .2s}
-    .input-wrap .toggle-pw:hover{color:var(--text2)}
+    .input-wrap .toggle-pw{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text2);cursor:pointer;font-size:14px;padding:2px;transition:color .2s}
+    .input-wrap .toggle-pw:hover{color:var(--text)}
 
     .form-group input{
       width:100%;padding:13px 14px;
-      background:rgba(0,0,0,0.25);border:1px solid var(--border2);border-radius:var(--rs);
+      background:var(--input-bg, rgba(0,0,0,0.25));border:1px solid var(--border2);border-radius:var(--rs);
       color:var(--text);font-family:'Inter',sans-serif;font-size:14px;outline:none;transition:border .2s,box-shadow .2s;
     }
-    .form-group .has-icon input { padding-left: 40px; }
+    .form-group .has-icon input { padding-left: 40px; padding-right: 38px; }
     .form-group input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(124,92,252,.15)}
     .form-group input::placeholder{color:var(--text3)}
-    .form-group input.input-error{border-color:var(--red);box-shadow:0 0 0 3px rgba(255,77,109,.12)}
-    .form-group input.input-ok{border-color:var(--green)}
+
+    .forgot-row{display:flex;justify-content:flex-end;margin:-6px 0 12px}
+    .forgot-btn{background:none;border:none;color:var(--accent);font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;padding:2px 0;transition:opacity .2s}
+    .forgot-btn:hover{opacity:.8;text-decoration:underline}
 
     /* PASSWORD STRENGTH */
     .pw-strength{margin-top:7px}
@@ -77,43 +85,52 @@
     .pw-bar.s2{background:var(--yellow)}
     .pw-bar.s3{background:var(--accent)}
     .pw-bar.s4{background:var(--green)}
-    .pw-hint{font-size:11px;color:var(--text3);margin-top:5px;display:flex;justify-content:space-between}
+    .pw-hint{font-size:11px;color:var(--text2);margin-top:5px;display:flex;justify-content:space-between}
 
-    /* FIELD HINT */
-    .field-hint{font-size:11px;color:var(--text3);margin-top:5px;font-style:italic}
     .field-check{font-size:11px;margin-top:5px;min-height:16px;font-weight:600}
     .fc-ok{color:var(--green)}
     .fc-err{color:var(--red)}
 
     /* DIVIDER */
-    .or-divider{display:flex;align-items:center;gap:12px;margin:18px 0;color:var(--text3);font-size:12px;font-weight:600}
-    .or-divider::before,.or-divider::after{content:'';flex:1;height:1px;background:var(--border)}
+    .or-divider{display:flex;align-items:center;gap:12px;margin:18px 0 14px;color:var(--text3);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px}
+    .or-divider::before,.or-divider::after{content:'';flex:1;height:1px;background:var(--border2)}
 
-    /* SUBMIT */
-    .btn-submit{width:100%;padding:15px;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:var(--rs);color:#fff;font-weight:800;font-size:15px;cursor:pointer;transition:transform .2s,box-shadow .2s,opacity .2s;margin-top:6px;font-family:'Inter',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px}
-    .btn-submit:hover{transform:scale(1.02);box-shadow:0 8px 28px rgba(124,92,252,.5)}
+    /* BUTTONS */
+    .btn-submit{width:100%;padding:14px;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:var(--rs);color:#fff;font-weight:800;font-size:15px;cursor:pointer;transition:transform .2s,box-shadow .2s,opacity .2s;margin-top:6px;font-family:'Inter',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px}
+    .btn-submit:hover{transform:translateY(-1px);box-shadow:0 8px 28px rgba(124,92,252,.45)}
     .btn-submit:disabled{opacity:.6;cursor:not-allowed;transform:none}
 
-    /* ERROR */
-    .error-msg{color:var(--red);font-size:13px;font-weight:600;margin-top:12px;text-align:center;min-height:20px;padding:8px;border-radius:var(--rx);background:var(--red-bg,rgba(255,77,109,.1));display:none}
+    .btn-guest{width:100%;padding:12px 14px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--rs);color:var(--text);font-weight:700;font-size:13px;cursor:pointer;transition:all .2s;font-family:'Inter',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px}
+    .btn-guest:hover{border-color:var(--cyan);color:var(--cyan);background:rgba(0,212,255,.08)}
+    .guest-note{text-align:center;font-size:11px;color:var(--text3);margin-top:8px;line-height:1.5}
+
+    /* MESSAGES */
+    .error-msg{color:var(--red);font-size:13px;font-weight:600;margin-top:12px;text-align:center;min-height:20px;padding:9px 12px;border-radius:var(--rx);background:rgba(255,77,109,.1);border:1px solid rgba(255,77,109,.25);display:none}
     .error-msg.show{display:block;animation:fadeIn .2s}
+    .info-msg{color:var(--green);font-size:13px;font-weight:600;margin-top:12px;text-align:center;padding:9px 12px;border-radius:var(--rx);background:rgba(0,229,160,.1);border:1px solid rgba(0,229,160,.25);display:none}
+    .info-msg.show{display:block;animation:fadeIn .2s}
 
     /* TERMS */
     .terms-row{display:flex;align-items:flex-start;gap:8px;margin:12px 0}
     .terms-check{width:16px;height:16px;flex-shrink:0;margin-top:2px;accent-color:var(--accent);cursor:pointer}
-    .terms-text{font-size:11px;color:var(--text3);line-height:1.6}
-    .terms-text a{color:var(--accent);text-decoration:none}
+    .terms-text{font-size:11px;color:var(--text2);line-height:1.6}
+    .terms-text a{color:var(--accent);text-decoration:none;font-weight:600}
     .terms-text a:hover{text-decoration:underline}
 
-    /* SUCCESS banner */
-    .success-banner{background:rgba(0,229,160,.1);border:1px solid rgba(0,229,160,.3);border-radius:var(--rs);padding:14px;text-align:center;color:var(--green);font-weight:700;font-size:14px;display:none;animation:fadeIn .3s}
-
     /* Feature list */
-    .features{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:16px 0}
-    .feat{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text3)}
+    .features{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px;padding-top:14px;border-top:1px solid var(--border)}
+    .feat{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text2)}
     .feat-icon{font-size:14px}
 
-    @media(max-width:480px){.form-row{grid-template-columns:1fr}.features{grid-template-columns:1fr}}
+    /* MODAL */
+    .overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);z-index:300;display:flex;align-items:center;justify-content:center;padding:16px}
+    .overlay.hidden{display:none}
+    .modal{background:var(--modal-bg);border:1px solid var(--border3);border-radius:20px;padding:24px;width:100%;max-width:420px;position:relative;box-shadow:0 30px 80px rgba(0,0,0,.6)}
+    .modal-title{font-size:17px;font-weight:800;margin-bottom:8px}
+    .modal-body{font-size:13px;color:var(--text2);line-height:1.65;margin-bottom:18px}
+    .btn-x{position:absolute;top:12px;right:12px;background:var(--surface2);border:1px solid var(--border);color:var(--text2);width:28px;height:28px;border-radius:7px;cursor:pointer;font-family:inherit}
+
+    @media(max-width:480px){.form-row{grid-template-columns:1fr}.features{grid-template-columns:1fr}.auth-card{padding:24px 20px}}
   </style>
   <script type="module" src="firebase_sync.js"></script>
 </head>
@@ -125,52 +142,60 @@
   <div class="auth-card">
     <div class="logo-area">
       <span class="logo-icon">&#11088;</span>
-      <div class="logo-title">Gelisim Takibi</div>
-      <div class="logo-sub">Planla, takip et ve ilerle</div>
+      <div class="logo-title">Gelişim Takibi</div>
+      <div class="logo-sub">Planla, takip et ve her gün ilerle</div>
+    </div>
+
+    <div class="config-banner" id="configBanner">
+      ℹ️ Bulut senkronizasyonu yapılandırılmamış. Aşağıdan <b>Misafir / Yerel Mod</b> ile tüm özellikleri hemen kullanabilirsiniz.
     </div>
 
     <div class="auth-tabs">
-      <div class="auth-tab active" id="tabLogin" onclick="switchTab('login')">Giris Yap</div>
-      <div class="auth-tab" id="tabRegister" onclick="switchTab('register')">Kayit Ol</div>
+      <button type="button" class="auth-tab active" id="tabLogin" onclick="switchTab('login')">Giriş Yap</button>
+      <button type="button" class="auth-tab" id="tabRegister" onclick="switchTab('register')">Kayıt Ol</button>
     </div>
 
     <!-- LOGIN -->
     <div class="form-section active" id="formLogin">
       <div class="form-group">
-        <label>E-posta</label>
+        <label for="logUsername">E-posta</label>
         <div class="input-wrap has-icon">
           <span class="input-icon">&#128140;</span>
           <input type="email" id="logUsername" placeholder="E-posta adresinizi girin" autocomplete="email" />
         </div>
       </div>
       <div class="form-group">
-        <label>Sifre</label>
+        <label for="logPassword">Şifre</label>
         <div class="input-wrap has-icon">
           <span class="input-icon">&#128272;</span>
-          <input type="password" id="logPassword" placeholder="Sifrenizi girin" autocomplete="current-password" onkeydown="if(event.key==='Enter')handleLogin()" />
-          <button class="toggle-pw" onclick="togglePw('logPassword',this)" type="button">&#128065;</button>
+          <input type="password" id="logPassword" placeholder="Şifrenizi girin" autocomplete="current-password" />
+          <button class="toggle-pw" onclick="togglePw('logPassword',this)" type="button" title="Şifreyi göster/gizle">&#128065;</button>
         </div>
       </div>
+      <div class="forgot-row">
+        <button type="button" class="forgot-btn" onclick="handleForgotPassword()">Şifremi Unuttum?</button>
+      </div>
       <button class="btn-submit" id="loginBtn" onclick="handleLogin()">
-        <span>&#9889;</span> Giris Yap
+        <span>&#9889;</span> Giriş Yap
       </button>
       <div class="error-msg" id="logError"></div>
+      <div class="info-msg" id="logInfo"></div>
     </div>
 
     <!-- REGISTER -->
     <div class="form-section" id="formRegister">
       <div class="form-row">
         <div class="form-group">
-          <label>Ad</label>
-          <input type="text" id="regName" placeholder="Adiniz" autocomplete="given-name" />
+          <label for="regName">Ad</label>
+          <input type="text" id="regName" placeholder="Adınız" autocomplete="given-name" />
         </div>
         <div class="form-group">
-          <label>Soyad</label>
-          <input type="text" id="regSurname" placeholder="Soyadiniz" autocomplete="family-name" />
+          <label for="regSurname">Soyad</label>
+          <input type="text" id="regSurname" placeholder="Soyadınız" autocomplete="family-name" />
         </div>
       </div>
       <div class="form-group">
-        <label>E-posta</label>
+        <label for="regEmail">E-posta</label>
         <div class="input-wrap has-icon">
           <span class="input-icon">&#128140;</span>
           <input type="email" id="regEmail" placeholder="eposta@ornek.com" autocomplete="email" oninput="validateEmail()" />
@@ -178,7 +203,7 @@
         <div class="field-check" id="emailCheck"></div>
       </div>
       <div class="form-group">
-        <label>Kullanici Adi</label>
+        <label for="regUsername">Kullanıcı Adı</label>
         <div class="input-wrap has-icon">
           <span class="input-icon">&#64;</span>
           <input type="text" id="regUsername" placeholder="benzersiz_kullanici_adi" autocomplete="username" oninput="validateUsername()" />
@@ -186,15 +211,15 @@
         <div class="field-check" id="usernameCheck"></div>
       </div>
       <div class="form-group">
-        <label>Dogum Tarihi</label>
-        <input type="date" id="regDob" style="cursor:pointer;color:var(--text2)" />
+        <label for="regDob">Doğum Tarihi (opsiyonel)</label>
+        <input type="date" id="regDob" style="cursor:pointer" />
       </div>
       <div class="form-group">
-        <label>Sifre</label>
+        <label for="regPassword">Şifre</label>
         <div class="input-wrap has-icon">
           <span class="input-icon">&#128272;</span>
           <input type="password" id="regPassword" placeholder="En az 6 karakter" autocomplete="new-password" oninput="onRegPwInput()" />
-          <button class="toggle-pw" onclick="togglePw('regPassword',this)" type="button">&#128065;</button>
+          <button class="toggle-pw" onclick="togglePw('regPassword',this)" type="button" title="Şifreyi göster/gizle">&#128065;</button>
         </div>
         <div class="pw-strength">
           <div class="pw-bars">
@@ -205,78 +230,114 @@
         </div>
       </div>
       <div class="form-group">
-        <label>Sifre Tekrar</label>
+        <label for="regConfirm">Şifre Tekrar</label>
         <div class="input-wrap has-icon">
           <span class="input-icon">&#128275;</span>
-          <input type="password" id="regConfirm" placeholder="Sifreyi tekrar girin" autocomplete="new-password" oninput="validateConfirm()" />
-          <button class="toggle-pw" onclick="togglePw('regConfirm',this)" type="button">&#128065;</button>
+          <input type="password" id="regConfirm" placeholder="Şifreyi tekrar girin" autocomplete="new-password" oninput="validateConfirm()" />
+          <button class="toggle-pw" onclick="togglePw('regConfirm',this)" type="button" title="Şifreyi göster/gizle">&#128065;</button>
         </div>
         <div class="field-check" id="confirmCheck"></div>
       </div>
       <div class="terms-row">
         <input type="checkbox" class="terms-check" id="termsCheck" />
-        <label for="termsCheck" class="terms-text">Hizmeti kullanarak <a href="#">Kullanim Sartlarini</a> kabul etmis olursunuz. Verileriniz yalnizca bu cihazda saklanir.</label>
+        <label for="termsCheck" class="terms-text">Hizmeti kullanarak <a href="#" onclick="openTerms(event)">Kullanım Şartlarını</a> kabul etmiş olursunuz. Verileriniz tarayıcınızda ve bulut hesabınızda güvenle saklanır.</label>
       </div>
       <button class="btn-submit" id="registerBtn" onclick="handleRegister()">
-        <span>&#127775;</span> Hesap Olustur
+        <span>&#127775;</span> Hesap Oluştur
       </button>
       <div class="error-msg" id="regError"></div>
-
-      <div class="features">
-        <div class="feat"><span class="feat-icon">&#128197;</span> Takvim takibi</div>
-        <div class="feat"><span class="feat-icon">&#127919;</span> Haftalik hedefler</div>
-        <div class="feat"><span class="feat-icon">&#127882;</span> Yillik planlama</div>
-        <div class="feat"><span class="feat-icon">&#128218;</span> Kisisel gunluk</div>
-      </div>
     </div>
 
+    <div class="or-divider">veya</div>
+
+    <button type="button" class="btn-guest" onclick="startGuestMode()">
+      <span>&#128190;</span> Misafir / Yerel Modda Devam Et
+    </button>
+    <div class="guest-note">Hesap oluşturmadan tüm planlama, grafik ve günlük araçlarını tarayıcınızda deneyin.</div>
+
+    <div class="features">
+      <div class="feat"><span class="feat-icon">&#128197;</span> Takvim &amp; puanlama</div>
+      <div class="feat"><span class="feat-icon">&#127919;</span> Haftalık hedefler</div>
+      <div class="feat"><span class="feat-icon">&#127882;</span> Yıllık planlama</div>
+      <div class="feat"><span class="feat-icon">&#128218;</span> Kişisel günlük</div>
+    </div>
+  </div>
+</div>
+
+<!-- TERMS MODAL -->
+<div class="overlay hidden" id="termsOverlay" onclick="if(event.target===this)closeTerms()">
+  <div class="modal">
+    <button type="button" class="btn-x" onclick="closeTerms()">&#10005;</button>
+    <div class="modal-title">&#128274; Kullanım Şartları &amp; Gizlilik</div>
+    <div class="modal-body">
+      <p style="margin-bottom:10px;">Gelişim Takibi, kişisel hedeflerinizi, günlük görevlerinizi ve ruh halinizi takip etmeniz için tasarlanmış bir üretkenlik aracıdır.</p>
+      <p style="margin-bottom:10px;">• <b>Bulut Hesabı:</b> Kayıt olduğunuzda verileriniz kendi Firebase hesabınıza özel olarak şifreli bağlantı ile senkronize edilir.</p>
+      <p>• <b>Yerel Mod:</b> Misafir modunda tüm verileriniz yalnızca kullandığınız tarayıcının yerel deposunda (localStorage) tutulur ve istediğiniz zaman Ayarlar sayfasından JSON olarak dışa aktarılabilir.</p>
+    </div>
+    <button type="button" class="btn-submit" onclick="closeTerms()">Anladım</button>
   </div>
 </div>
 
 <script>
+  window.addEventListener('DOMContentLoaded', () => {
+    if (window.firebaseConfigured === false) {
+      document.getElementById('configBanner').classList.add('show');
+    }
+  });
+
+  function openTerms(e) {
+    if (e) e.preventDefault();
+    document.getElementById('termsOverlay').classList.remove('hidden');
+  }
+  function closeTerms() {
+    document.getElementById('termsOverlay').classList.add('hidden');
+  }
+
+  function startGuestMode() {
+    if (window.enterGuestMode) window.enterGuestMode();
+    else {
+      localStorage.setItem('gtk_guest_mode', '1');
+      localStorage.setItem('gtk_session', 'guest');
+      window.location.href = 'index.html';
+    }
+  }
 
   function switchTab(tab) {
     ['login','register'].forEach(t => {
       document.getElementById('tab'+capitalize(t)).classList.toggle('active', t===tab);
       document.getElementById('form'+capitalize(t)).classList.toggle('active', t===tab);
     });
-    document.getElementById('logError').classList.remove('show');
-    document.getElementById('regError').classList.remove('show');
+    hideErr('logError');
+    hideErr('logInfo');
+    hideErr('regError');
   }
   function capitalize(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
 
-  /* Toggle password visibility */
   function togglePw(id, btn) {
     const el = document.getElementById(id);
     const show = el.type === 'password';
     el.type = show ? 'text' : 'password';
-    btn.textContent = show ? '&#128683;' : '&#128065;';
-    btn.innerHTML   = show ? '&#128683;' : '&#128065;';
+    btn.textContent = show ? '🙈' : '👁';
   }
 
-  /* Email validation */
   function validateEmail() {
     const val = document.getElementById('regEmail').value.trim();
     const chk = document.getElementById('emailCheck');
     if(!val) { chk.textContent=''; return; }
     const ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
     chk.className = 'field-check ' + (ok ? 'fc-ok' : 'fc-err');
-    chk.textContent = ok ? '✓ Gecerli e-posta' : '✗ Gecerli bir e-posta girin';
+    chk.textContent = ok ? '✓ Geçerli e-posta' : '✗ Geçerli bir e-posta girin';
   }
 
-  /* Username validation */
   function validateUsername() {
     const val = document.getElementById('regUsername').value.trim().toLowerCase();
     const chk = document.getElementById('usernameCheck');
     if(!val) { chk.textContent=''; return; }
-    if(val.length < 3) { chk.className='field-check fc-err'; chk.textContent='✗ En az 3 karakter olmali'; return; }
-    if(!/^[a-z0-9_]+$/.test(val)) { chk.className='field-check fc-err'; chk.textContent='✗ Sadece harf, rakam ve alt cizgi'; return; }
-    const users = JSON.parse(localStorage.getItem('gtk_users')||'{}');
-    if(users[val]) { chk.className='field-check fc-err'; chk.textContent='✗ Bu kullanici adi alinmis'; return; }
-    chk.className='field-check fc-ok'; chk.textContent='✓ Kullanilabilir';
+    if(val.length < 3) { chk.className='field-check fc-err'; chk.textContent='✗ En az 3 karakter olmalı'; return; }
+    if(!/^[a-z0-9_]+$/.test(val)) { chk.className='field-check fc-err'; chk.textContent='✗ Sadece küçük harf, rakam ve alt çizgi (_)'; return; }
+    chk.className='field-check fc-ok'; chk.textContent='✓ Uygun kullanıcı adı';
   }
 
-  /* Password strength */
   function onRegPwInput() {
     const pw = document.getElementById('regPassword').value;
     let score = 0;
@@ -285,7 +346,7 @@
     if(/[A-Z]/.test(pw)&&/[0-9]/.test(pw)) score++;
     if(/[^A-Za-z0-9]/.test(pw)) score++;
     const cls   = ['','s1','s2','s3','s4'];
-    const names = ['','Zayif','Orta','Iyi','Guclu'];
+    const names = ['','Zayıf','Orta','İyi','Güçlü'];
     const pcts  = ['','25%','50%','75%','100%'];
     ['rb1','rb2','rb3','rb4'].forEach((id,i) => {
       document.getElementById(id).className = 'pw-bar' + (i<score?' '+cls[score]:'');
@@ -295,14 +356,13 @@
     validateConfirm();
   }
 
-  /* Confirm password */
   function validateConfirm() {
     const pw  = document.getElementById('regPassword').value;
     const pw2 = document.getElementById('regConfirm').value;
     const chk = document.getElementById('confirmCheck');
     if(!pw2) { chk.textContent=''; return; }
-    if(pw===pw2) { chk.className='field-check fc-ok'; chk.textContent='✓ Sifreler eslesiyor'; }
-    else          { chk.className='field-check fc-err'; chk.textContent='✗ Sifreler eslesmiyor'; }
+    if(pw===pw2) { chk.className='field-check fc-ok'; chk.textContent='✓ Şifreler eşleşiyor'; }
+    else         { chk.className='field-check fc-err'; chk.textContent='✗ Şifreler eşleşmiyor'; }
   }
 
   function showErr(id, msg) {
@@ -311,9 +371,34 @@
   }
   function hideErr(id) { document.getElementById(id).classList.remove('show'); }
 
+  async function handleForgotPassword() {
+    hideErr('logError'); hideErr('logInfo');
+    if (!window.firebaseConfigured) {
+      showErr('logError', 'Firebase yapılandırılmamış. Yerel modda şifre sıfırlama gerekmez.');
+      return;
+    }
+    const email = document.getElementById('logUsername').value.trim();
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      showErr('logError', 'Şifre sıfırlama bağlantısı için önce geçerli e-posta adresinizi yazın.');
+      return;
+    }
+    try {
+      await window.firebaseResetPassword(email);
+      showErr('logInfo', '✓ Şifre sıfırlama bağlantısı e-posta adresinize gönderildi.');
+    } catch (error) {
+      let msg = 'Sıfırlama e-postası gönderilemedi.';
+      if (error.code === 'auth/user-not-found') msg = 'Bu e-posta adresi ile kayıtlı hesap bulunamadı.';
+      showErr('logError', msg);
+    }
+  }
+
   /* REGISTER */
   async function handleRegister() {
     hideErr('regError');
+    if (!window.firebaseConfigured) {
+      showErr('regError', 'Bulut kimlik doğrulaması yapılandırılmamış. Misafir modunu kullanabilirsiniz.');
+      return;
+    }
     const name     = document.getElementById('regName').value.trim();
     const surname  = document.getElementById('regSurname').value.trim();
     const email    = document.getElementById('regEmail').value.trim();
@@ -323,57 +408,71 @@
     const confirm  = document.getElementById('regConfirm').value;
     const terms    = document.getElementById('termsCheck').checked;
 
-    if(!name||!surname)     { showErr('regError','Ad ve soyad alanlari bos birakilamaz.'); return; }
-    if(!email)              { showErr('regError','E-posta adresi gereklidir.'); return; }
-    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showErr('regError','Gecerli bir e-posta adresi girin.'); return; }
-    if(!username||username.length<3) { showErr('regError','Kullanici adi en az 3 karakter olmali.'); return; }
-    if(!/^[a-z0-9_]+$/.test(username)) { showErr('regError','Kullanici adi sadece harf, rakam ve _ icerabilir.'); return; }
-    if(password.length<6)  { showErr('regError','Sifre en az 6 karakter olmali.'); return; }
-    if(password!==confirm)  { showErr('regError','Sifreler eslesmiyor.'); return; }
-    if(!terms)              { showErr('regError','Kullanim sartlarini kabul etmelisiniz.'); return; }
+    if(!name||!surname)                { showErr('regError','Ad ve soyad alanları boş bırakılamaz.'); return; }
+    if(!email)                         { showErr('regError','E-posta adresi gereklidir.'); return; }
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showErr('regError','Geçerli bir e-posta adresi girin.'); return; }
+    if(!username||username.length<3)   { showErr('regError','Kullanıcı adı en az 3 karakter olmalı.'); return; }
+    if(!/^[a-z0-9_]+$/.test(username)) { showErr('regError','Kullanıcı adı sadece küçük harf, rakam ve _ içerebilir.'); return; }
+    if(password.length<6)              { showErr('regError','Şifre en az 6 karakter olmalı.'); return; }
+    if(password!==confirm)             { showErr('regError','Şifreler eşleşmiyor.'); return; }
+    if(!terms)                         { showErr('regError','Kullanım şartlarını kabul etmelisiniz.'); return; }
 
     const btn = document.getElementById('registerBtn');
-    btn.disabled = true; btn.innerHTML = '&#8987; Olusturuluyor...';
+    btn.disabled = true; btn.innerHTML = '&#8987; Oluşturuluyor...';
+    window.__authManualRedirect = true;
 
     try {
-        await window.createUserWithEmailAndPassword(window.firebaseAuth, email, password);
-        // Save initial profile to localStorage so firebase_sync will push it to Firestore
-        localStorage.setItem('gtk_session', username);
-        localStorage.setItem('gtk_profile', JSON.stringify({ fn: name, ln: surname, email, bd: dob }));
-        window.location.href = 'index.html';
+      await window.createUserWithEmailAndPassword(window.firebaseAuth, email, password);
+      localStorage.removeItem('gtk_guest_mode');
+      localStorage.setItem('gtk_session', username);
+      localStorage.setItem('gtk_profile', JSON.stringify({ fn: name, ln: surname, email, bd: dob, bio: '', avColor: 0 }));
+      if (window.flushFirebaseSync) {
+        await window.flushFirebaseSync(true);
+      }
+      window.location.href = 'index.html';
     } catch (error) {
-        btn.disabled = false; btn.innerHTML = '<span>&#127775;</span> Hesap Olustur';
-        let msg = 'Bir hata olustu.';
-        if (error.code === 'auth/email-already-in-use') msg = 'Bu e-posta adresi zaten kullanimda.';
-        else if (error.code === 'auth/weak-password') msg = 'Sifre cok zayif.';
-        showErr('regError', msg);
+      window.__authManualRedirect = false;
+      btn.disabled = false; btn.innerHTML = '<span>&#127775;</span> Hesap Oluştur';
+      let msg = 'Hesap oluşturulurken bir hata oluştu.';
+      if (error.code === 'auth/email-already-in-use') msg = 'Bu e-posta adresi zaten kullanımda.';
+      else if (error.code === 'auth/weak-password') msg = 'Şifre çok zayıf (en az 6 karakter).';
+      else if (error.code === 'auth/invalid-email') msg = 'Geçersiz e-posta adresi.';
+      showErr('regError', msg);
     }
   }
 
   /* LOGIN */
   async function handleLogin() {
-    hideErr('logError');
+    hideErr('logError'); hideErr('logInfo');
+    if (!window.firebaseConfigured) {
+      showErr('logError', 'Bulut kimlik doğrulaması yapılandırılmamış. Misafir modunu kullanabilirsiniz.');
+      return;
+    }
     const email = document.getElementById('logUsername').value.trim();
     const password = document.getElementById('logPassword').value;
-    if(!email||!password) { showErr('logError','E-posta ve sifre gereklidir.'); return; }
+    if(!email||!password) { showErr('logError','E-posta ve şifre gereklidir.'); return; }
 
     const btn = document.getElementById('loginBtn');
-    btn.disabled = true; btn.innerHTML = '&#8987; Giris yapiliyor...';
+    btn.disabled = true; btn.innerHTML = '&#8987; Giriş yapılıyor...';
+    window.__authManualRedirect = true;
 
     try {
-        await window.signInWithEmailAndPassword(window.firebaseAuth, email, password);
-        window.location.href = 'index.html';
+      await window.signInWithEmailAndPassword(window.firebaseAuth, email, password);
+      localStorage.removeItem('gtk_guest_mode');
+      window.location.href = 'index.html';
     } catch (error) {
-        btn.disabled = false; btn.innerHTML = '<span>&#9889;</span> Giris Yap';
-        let msg = 'Giris basarisiz.';
-        if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
-            msg = 'E-posta veya sifre hatali.';
-        }
-        showErr('logError', msg);
+      window.__authManualRedirect = false;
+      btn.disabled = false; btn.innerHTML = '<span>&#9889;</span> Giriş Yap';
+      let msg = 'Giriş başarısız.';
+      if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+        msg = 'E-posta veya şifre hatalı.';
+      } else if (error.code === 'auth/too-many-requests') {
+        msg = 'Çok fazla deneme yapıldı. Lütfen biraz bekleyin.';
+      }
+      showErr('logError', msg);
     }
   }
 
-  /* Enter key on login */
   document.getElementById('logPassword').addEventListener('keydown', e => {
     if(e.key==='Enter') handleLogin();
   });

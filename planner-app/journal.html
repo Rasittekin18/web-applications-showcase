@@ -3,9 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Gunluk — Gelisim Takibi</title>
+  <title>Günlük — Gelişim Takibi</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet" />
+  <script src="app_common.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -73,8 +74,8 @@
     /* SIDEBAR */
     .sidebar {
       position:fixed; top:0; left:0; bottom:0; width:var(--sb-w);
-      background:rgba(9,9,22,0.98);
-      border-right:1px solid rgba(255,255,255,0.09);
+      background:var(--sb-bg, rgba(9,9,22,0.98));
+      border-right:1px solid var(--sb-border, rgba(255,255,255,0.09));
       backdrop-filter:blur(30px); -webkit-backdrop-filter:blur(30px);
       z-index:150; transform:translateX(-100%);
       transition:transform .32s cubic-bezier(.4,0,.2,1);
@@ -267,8 +268,8 @@
       background:repeating-linear-gradient(
         transparent,
         transparent 31px,
-        rgba(245,158,11,.06) 31px,
-        rgba(245,158,11,.06) 32px
+        var(--journal-line, rgba(245,158,11,.06)) 31px,
+        var(--journal-line, rgba(245,158,11,.06)) 32px
       );
       border-radius:var(--rx);
       padding:4px 0;
@@ -289,7 +290,7 @@
       letter-spacing:.01em;
     }
     .journal-textarea::placeholder {
-      color:rgba(255,248,230,.2);
+      color:var(--journal-placeholder, rgba(255,248,230,.2));
       font-style:italic;
     }
     .journal-textarea::-webkit-scrollbar { width:4px; }
@@ -435,20 +436,29 @@
     /* TOAST */
     .toast {
       position:fixed; bottom:22px; left:50%; transform:translateX(-50%) translateY(90px);
-      background:#1a1505; border:1px solid rgba(245,158,11,.35); border-radius:50px;
+      background:var(--toast-bg, #1a1505); border:1px solid rgba(245,158,11,.35); border-radius:50px;
       padding:10px 22px; font-size:13px; font-weight:700; color:var(--warm); z-index:999;
       pointer-events:none; white-space:nowrap; box-shadow:0 10px 40px rgba(0,0,0,.5);
       transition:transform .35s cubic-bezier(.34,1.56,.64,1);
     }
     .toast.show { transform:translateX(-50%) translateY(0); }
 
+    .mood-filter-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+    .mf-btn{background:var(--surface2);border:1px solid var(--border2);color:var(--text2);font-family:inherit;font-size:11px;font-weight:700;padding:5px 11px;border-radius:50px;cursor:pointer;transition:all .15s}
+    .mf-btn.mf-active{background:rgba(245,158,11,.16);border-color:var(--warm);color:var(--warm)}
+    .entry-edit-btn{font-size:10px;font-weight:700;padding:3px 9px;border-radius:50px;border:1px solid rgba(245,158,11,.3);background:var(--warm-bg);color:var(--warm);cursor:pointer;font-family:inherit}
+    @media(hover:none),(max-width:640px){.entry-del-btn{opacity:1!important}}
+
     /* GLASS */
     .glass { background:var(--surface); border:1px solid var(--border); backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px); }
 
     @media(max-width:640px){
-      .app { padding-left:64px; }
+      .app { padding:70px 14px 60px 14px; }
+      .journal-writing-area { padding:16px 14px; }
+      .journal-header, .journal-footer-row { padding-left:16px; padding-right:16px; }
       .journal-textarea-wrap::before { display:none; }
       .journal-textarea { padding:4px 12px 16px; }
+      .entries-search-wrap { min-width:0; width:100%; }
     }
     @media(max-width:480px){
       .mood-opts { gap:5px; }
@@ -458,11 +468,12 @@
   <script type="module" src="firebase_sync.js"></script>
 </head>
 <body>
+<script>if(window.GTK)GTK.applyTheme();</script>
 
 <div class="bg-scene"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div></div>
 
 <!-- Hamburger -->
-<button class="hamburger" id="hamburger" onclick="toggleSidebar()" title="Menu">
+<button class="hamburger" id="hamburger" onclick="toggleSidebar()" title="Menü">
   <svg width="18" height="14" viewBox="0 0 18 14" fill="none">
     <rect width="18" height="2" rx="1" fill="white"/>
     <rect y="6" width="14" height="2" rx="1" fill="white"/>
@@ -476,40 +487,41 @@
 <!-- SIDEBAR -->
 <div class="sidebar" id="sidebar">
   <div class="sb-header">
-    <div class="sb-logo">&#128218; Gelisim Takibi</div>
+    <div class="sb-logo">&#128218; Gelişim Takibi</div>
     <button class="sb-close" onclick="closeSidebar()">&#10005;</button>
   </div>
   <div class="sb-body">
     <div class="sb-nav">
       <a class="sb-nav-item" href="index.html"><span class="sb-nav-icon">&#128197;</span><span>Takvim</span></a>
       <a class="sb-nav-item" href="chart.html"><span class="sb-nav-icon">&#128202;</span><span>Grafik Analizi</span></a>
-      <a class="sb-nav-item" href="planner.html"><span class="sb-nav-icon">&#128221;</span><span>Gunluk Planlama</span></a>
-      <a class="sb-nav-item" href="weekly.html"><span class="sb-nav-icon">&#127919;</span><span>Haftalik Hedefler</span></a>
-      <a class="sb-nav-item" href="yearly.html"><span class="sb-nav-icon">&#127882;</span><span>Yillik Hedefler</span></a>
-      <a class="sb-nav-item sb-active" href="journal.html"><span class="sb-nav-icon">&#128218;</span><span>Gunluk</span></a>
+      <a class="sb-nav-item" href="planner.html"><span class="sb-nav-icon">&#128221;</span><span>Günlük Planlama</span></a>
+      <a class="sb-nav-item" href="weekly.html"><span class="sb-nav-icon">&#127919;</span><span>Haftalık Hedefler</span></a>
+      <a class="sb-nav-item" href="yearly.html"><span class="sb-nav-icon">&#127882;</span><span>Yıllık Hedefler</span></a>
+      <a class="sb-nav-item sb-active" href="journal.html"><span class="sb-nav-icon">&#128218;</span><span>Günlük</span></a>
+      <a class="sb-nav-item" href="settings.html"><span class="sb-nav-icon">&#9881;</span><span>Ayarlar</span></a>
     </div>
 
     <div class="sb-divider"></div>
-    <div class="sb-section-lbl">YAZMA SERiSi</div>
+    <div class="sb-section-lbl">YAZMA SERİSİ</div>
 
     <div class="sb-streak-card">
       <div class="sb-streak-flame">&#128293;</div>
       <div class="sb-streak-info">
         <div class="sb-streak-num" id="sbStreakNum">0</div>
-        <div class="sb-streak-lbl">gun ust uste</div>
+        <div class="sb-streak-lbl">gün üst üste</div>
       </div>
     </div>
 
     <div class="sb-mini-stats">
       <div class="sb-mini-chip"><div class="smc-lbl">Toplam</div><div class="smc-val w" id="sms-total">0</div></div>
       <div class="sb-mini-chip"><div class="smc-lbl">Bu Ay</div><div class="smc-val w" id="sms-month">0</div></div>
-      <div class="sb-mini-chip"><div class="smc-lbl">Iyi Gun</div><div class="smc-val g" id="sms-good">0</div></div>
-      <div class="sb-mini-chip"><div class="smc-lbl">Zor Gun</div><div class="smc-val r" id="sms-hard">0</div></div>
+      <div class="sb-mini-chip"><div class="smc-lbl">İyi Gün</div><div class="smc-val g" id="sms-good">0</div></div>
+      <div class="sb-mini-chip"><div class="smc-lbl">Zor Gün</div><div class="smc-val r" id="sms-hard">0</div></div>
     </div>
 
     <div style="margin-top:16px; padding-top:14px; border-top:1px solid var(--border);">
-      <a class="sb-nav-item" href="#" onclick="doLogout()" style="color:var(--red);">
-        <span class="sb-nav-icon">&#128682;</span> Cikis Yap
+      <a class="sb-nav-item" href="#" onclick="doLogout(); return false;" style="color:var(--red);">
+        <span class="sb-nav-icon">&#128682;</span> Çıkış Yap
       </a>
     </div>
   </div>
@@ -521,29 +533,29 @@
   <!-- Header -->
   <header class="page-header">
     <div class="logo-area">
-      <div class="logo-text">&#128218; Gunluğum</div>
-      <div class="logo-sub">Her gunu kelimelerle dondur, gelisimini izle</div>
+      <div class="logo-text">&#128218; Günlüğüm</div>
+      <div class="logo-sub">Her günü kelimelerle dondur, gelişimini izle</div>
     </div>
     <div id="headerStreakBadge" style="display:flex;align-items:center;gap:6px;background:var(--warm-bg);border:1px solid rgba(245,158,11,.25);border-radius:50px;padding:8px 16px;">
       <span style="font-size:16px;">&#128293;</span>
-      <span style="font-size:13px;font-weight:700;color:var(--warm);" id="headerStreak">0 gun</span>
+      <span style="font-size:13px;font-weight:700;color:var(--warm);" id="headerStreak">0 gün</span>
     </div>
   </header>
 
   <!-- Date Navigator -->
   <div class="date-nav">
-    <button class="dnav-btn" id="btnPrev" onclick="shiftDay(-1)">&larr; Onceki</button>
+    <button class="dnav-btn" id="btnPrev" onclick="shiftDay(-1)">&larr; Önceki</button>
     <div class="date-center">
-      <div class="date-main" id="dateMain">Bugun</div>
-      <div class="date-sub"  id="dateSub">10 Eylul 2026, Carsamba</div>
-      <span class="date-badge today-badge" id="dateBadge">Bugun</span>
+      <div class="date-main" id="dateMain">Bugün</div>
+      <div class="date-sub"  id="dateSub">—</div>
+      <span class="date-badge today-badge" id="dateBadge">Bugün</span>
     </div>
     <div style="display:flex;align-items:center;gap:8px;">
-      <div class="dnav-picker-wrap" title="Tarih Sec">
+      <div class="dnav-picker-wrap" title="Tarih Seç">
         <span style="font-size:17px;pointer-events:none;">&#128197;</span>
         <input type="date" id="datePicker" />
       </div>
-      <button class="dnav-btn" id="btnToday" onclick="goToday()" style="font-size:11px;">Bugun</button>
+      <button class="dnav-btn" id="btnToday" onclick="goToday()" style="font-size:11px;">Bugün</button>
     </div>
     <button class="dnav-btn" id="btnNext" onclick="shiftDay(1)">Sonraki &rarr;</button>
   </div>
@@ -553,10 +565,10 @@
     <span class="mood-label">Ruh Hali:</span>
     <div class="mood-opts" id="moodOpts">
       <button class="mood-opt" data-mood="harika"   onclick="selectMood('harika')">  &#127775; Harika</button>
-      <button class="mood-opt" data-mood="iyi"      onclick="selectMood('iyi')">     &#128578; Iyi</button>
+      <button class="mood-opt" data-mood="iyi"      onclick="selectMood('iyi')">     &#128578; İyi</button>
       <button class="mood-opt" data-mood="orta"     onclick="selectMood('orta')">    &#128528; Orta</button>
       <button class="mood-opt" data-mood="zor"      onclick="selectMood('zor')">     &#128533; Zor</button>
-      <button class="mood-opt" data-mood="cok-zor"  onclick="selectMood('cok-zor')"> &#128542; Cok Zor</button>
+      <button class="mood-opt" data-mood="cok-zor"  onclick="selectMood('cok-zor')"> &#128542; Çok Zor</button>
     </div>
   </div>
 
@@ -565,7 +577,7 @@
     <div class="journal-header">
       <div class="journal-title-area">
         <span class="journal-pen-icon">&#9997;</span>
-        <span class="journal-entry-date" id="journalEntryDate">10 Eylul 2026</span>
+        <span class="journal-entry-date" id="journalEntryDate">—</span>
       </div>
       <div style="display:flex;align-items:center;gap:12px;">
         <span class="journal-word-count" id="wordCount">0 kelime</span>
@@ -580,15 +592,15 @@
         <textarea
           id="journalTextarea"
           class="journal-textarea"
-          placeholder="Bugun nasil gecti? Duygularini, dusuncelerini, yasadikllarini buraya dokebilirsin... Bu sayfa sadece senin."
+          placeholder="Bugün nasıl geçti? Duygularını, düşüncelerini, yaşadıklarını buraya dökebilirsin... Bu sayfa sadece senin."
           oninput="onTextareaInput()"
         ></textarea>
       </div>
     </div>
 
     <div class="journal-footer-row">
-      <input type="text" id="tagsInput" class="journal-tags-input" placeholder="Etiketler: spor, is, aile..." />
-      <span class="jf-hint">Enter ile kaydet &middot; Her gun yeni bir sayfa</span>
+      <input type="text" id="tagsInput" class="journal-tags-input" placeholder="Etiketler: spor, iş, aile..." />
+      <span class="jf-hint">Ctrl+S veya Enter ile kaydet &middot; Her gün yeni bir sayfa</span>
     </div>
   </div>
 
@@ -596,13 +608,21 @@
   <div class="entries-section">
     <div class="entries-header">
       <div class="entries-title">
-        &#128196; Gecmis Sayfalar
-        <span class="entries-count" id="entriesCount">0 kayit</span>
+        &#128196; Geçmiş Sayfalar
+        <span class="entries-count" id="entriesCount">0 kayıt</span>
       </div>
       <div class="entries-search-wrap">
         <input type="text" id="entriesSearch" class="entries-search" placeholder="Sayfalarda ara..." oninput="renderEntries()" />
         <span class="entries-search-icon">&#128269;</span>
       </div>
+    </div>
+    <div class="mood-filter-row" id="moodFilterRow">
+      <button type="button" class="mf-btn mf-active" data-mf="all" onclick="setMoodFilter('all')">Tümü</button>
+      <button type="button" class="mf-btn" data-mf="harika" onclick="setMoodFilter('harika')">🌟 Harika</button>
+      <button type="button" class="mf-btn" data-mf="iyi" onclick="setMoodFilter('iyi')">🙂 İyi</button>
+      <button type="button" class="mf-btn" data-mf="orta" onclick="setMoodFilter('orta')">😐 Orta</button>
+      <button type="button" class="mf-btn" data-mf="zor" onclick="setMoodFilter('zor')">😕 Zor</button>
+      <button type="button" class="mf-btn" data-mf="cok-zor" onclick="setMoodFilter('cok-zor')">😞 Çok Zor</button>
     </div>
     <div class="timeline" id="timeline"></div>
   </div>
@@ -612,45 +632,36 @@
 <div class="toast" id="toast"></div>
 
 <script>
-/* ═══════════════════════════════════════
-   AUTH GUARD
-═══════════════════════════════════════ */
-const sessionUser = localStorage.getItem('gtk_session');
+const sessionUser = window.GTK ? GTK.getSessionUser() : localStorage.getItem('gtk_session');
 
 function doLogout() {
   if (window.doFirebaseLogout) window.doFirebaseLogout();
   else {
     localStorage.removeItem('gtk_session');
+    localStorage.removeItem('gtk_guest_mode');
     localStorage.removeItem('gtk_profile');
     window.location.href = 'auth.html';
   }
 }
 
-/* ═══════════════════════════════════════
-   CONSTANTS
-═══════════════════════════════════════ */
 const SK_JOURNAL = 'gtk_journal_' + sessionUser;
 
-const TR_MONTHS = ['Ocak','Subat','Mart','Nisan','Mayis','Haziran',
-                   'Temmuz','Agustos','Eylul','Ekim','Kasim','Aralik'];
-const TR_DAYS   = ['Pazar','Pazartesi','Sali','Carsamba','Persembe','Cuma','Cumartesi'];
+const TR_MONTHS = ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran',
+                   'Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
+const TR_DAYS   = ['Pazar','Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi'];
 
 const MOOD_META = {
   'harika':  { label:'Harika',  icon:'&#127775;', cls:'harika'  },
-  'iyi':     { label:'Iyi',     icon:'&#128578;', cls:'iyi'     },
+  'iyi':     { label:'İyi',     icon:'&#128578;', cls:'iyi'     },
   'orta':    { label:'Orta',    icon:'&#128528;', cls:'orta'    },
   'zor':     { label:'Zor',     icon:'&#128533;', cls:'zor'     },
-  'cok-zor': { label:'Cok Zor', icon:'&#128542;', cls:'cok-zor' }
+  'cok-zor': { label:'Çok Zor', icon:'&#128542;', cls:'cok-zor' }
 };
 
-/* ═══════════════════════════════════════
-   STATE
-═══════════════════════════════════════ */
 let journal = JSON.parse(localStorage.getItem(SK_JOURNAL) || '{}');
-// journal structure: { "YYYY-MM-DD": { text, mood, tags, savedAt, wordCount } }
-
 let currentDate = todayDate();
 let currentMood = null;
+let moodFilter  = 'all';
 let isDirty     = false;
 
 /* ═══════════════════════════════════════
@@ -715,17 +726,23 @@ function escHtml(s) {
    MOOD SELECTION
 ═══════════════════════════════════════ */
 function selectMood(mood) {
-  currentMood = mood;
+  currentMood = (currentMood === mood) ? null : mood;
   document.querySelectorAll('.mood-opt').forEach(btn => {
-    btn.classList.toggle('mo-active', btn.dataset.mood === mood);
+    btn.classList.toggle('mo-active', Boolean(currentMood && btn.dataset.mood === currentMood));
   });
   isDirty = true;
+}
+
+function setMoodFilter(mf) {
+  moodFilter = mf;
+  document.querySelectorAll('.mf-btn').forEach(b => b.classList.toggle('mf-active', b.dataset.mf === mf));
+  renderEntries();
 }
 
 function setMoodUI(mood) {
   currentMood = mood || null;
   document.querySelectorAll('.mood-opt').forEach(btn => {
-    btn.classList.toggle('mo-active', mood && btn.dataset.mood === mood);
+    btn.classList.toggle('mo-active', Boolean(mood && btn.dataset.mood === mood));
   });
 }
 
@@ -736,7 +753,7 @@ function shiftDay(dir) {
   if(isDirty) { autoSave(); }
   const d = new Date(currentDate);
   d.setDate(d.getDate() + dir);
-  if(d > todayDate()) { showToast('Gelecege gidemezsin!'); return; }
+  if(d > todayDate()) { showToast('Geleceğe gidemezsin!'); return; }
   currentDate = d;
   loadDay();
 }
@@ -751,7 +768,7 @@ document.getElementById('datePicker').addEventListener('change', (e) => {
   if(!e.target.value) return;
   const p = e.target.value.split('-');
   const d = new Date(+p[0], +p[1]-1, +p[2]);
-  if(d > todayDate()) { showToast('Gelecege gidemezsin!'); e.target.value=''; return; }
+  if(d > todayDate()) { showToast('Geleceğe gidemezsin!'); e.target.value=''; return; }
   if(isDirty) autoSave();
   currentDate = d;
   loadDay();
@@ -767,14 +784,14 @@ function loadDay() {
   const today   = isToday(currentDate);
 
   /* Date display */
-  document.getElementById('dateMain').textContent = today ? 'Bugun' :
+  document.getElementById('dateMain').textContent = today ? 'Bugün' :
     fmtLong(currentDate);
   document.getElementById('dateSub').textContent  =
     fmtLong(currentDate) + ', ' + TR_DAYS[currentDate.getDay()];
   document.getElementById('journalEntryDate').textContent = fmtLong(currentDate);
 
   const badge = document.getElementById('dateBadge');
-  badge.textContent  = today ? 'Bugun' : future ? 'Gelecek' : 'Gecmis';
+  badge.textContent  = today ? 'Bugün' : future ? 'Gelecek' : 'Geçmiş';
   badge.className    = 'date-badge ' + (today ? 'today-badge' : future ? 'future-badge' : '');
 
   /* Date picker */
@@ -832,7 +849,7 @@ function saveEntry() {
   const text = document.getElementById('journalTextarea').value.trim();
   const tags = document.getElementById('tagsInput').value.trim();
 
-  if(!text && !currentMood) { showToast('Bir sey yaz ya da ruh halini sec'); return; }
+  if(!text && !currentMood) { showToast('Bir şey yaz ya da ruh halini seç'); return; }
 
   if(!journal[key]) journal[key] = {};
   journal[key].text      = text;
@@ -847,7 +864,7 @@ function saveEntry() {
   updateSaveBtnState(true);
   renderEntries();
   updateSidebarStats();
-  showToast('&#128218; Sayfa kaydedildi');
+  showToast('📚 Sayfa kaydedildi');
 }
 
 function autoSave() {
@@ -875,13 +892,18 @@ document.getElementById('tagsInput').addEventListener('keydown', e => {
 function renderEntries() {
   const q    = (document.getElementById('entriesSearch').value || '').toLowerCase().trim();
   const all  = Object.values(journal).sort((a,b) => (b.date||'').localeCompare(a.date||''));
-  const filtered = q ? all.filter(e =>
-    (e.text||'').toLowerCase().includes(q) ||
-    (e.tags||'').toLowerCase().includes(q) ||
-    (e.date||'').includes(q)
-  ) : all;
+  const filtered = all.filter(e => {
+    if (moodFilter !== 'all' && e.mood !== moodFilter) return false;
+    if (q) {
+      const ok = (e.text||'').toLowerCase().includes(q) ||
+                 (e.tags||'').toLowerCase().includes(q) ||
+                 (e.date||'').includes(q);
+      if (!ok) return false;
+    }
+    return true;
+  });
 
-  document.getElementById('entriesCount').textContent = filtered.length + ' kayit';
+  document.getElementById('entriesCount').textContent = filtered.length + ' kayıt';
 
   const tl = document.getElementById('timeline');
   tl.innerHTML = '';
@@ -890,10 +912,10 @@ function renderEntries() {
     tl.innerHTML =
       '<div class="entries-empty">' +
         '<div class="entries-empty-icon">&#128196;</div>' +
-        '<div class="entries-empty-title">' + (q ? 'Arama sonucu yok' : 'Henuz hic yazi yazmadin') + '</div>' +
+        '<div class="entries-empty-title">' + (q || moodFilter!=='all' ? 'Eşleşen sayfa bulunamadı' : 'Henüz hiç yazı yazmadın') + '</div>' +
         '<div class="entries-empty-sub">' +
-          (q ? 'Farkli bir anahtar kelime dene.' :
-               'Bugunun duygularini, dusuncelerini yukari yaz.\nHer gece bir sayfa, zamanla bir kitap olur.') +
+          (q || moodFilter!=='all' ? 'Farklı bir anahtar kelime veya ruh hali filtresi dene.' :
+               'Bugünün duygularını, düşüncelerini yukarı yaz.\nHer gece bir sayfa, zamanla bir kitap olur.') +
         '</div>' +
       '</div>';
     return;
@@ -939,12 +961,13 @@ function buildEntryCard(entry, d) {
   card.innerHTML =
     '<div class="entry-top">' +
       '<div class="entry-date-col">' +
-        '<div class="entry-date-main">' + fmtLong(d) + (today ? ' &bull; Bugun' : '') + '</div>' +
+        '<div class="entry-date-main">' + fmtLong(d) + (today ? ' &bull; Bugün' : '') + '</div>' +
         '<div class="entry-date-sub">'  + TR_DAYS[d.getDay()] + (entry.savedAt ? ' &middot; ' + fmtTime(entry.savedAt) : '') + '</div>' +
       '</div>' +
       '<div class="entry-right">' +
         (mm ? '<span class="entry-mood-badge eb-' + mm.cls + '">' + mm.icon + ' ' + mm.label + '</span>' : '') +
         '<span class="entry-wc">' + wc + ' kelime</span>' +
+        '<button class="entry-edit-btn" onclick="openEntryInEditor(event,\'' + entry.date + '\')" title="Editörde Aç">✎ Düzenle</button>' +
         '<button class="entry-del-btn" onclick="deleteEntry(event,\'' + entry.date + '\')" title="Sil">&#10005;</button>' +
       '</div>' +
     '</div>' +
@@ -953,22 +976,20 @@ function buildEntryCard(entry, d) {
     (tags.length ? '<div class="entry-tags-row">' + tags.map(t => '<span class="entry-tag">#' + escHtml(t) + '</span>').join('') + '</div>' : '');
 
   card.addEventListener('click', (e) => {
-    if(e.target.closest('.entry-del-btn')) return;
-    const isExpanded = card.classList.contains('ec-expanded');
-    if(isExpanded) {
-      card.classList.remove('ec-expanded');
-    } else {
-      /* Also load this day into editor */
-      if(isDirty) autoSave();
-      const p = entry.date.split('-');
-      currentDate = new Date(+p[0], +p[1]-1, +p[2]);
-      loadDay();
-      /* Scroll to top */
-      document.querySelector('.journal-card').scrollIntoView({behavior:'smooth',block:'start'});
-    }
+    if(e.target.closest('.entry-del-btn') || e.target.closest('.entry-edit-btn')) return;
+    card.classList.toggle('ec-expanded');
   });
 
   return card;
+}
+
+function openEntryInEditor(event, key) {
+  event.stopPropagation();
+  if(isDirty) autoSave();
+  const p = key.split('-');
+  currentDate = new Date(+p[0], +p[1]-1, +p[2]);
+  loadDay();
+  document.querySelector('.journal-card').scrollIntoView({behavior:'smooth',block:'start'});
 }
 
 function fmtTime(ts) {
@@ -979,7 +1000,7 @@ function fmtTime(ts) {
 
 function deleteEntry(event, key) {
   event.stopPropagation();
-  if(!confirm('Bu gunluk sayfasini silmek istediğine emin misin?')) return;
+  if(!confirm('Bu günlük sayfasını silmek istediğine emin misin?')) return;
   delete journal[key];
   saveJournal();
   if(dateKey(currentDate) === key) {
@@ -1013,15 +1034,19 @@ function updateSidebarStats() {
 
   const streak = calcStreak();
   document.getElementById('sbStreakNum').textContent   = streak;
-  document.getElementById('headerStreak').textContent  = streak + ' gun';
+  document.getElementById('headerStreak').textContent  = streak + ' gün';
 }
 
 function calcStreak() {
   let streak = 0;
   const d = new Date(); d.setHours(0,0,0,0);
+  const todayK = dateKey(d);
+  if(!(journal[todayK] && (journal[todayK].text || journal[todayK].mood))) {
+    d.setDate(d.getDate() - 1);
+  }
   while(true) {
     const k = dateKey(d);
-    if(journal[k] && journal[k].text) { streak++; }
+    if(journal[k] && (journal[k].text || journal[k].mood)) { streak++; }
     else { break; }
     d.setDate(d.getDate() - 1);
   }

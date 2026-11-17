@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
     rel="stylesheet" />
+  <script src="app_common.js"></script>
   <style>
     *,
     *::before,
@@ -76,8 +77,8 @@
     /* SIDEBAR */
     .sidebar {
       position:fixed; top:0; left:0; bottom:0; width:280px;
-      background:rgba(9,9,22,0.98);
-      border-right:1px solid rgba(255,255,255,0.09);
+      background:var(--sb-bg, rgba(9,9,22,0.98));
+      border-right:1px solid var(--sb-border, rgba(255,255,255,0.09));
       backdrop-filter:blur(30px); -webkit-backdrop-filter:blur(30px);
       z-index:150;
       transform:translateX(-100%); transition:transform .3s cubic-bezier(0.4,0,0.2,1);
@@ -90,13 +91,13 @@
       padding:20px 18px 16px;
       border-bottom:1px solid var(--border);
     }
-    .sb-logo { font-size:16px; font-weight:800; color:#fff; letter-spacing:-0.2px; }
+    .sb-logo { font-size:16px; font-weight:800; color:var(--text); letter-spacing:-0.2px; }
     .sb-close {
-      background:rgba(255,255,255,0.05); border:1px solid var(--border);
-      width:32px; height:32px; border-radius:10px; color:#fff; font-size:16px;
+      background:var(--surface2); border:1px solid var(--border);
+      width:32px; height:32px; border-radius:10px; color:var(--text2); font-size:16px;
       cursor:pointer; display:flex; align-items:center; justify-content:center; transition:background .2s;
     }
-    .sb-close:hover { background:rgba(255,255,255,0.1); }
+    .sb-close:hover { background:var(--red-bg); color:var(--red); }
     .sb-body { flex:1; overflow-y:auto; padding:18px; }
     .sb-body::-webkit-scrollbar { width:4px; }
     .sb-body::-webkit-scrollbar-track { background:transparent; }
@@ -109,9 +110,9 @@
       border-radius:8px; text-decoration:none; color:var(--text2);
       font-size:13px; font-weight:600; transition:all .2s; border:1px solid transparent;
     }
-    .sb-nav-item:hover { background:rgba(255,255,255,0.04); color:#fff; }
+    .sb-nav-item:hover { background:var(--surface2); color:var(--text); }
     .sb-nav-item.sb-active {
-      background:rgba(124,92,252,0.15); color:#fff; border-color:rgba(124,92,252,0.3);
+      background:rgba(124,92,252,0.15); color:var(--accent); border-color:rgba(124,92,252,0.3);
     }
     .sb-nav-icon { font-size:16px; }
 
@@ -446,7 +447,7 @@
       position: absolute;
       pointer-events: none;
       display: none;
-      background: rgba(14, 14, 36, .96);
+      background: var(--tooltip-bg, rgba(14, 14, 36, .96));
       border: 1px solid var(--border3);
       border-radius: 12px;
       padding: 12px 14px;
@@ -664,7 +665,7 @@
       padding: 14px 16px;
       border-radius: var(--rs);
       transition: border-color .2s, transform .15s;
-      cursor: default;
+      cursor: pointer;
     }
 
     .day-entry:hover {
@@ -767,7 +768,7 @@
       bottom: 22px;
       left: 50%;
       transform: translateX(-50%) translateY(90px);
-      background: #1a1a36;
+      background: var(--toast-bg, #1a1a36);
       border: 1px solid var(--border3);
       border-radius: 50px;
       padding: 10px 22px;
@@ -787,7 +788,7 @@
 
     @media(max-width:640px) {
       .page {
-        padding: 14px 12px 60px
+        padding: 70px 14px 60px
       }
 
       #mainChart {
@@ -808,7 +809,7 @@
 </head>
 
 <body>
-<script>!function(){var u=localStorage.getItem('gtk_session');if(!u)return;var t=JSON.parse(localStorage.getItem('gtk_theme_'+u)||'null');if(!t||!t.vars)return;var r=document.documentElement;Object.keys(t.vars).forEach(function(k){r.style.setProperty(k,t.vars[k]);});if(t.fontSize==='lg')r.style.fontSize='17px';else if(t.fontSize==='sm')r.style.fontSize='13px';}();</script>
+<script>if(window.GTK)GTK.applyTheme();</script>
 
   <div class="bg-scene">
     <div class="blob b1"></div>
@@ -862,12 +863,6 @@
     </div>
     
     
-    <div style="margin-top:auto; padding-top:20px;">
-      <a class="sb-nav-item" href="#" onclick="doLogout()" style="color:var(--red);">
-        <span class="sb-nav-icon">🚪</span> Çıkış Yap
-      </a>
-    </div>
-
     <div class="sb-divider"></div>
     <div class="sb-mini-stats">
       <div class="sb-mini-chip">
@@ -880,6 +875,12 @@
         <div class="smc-val" id="sbScorePct" style="color:var(--accent);">%0</div>
         <div class="smc-lbl" style="margin-top:2px;">iyi skor</div>
       </div>
+    </div>
+
+    <div style="margin-top:16px; padding-top:14px; border-top:1px solid var(--border);">
+      <a class="sb-nav-item" href="#" onclick="doLogout(); return false;" style="color:var(--red);">
+        <span class="sb-nav-icon">🚪</span> Çıkış Yap
+      </a>
     </div>
   </div>
 </div>
@@ -1005,12 +1006,13 @@
   <div class="toast" id="toast"></div>
 
   <script>
-    function escHtml(s){if(!s)return'';return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[m]));}
-    const sessionUser = localStorage.getItem('gtk_session');
+    function escHtml(s){return window.GTK?GTK.escHtml(s):String(s||'');}
+    const sessionUser = window.GTK ? GTK.getSessionUser() : localStorage.getItem('gtk_session');
     function doLogout() {
         if (window.doFirebaseLogout) window.doFirebaseLogout();
         else {
             localStorage.removeItem('gtk_session');
+            localStorage.removeItem('gtk_guest_mode');
             localStorage.removeItem('gtk_profile');
             window.location.href = 'auth.html';
         }
@@ -1033,7 +1035,7 @@
     /* ════════════════════════════════════
        STATE
     ════════════════════════════════════ */
-    let profile = JSON.parse(localStorage.getItem(SK_PROF) || 'null');
+    let profile = window.GTK ? GTK.getProfile() : JSON.parse(localStorage.getItem(SK_PROF) || 'null');
     let scores = JSON.parse(localStorage.getItem(SK_SC) || '{}');
 
     let _currentFilter = '1A';
@@ -1215,7 +1217,7 @@
         const todayBadge = isToday ? `<span style="font-size:9px;background:rgba(0,212,255,.15);color:var(--cyan);padding:2px 7px;border-radius:50px;font-weight:800;margin-left:6px;">BUGÜN</span>` : '';
         const futBadge = isFut ? `<span style="font-size:9px;background:rgba(78,140,255,.15);color:var(--accent2);padding:2px 7px;border-radius:50px;font-weight:800;margin-left:6px;">GELECEK</span>` : '';
 
-        return `<div class="day-entry glass">
+        return `<div class="day-entry glass" onclick="openInPlanner('${key}')" title="Günlük planlayıcıda aç">
       <div class="de-left">
         <div class="de-date">${dateStr}${todayBadge}${futBadge}</div>
         ${noteHtml}
@@ -1224,6 +1226,10 @@
       <div class="de-score-badge ${scoreClass}">${scoreIcon} ${scoreLbl}</div>
     </div>`;
       }).join('');
+    }
+    function openInPlanner(dateKey) {
+      sessionStorage.setItem('gtk_planner_date', dateKey);
+      window.location.href = 'planner.html';
     }
 
     /* ════════════════════════════════════
@@ -1255,16 +1261,23 @@
       canvas.width = W * dpr;
       canvas.height = H * dpr;
       canvas.style.width = W + 'px';
-      ctx.scale(dpr, dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, W, H);
+      canvas._points = points;
+
+      const cs = getComputedStyle(document.documentElement);
+      const cEmpty = cs.getPropertyValue('--canvas-empty').trim() || 'rgba(255,255,255,.14)';
+      const cGrid = cs.getPropertyValue('--canvas-grid').trim() || 'rgba(255,255,255,.03)';
+      const cZero = cs.getPropertyValue('--canvas-zero').trim() || 'rgba(255,255,255,.14)';
+      const cAxis = cs.getPropertyValue('--canvas-axis').trim() || 'rgba(255,255,255,.22)';
+      const cDotBorder = cs.getPropertyValue('--canvas-dot-border').trim() || 'rgba(8,8,18,.8)';
 
       if (points.length < 2) {
-        ctx.fillStyle = 'rgba(255,255,255,.12)';
+        ctx.fillStyle = cEmpty;
         ctx.font = '14px Inter,sans-serif';
         ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
         ctx.fillText('Bu dönemde puanlanmış gün yok', W / 2, H / 2 - 14);
         ctx.font = '11px Inter,sans-serif';
-        ctx.fillStyle = 'rgba(255,255,255,.06)';
         ctx.fillText('Takvimden günlere puan ekleyebilirsin', W / 2, H / 2 + 14);
         return;
       }
@@ -1286,7 +1299,7 @@
       const zY = yOf(0);
 
       /* ── Grid ── */
-      ctx.strokeStyle = 'rgba(255,255,255,.03)'; ctx.lineWidth = 1;
+      ctx.strokeStyle = cGrid; ctx.lineWidth = 1;
       for (let i = 0; i <= 5; i++) {
         const gy = PAD.top + (CH / 5) * i;
         ctx.beginPath(); ctx.moveTo(PAD.left, gy); ctx.lineTo(PAD.left + CW, gy); ctx.stroke();
@@ -1294,10 +1307,10 @@
 
       /* ── Zero line ── */
       if (zY >= PAD.top && zY <= PAD.top + CH) {
-        ctx.strokeStyle = 'rgba(255,255,255,.14)'; ctx.setLineDash([5, 6]); ctx.lineWidth = 1;
+        ctx.strokeStyle = cZero; ctx.setLineDash([5, 6]); ctx.lineWidth = 1;
         ctx.beginPath(); ctx.moveTo(PAD.left, zY); ctx.lineTo(PAD.left + CW, zY); ctx.stroke();
         ctx.setLineDash([]);
-        ctx.fillStyle = 'rgba(255,255,255,.22)'; ctx.font = '9px Inter,sans-serif';
+        ctx.fillStyle = cAxis; ctx.font = '9px Inter,sans-serif';
         ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
         ctx.fillText('0', PAD.left - 6, zY);
       }
@@ -1309,7 +1322,7 @@
         const vy = yOf(v);
         const vRnd = Math.round(v);
         if (vy < PAD.top || vy > PAD.top + CH) continue;
-        ctx.fillStyle = 'rgba(255,255,255,.18)'; ctx.font = '9px Inter,sans-serif';
+        ctx.fillStyle = cAxis; ctx.font = '9px Inter,sans-serif';
         ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
         ctx.fillText(vRnd > 0 ? '+' + vRnd : String(vRnd), PAD.left - 6, vy);
       }
@@ -1323,9 +1336,9 @@
         if (m !== lastMonth) {
           lastMonth = m;
           const x = xOf(i);
-          ctx.strokeStyle = 'rgba(255,255,255,.06)'; ctx.lineWidth = 1; ctx.setLineDash([]);
+          ctx.strokeStyle = cGrid; ctx.lineWidth = 1; ctx.setLineDash([]);
           ctx.beginPath(); ctx.moveTo(x, PAD.top); ctx.lineTo(x, PAD.top + CH); ctx.stroke();
-          ctx.fillStyle = 'rgba(255,255,255,.15)'; ctx.font = '9px Inter,sans-serif';
+          ctx.fillStyle = cAxis; ctx.font = '9px Inter,sans-serif';
           ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
           ctx.fillText(MONTH_SHORT[m], x, PAD.top - 4);
         }
@@ -1379,7 +1392,7 @@
         const dc = p.score === '+' ? '#00e5a0' : p.score === '-' ? '#ff4d6d' : '#ffcd47';
         ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2);
         ctx.fillStyle = dc; ctx.fill();
-        ctx.strokeStyle = 'rgba(8,8,18,.8)'; ctx.lineWidth = isHov ? 2 : 1.5; ctx.stroke();
+        ctx.strokeStyle = cDotBorder; ctx.lineWidth = isHov ? 2 : 1.5; ctx.stroke();
 
         if (isHov) {
           // Outer ring
@@ -1391,7 +1404,7 @@
       /* Crosshair */
       if (hoveredIdx !== null && hoveredIdx > 0 && hoveredIdx < points.length) {
         const x = xOf(hoveredIdx);
-        ctx.strokeStyle = 'rgba(255,255,255,.1)'; ctx.lineWidth = 1; ctx.setLineDash([3, 3]);
+        ctx.strokeStyle = cZero; ctx.lineWidth = 1; ctx.setLineDash([3, 3]);
         ctx.beginPath(); ctx.moveTo(x, PAD.top); ctx.lineTo(x, PAD.top + CH); ctx.stroke();
         ctx.setLineDash([]);
       }
@@ -1412,15 +1425,14 @@
       }
 
       /* X-axis labels */
-      ctx.fillStyle = 'rgba(255,255,255,.22)'; ctx.font = '9px Inter,sans-serif';
+      ctx.fillStyle = cAxis; ctx.font = '9px Inter,sans-serif';
       ctx.textAlign = 'center'; ctx.textBaseline = 'top';
-      const maxLabels = Math.floor(CW / 60);
+      const maxLabels = Math.max(2, Math.floor(CW / 60));
       const step = Math.max(1, Math.ceil(N / maxLabels));
       points.forEach((p, i) => {
-        if (p._start || i % step !== 0) return;
+        if (p._start || i % step !== 0 || i === N) return;
         const x = xOf(i);
         if (x > PAD.left + clipW + 5) return;
-        // Very short label: d/m
         const parts = p.key.split('-');
         ctx.fillText(`${parseInt(parts[2])}/${parseInt(parts[1])}`, x, PAD.top + CH + 6);
       });
@@ -1513,13 +1525,12 @@
     ════════════════════════════════════ */
     function initUserBadge() {
       if (!profile) {
-        document.getElementById('userName').textContent = 'Profil yok';
+        document.getElementById('userName').textContent = 'Kullanıcı';
         document.getElementById('userAv').textContent = '?';
         return;
       }
-      const ini = (profile.fn[0] || '') + (profile.ln[0] || '');
-      document.getElementById('userAv').textContent = ini.toUpperCase();
-      document.getElementById('userName').textContent = `${profile.fn} ${profile.ln}`;
+      document.getElementById('userAv').textContent = window.GTK ? GTK.getProfileInitials(profile) : ((profile.fn?.[0]||'')+(profile.ln?.[0]||'')).toUpperCase() || '?';
+      document.getElementById('userName').textContent = window.GTK ? GTK.getProfileDisplayName(profile) : `${profile.fn||''} ${profile.ln||''}`.trim() || 'Kullanıcı';
     }
 
     /* ════════════════════════════════════
@@ -1563,7 +1574,6 @@
     
     // Sidebar Stats
     function updateSidebarStats() {
-        const scores = JSON.parse(localStorage.getItem('gtk_scores') || '{}');
         let plus=0, minus=0, zero=0;
         for(const k in scores) {
             if(scores[k].score==='+') plus++;
@@ -1580,6 +1590,18 @@
             document.getElementById('sbScorePct').textContent = `%${pct}`;
         }
     }
+
+    window.addEventListener('storage', (e) => {
+      if (e.key === SK_SC) {
+        scores = JSON.parse(e.newValue || '{}');
+        updateSidebarStats();
+        updateAll();
+      }
+      if (e.key === SK_PROF) {
+        profile = window.GTK ? GTK.getProfile() : JSON.parse(e.newValue || 'null');
+        initUserBadge();
+      }
+    });
 
     updateSidebarStats();
     updateAll(); // default: 1A

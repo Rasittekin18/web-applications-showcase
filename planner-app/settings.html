@@ -3,9 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ayarlar — Gelisim Takibi</title>
+  <title>Ayarlar — Gelişim Takibi</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <script src="app_common.js"></script>
   <style>
     *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
     :root {
@@ -36,7 +37,7 @@
     /* SIDEBAR */
     .sb-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);z-index:149;opacity:0;pointer-events:none;transition:opacity .3s}
     .sb-backdrop.open{opacity:1;pointer-events:auto}
-    .sidebar{position:fixed;top:0;left:0;bottom:0;width:var(--sb-w);background:rgba(9,9,22,.98);border-right:1px solid rgba(255,255,255,.09);backdrop-filter:blur(30px);z-index:150;transform:translateX(-100%);transition:transform .32s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;overflow:hidden}
+    .sidebar{position:fixed;top:0;left:0;bottom:0;width:var(--sb-w);background:var(--sb-bg, rgba(9,9,22,.98));border-right:1px solid var(--sb-border, rgba(255,255,255,.09));backdrop-filter:blur(30px);z-index:150;transform:translateX(-100%);transition:transform .32s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;overflow:hidden}
     .sidebar.open{transform:translateX(0)}
     .sb-header{display:flex;align-items:center;justify-content:space-between;padding:20px 18px 16px;border-bottom:1px solid var(--border);flex-shrink:0}
     .sb-logo{font-size:16px;font-weight:900;letter-spacing:-.4px;background:linear-gradient(130deg,var(--accent),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
@@ -103,7 +104,7 @@
     .field{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
     .field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
     .field-label{font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.6px}
-    .field-input{background:rgba(255,255,255,.05);border:1px solid var(--border2);border-radius:var(--rs);color:var(--text);font-family:'Inter',sans-serif;font-size:14px;padding:11px 13px;width:100%;outline:none;transition:border-color .2s,box-shadow .2s}
+    .field-input{background:var(--input-bg, rgba(255,255,255,.05));border:1px solid var(--border2);border-radius:var(--rs);color:var(--text);font-family:'Inter',sans-serif;font-size:14px;padding:11px 13px;width:100%;outline:none;transition:border-color .2s,box-shadow .2s}
     .field-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(124,92,252,.15)}
     .field-input::placeholder{color:var(--text3)}
     .field-input:disabled{opacity:.5;cursor:not-allowed}
@@ -137,7 +138,7 @@
     .tp-bar.b2{width:50%}
     .tp-bar.b3{width:85%}
     .tc-active-badge{position:absolute;top:6px;right:6px;background:var(--accent);color:#fff;font-size:9px;font-weight:700;padding:2px 7px;border-radius:50px}
-    .theme-info{padding:10px 12px;background:rgba(0,0,0,.2)}
+    .theme-info{padding:10px 12px;background:var(--surface)}
     .theme-name{font-size:12px;font-weight:700;color:var(--text)}
     .theme-desc{font-size:10px;color:var(--text3)}
 
@@ -183,28 +184,25 @@
     .dz-sub{font-size:12px;color:var(--text2);margin-bottom:14px;line-height:1.6}
 
     /* TOAST */
-    .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(90px);background:#1a1a36;border:1px solid var(--border3);border-radius:50px;padding:10px 22px;font-size:13px;font-weight:700;color:var(--text);z-index:999;pointer-events:none;white-space:nowrap;box-shadow:0 10px 40px rgba(0,0,0,.5);transition:transform .35s cubic-bezier(.34,1.56,.64,1)}
+    .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(90px);background:var(--toast-bg, #1a1a36);border:1px solid var(--border3);border-radius:50px;padding:10px 22px;font-size:13px;font-weight:700;color:var(--text);z-index:999;pointer-events:none;white-space:nowrap;box-shadow:0 10px 40px rgba(0,0,0,.5);transition:transform .35s cubic-bezier(.34,1.56,.64,1)}
     .toast.show{transform:translateX(-50%) translateY(0)}
 
     /* SAVE INDICATOR */
     .save-dot{width:7px;height:7px;border-radius:50%;background:var(--yellow);display:inline-block;margin-left:6px;transition:background .3s}
     .save-dot.saved{background:var(--green)}
 
-    @media(max-width:700px){.theme-grid{grid-template-columns:repeat(2,1fr)}.field-row{grid-template-columns:1fr}.data-grid{grid-template-columns:1fr 1fr}.color-pickers{grid-template-columns:1fr}.app{padding-left:64px}}
+    @media(max-width:700px){.theme-grid{grid-template-columns:repeat(2,1fr)}.field-row{grid-template-columns:1fr}.data-grid{grid-template-columns:1fr 1fr}.color-pickers{grid-template-columns:1fr}.app{padding:70px 14px 60px 14px}}
     @media(max-width:440px){.theme-grid{grid-template-columns:1fr}.tabs{flex-direction:column;border-radius:var(--r)}}
   </style>
   <script type="module" src="firebase_sync.js"></script>
 </head>
 <body>
 
-<script>
-/* THEME INIT */
-!function(){var u=localStorage.getItem('gtk_session');if(!u)return;var t=JSON.parse(localStorage.getItem('gtk_theme_'+u)||'null');if(!t||!t.vars)return;var r=document.documentElement;Object.keys(t.vars).forEach(function(k){r.style.setProperty(k,t.vars[k]);});if(t.fontSize==='lg')r.style.fontSize='17px';else if(t.fontSize==='sm')r.style.fontSize='13px';}();
-</script>
+<script>if(window.GTK)GTK.applyTheme();</script>
 
 <div class="bg-scene"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div></div>
 
-<button class="hamburger" id="hamburger" onclick="toggleSidebar()">
+<button class="hamburger" id="hamburger" onclick="toggleSidebar()" title="Menü">
   <svg width="18" height="14" viewBox="0 0 18 14" fill="none"><rect width="18" height="2" rx="1" fill="white"/><rect y="6" width="14" height="2" rx="1" fill="white"/><rect y="12" width="18" height="2" rx="1" fill="white"/></svg>
 </button>
 
@@ -212,26 +210,26 @@
 
 <div class="sidebar" id="sidebar">
   <div class="sb-header">
-    <div class="sb-logo">&#9881; Gelisim Takibi</div>
+    <div class="sb-logo">&#9881; Gelişim Takibi</div>
     <button class="sb-close" onclick="closeSidebar()">&#10005;</button>
   </div>
   <div class="sb-body">
     <div class="sb-profile" id="sbProfile">
       <div class="sb-av" id="sbAv" style="background:linear-gradient(135deg,#7c5cfc,#4e8cff)">A</div>
-      <div><div class="sb-user-name" id="sbName">Kullanici</div><div class="sb-user-tag" id="sbTag">@kullanici</div></div>
+      <div><div class="sb-user-name" id="sbName">Kullanıcı</div><div class="sb-user-tag" id="sbTag">@kullanici</div></div>
     </div>
     <div class="sb-nav">
       <a class="sb-nav-item" href="index.html"><span class="sb-nav-icon">&#128197;</span><span>Takvim</span></a>
       <a class="sb-nav-item" href="chart.html"><span class="sb-nav-icon">&#128202;</span><span>Grafik Analizi</span></a>
-      <a class="sb-nav-item" href="planner.html"><span class="sb-nav-icon">&#128221;</span><span>Gunluk Planlama</span></a>
-      <a class="sb-nav-item" href="weekly.html"><span class="sb-nav-icon">&#127919;</span><span>Haftalik Hedefler</span></a>
-      <a class="sb-nav-item" href="yearly.html"><span class="sb-nav-icon">&#127882;</span><span>Yillik Hedefler</span></a>
-      <a class="sb-nav-item" href="journal.html"><span class="sb-nav-icon">&#128218;</span><span>Gunluk</span></a>
+      <a class="sb-nav-item" href="planner.html"><span class="sb-nav-icon">&#128221;</span><span>Günlük Planlama</span></a>
+      <a class="sb-nav-item" href="weekly.html"><span class="sb-nav-icon">&#127919;</span><span>Haftalık Hedefler</span></a>
+      <a class="sb-nav-item" href="yearly.html"><span class="sb-nav-icon">&#127882;</span><span>Yıllık Hedefler</span></a>
+      <a class="sb-nav-item" href="journal.html"><span class="sb-nav-icon">&#128218;</span><span>Günlük</span></a>
       <a class="sb-nav-item sb-active" href="settings.html"><span class="sb-nav-icon">&#9881;</span><span>Ayarlar</span></a>
     </div>
     <div class="sb-divider"></div>
-    <a class="sb-nav-item" href="#" onclick="doLogout()" style="color:var(--red);">
-      <span class="sb-nav-icon">&#128682;</span> Cikis Yap
+    <a class="sb-nav-item" href="#" onclick="doLogout(); return false;" style="color:var(--red);">
+      <span class="sb-nav-icon">&#128682;</span> Çıkış Yap
     </a>
   </div>
 </div>
@@ -240,10 +238,10 @@
   <header class="page-header glass">
     <div>
       <div class="page-title">&#9881; <span>Ayarlar</span></div>
-      <div class="page-sub">Profil, tema ve uygulama tercihlerin</div>
+      <div class="page-sub">Profil, tema, güvenlik ve veri tercihlerin</div>
     </div>
     <div id="saveDotWrap" style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text3)">
-      Degisiklikler <span class="save-dot" id="saveDot"></span>
+      Değişiklikler <span class="save-dot saved" id="saveDot"></span>
     </div>
   </header>
 
@@ -251,7 +249,7 @@
   <div class="tabs">
     <button class="tab-btn t-active" onclick="switchTab('profile')">&#128100; Profil</button>
     <button class="tab-btn" onclick="switchTab('theme')">&#127912; Tema</button>
-    <button class="tab-btn" onclick="switchTab('security')">&#128272; Guvenlik</button>
+    <button class="tab-btn" onclick="switchTab('security')">&#128272; Güvenlik</button>
     <button class="tab-btn" onclick="switchTab('data')">&#128190; Veri</button>
   </div>
 
@@ -259,14 +257,14 @@
   <div class="tab-panel tp-active" id="panel-profile">
     <div class="settings-card glass">
       <div class="sc-title">Profil Bilgileri</div>
-      <div class="sc-sub">Uygulamada gorunecek ad, e-posta ve profil gorselin.</div>
+      <div class="sc-sub">Uygulamada görünecek ad, doğum tarihi, e-posta ve profil görselin.</div>
 
       <div class="avatar-section">
         <div class="avatar-big" id="avatarBig">
           <div class="avatar-edit-hint">&#128247;</div>
         </div>
         <div class="avatar-info">
-          <div class="avatar-name" id="avatarName">Kullanici</div>
+          <div class="avatar-name" id="avatarName">Kullanıcı</div>
           <div class="avatar-username" id="avatarUsername">@kullanici</div>
           <div class="avatar-colors" id="avatarColors"></div>
         </div>
@@ -274,26 +272,32 @@
 
       <div class="field-row">
         <div class="field">
-          <label class="field-label">Ad</label>
-          <input type="text" class="field-input" id="profFirstName" placeholder="Adiniz" oninput="onProfileChange()" />
+          <label class="field-label" for="profFirstName">Ad</label>
+          <input type="text" class="field-input" id="profFirstName" placeholder="Adınız" oninput="onProfileChange()" />
         </div>
         <div class="field">
-          <label class="field-label">Soyad</label>
-          <input type="text" class="field-input" id="profLastName" placeholder="Soyadiniz" oninput="onProfileChange()" />
+          <label class="field-label" for="profLastName">Soyad</label>
+          <input type="text" class="field-input" id="profLastName" placeholder="Soyadınız" oninput="onProfileChange()" />
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label class="field-label" for="profEmail">E-posta</label>
+          <input type="email" class="field-input" id="profEmail" placeholder="eposta@ornek.com" oninput="onProfileChange()" />
+        </div>
+        <div class="field">
+          <label class="field-label" for="profBirth">Doğum Tarihi</label>
+          <input type="date" class="field-input" id="profBirth" oninput="onProfileChange()" />
         </div>
       </div>
       <div class="field">
-        <label class="field-label">E-posta</label>
-        <input type="email" class="field-input" id="profEmail" placeholder="eposta@ornek.com" oninput="onProfileChange()" />
-      </div>
-      <div class="field">
-        <label class="field-label">Kullanici Adi</label>
+        <label class="field-label" for="profUsername">Kullanıcı Adı</label>
         <input type="text" class="field-input" id="profUsername" readonly />
-        <div class="field-hint">Kullanici adi degistirilemez.</div>
+        <div class="field-hint">Oturum kimliği değiştirilemez.</div>
       </div>
       <div class="field">
-        <label class="field-label">Hakkimda (opsiyonel)</label>
-        <textarea class="field-input" id="profBio" rows="3" placeholder="Kendinizden kisa bir bilgi..." maxlength="200" oninput="onProfileChange()"></textarea>
+        <label class="field-label" for="profBio">Hakkımda (opsiyonel)</label>
+        <textarea class="field-input" id="profBio" rows="3" placeholder="Kendinizden kısa bir bilgi..." maxlength="200" oninput="onProfileChange()"></textarea>
       </div>
       <div class="btn-row">
         <button class="btn-primary" onclick="saveProfile()">&#10003; Profili Kaydet</button>
@@ -304,77 +308,83 @@
   <!-- ═══ THEME TAB ═══ -->
   <div class="tab-panel" id="panel-theme">
     <div class="settings-card glass">
-      <div class="sc-title">Tema Secimi</div>
-      <div class="sc-sub">Uygulamanin gorsel stilini sec veya kendi renk palettini olustur.</div>
+      <div class="sc-title">Tema Seçimi</div>
+      <div class="sc-sub">Uygulamanın görsel stilini seç veya kendi renk paletini oluştur.</div>
 
       <div class="theme-grid" id="themeGrid"></div>
 
       <!-- Custom theme panel -->
       <div class="custom-theme-panel" id="customPanel">
-        <div class="sc-title" style="margin-bottom:14px">&#127912; Ozel Tema Olusturucu</div>
+        <div class="sc-title" style="margin-bottom:14px">&#127912; Özel Tema Oluşturucu</div>
         <div class="field" style="margin-bottom:14px">
           <label class="field-label">Arkaplan Tonu</label>
           <div class="base-toggle">
             <button class="bt-btn bt-active" id="btDark"  onclick="setCustomBase('dark')">&#127769; Koyu</button>
-            <button class="bt-btn"           id="btLight" onclick="setCustomBase('light')">&#9728;&#65039; Acik</button>
+            <button class="bt-btn"           id="btLight" onclick="setCustomBase('light')">&#9728;&#65039; Açık</button>
           </div>
         </div>
         <div class="color-pickers" id="colorPickers"></div>
-        <button class="btn-primary" onclick="applyCustomTheme()" style="width:100%">&#128279; Ozel Temay&#305; Uygula</button>
+        <button class="btn-primary" onclick="applyCustomTheme()" style="width:100%">&#128279; Özel Temayı Uygula</button>
       </div>
     </div>
 
     <div class="settings-card glass" style="margin-top:0">
-      <div class="sc-title">Yazi Boyutu</div>
-      <div class="sc-sub">Tum sayfalarda metin buyuklugunu ayarla.</div>
+      <div class="sc-title">Yazı Boyutu</div>
+      <div class="sc-sub">Tüm sayfalarda metin büyüklüğünü ayarla.</div>
       <div class="font-size-pills">
-        <button class="fs-pill" data-size="sm"  onclick="setFontSize('sm')"  style="font-size:11px">K&#252;&#231;&#252;k</button>
+        <button class="fs-pill" data-size="sm"  onclick="setFontSize('sm')"  style="font-size:11px">Küçük</button>
         <button class="fs-pill fsp-active" data-size="md" onclick="setFontSize('md')">Orta</button>
-        <button class="fs-pill" data-size="lg"  onclick="setFontSize('lg')"  style="font-size:15px">Buyuk</button>
+        <button class="fs-pill" data-size="lg"  onclick="setFontSize('lg')"  style="font-size:15px">Büyük</button>
       </div>
     </div>
   </div>
 
   <!-- ═══ SECURITY TAB ═══ -->
   <div class="tab-panel" id="panel-security">
-    <div class="settings-card glass">
-      <div class="sc-title">Sifre Degistir</div>
-      <div class="sc-sub">Hesabini korumak icin guvenli bir sifre kullan.</div>
-      <div class="field">
-        <label class="field-label">Mevcut Sifre</label>
-        <input type="password" class="field-input" id="pwCurrent" placeholder="Mevcut sifreniz" />
+    <div class="settings-card glass" id="pwCard">
+      <div class="sc-title">Şifre Değiştir</div>
+      <div class="sc-sub">Bulut hesabını korumak için güvenli bir şifre kullan.</div>
+      <div id="guestPwNotice" style="display:none;padding:12px 14px;border-radius:var(--rs);background:var(--yellow-bg);border:1px solid rgba(255,205,71,.3);color:var(--yellow);font-size:12px;line-height:1.5;margin-bottom:12px;">
+        Şu anda <b>Misafir / Yerel Mod</b> kullanıyorsunuz. Şifre yönetimi için bulut hesabı ile giriş yapın.
+        <div style="margin-top:8px;"><a href="auth.html" style="color:var(--cyan);font-weight:700;text-decoration:none;">Giriş / Kayıt Ekranına Git →</a></div>
       </div>
-      <div class="field">
-        <label class="field-label">Yeni Sifre</label>
-        <input type="password" class="field-input" id="pwNew" placeholder="Yeni sifreniz" oninput="checkPwStrength(this.value,'pwStrength')" />
-        <div class="pw-strength">
-          <div class="pw-bars">
-            <div class="pw-bar" id="pwb1"></div><div class="pw-bar" id="pwb2"></div>
-            <div class="pw-bar" id="pwb3"></div><div class="pw-bar" id="pwb4"></div>
-          </div>
-          <div class="pw-label" id="pwStrengthLabel"></div>
+      <div id="pwFormFields">
+        <div class="field">
+          <label class="field-label" for="pwCurrent">Mevcut Şifre</label>
+          <input type="password" class="field-input" id="pwCurrent" placeholder="Mevcut şifreniz" />
         </div>
+        <div class="field">
+          <label class="field-label" for="pwNew">Yeni Şifre</label>
+          <input type="password" class="field-input" id="pwNew" placeholder="Yeni şifreniz (en az 6 karakter)" oninput="checkPwStrength(this.value,'pwStrength')" />
+          <div class="pw-strength">
+            <div class="pw-bars">
+              <div class="pw-bar" id="pwb1"></div><div class="pw-bar" id="pwb2"></div>
+              <div class="pw-bar" id="pwb3"></div><div class="pw-bar" id="pwb4"></div>
+            </div>
+            <div class="pw-label" id="pwStrengthLabel"></div>
+          </div>
+        </div>
+        <div class="field">
+          <label class="field-label" for="pwConfirm">Yeni Şifre (Tekrar)</label>
+          <input type="password" class="field-input" id="pwConfirm" placeholder="Yeni şifrenizi tekrar girin" />
+        </div>
+        <div class="btn-row">
+          <button class="btn-primary" id="btnChangePw" onclick="changePassword()">&#128272; Şifreyi Değiştir</button>
+        </div>
+        <div id="pwMsg" style="margin-top:10px;font-size:13px;font-weight:600;min-height:18px"></div>
       </div>
-      <div class="field">
-        <label class="field-label">Yeni Sifre (Tekrar)</label>
-        <input type="password" class="field-input" id="pwConfirm" placeholder="Yeni sifrenizi tekrar girin" />
-      </div>
-      <div class="btn-row">
-        <button class="btn-primary" onclick="changePassword()">&#128272; Sifreyi Degistir</button>
-      </div>
-      <div id="pwMsg" style="margin-top:10px;font-size:13px;font-weight:600;min-height:18px"></div>
     </div>
 
     <div class="settings-card glass">
       <div class="sc-title">Aktif Oturum</div>
-      <div class="sc-sub">Mevcut tarayici oturumunuzu yonetin.</div>
-      <div style="display:flex;align-items:center;gap:12px;padding:14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--rs)">
+      <div class="sc-sub">Mevcut tarayıcı oturumunuzu yönetin.</div>
+      <div style="display:flex;align-items:center;gap:12px;padding:14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--rs);flex-wrap:wrap;">
         <div style="font-size:24px">&#128187;</div>
         <div>
-          <div style="font-size:13px;font-weight:700">Bu Cihaz &bull; Web Tarayicisi</div>
-          <div style="font-size:11px;color:var(--text3);margin-top:2px" id="loginSince">Giris tarihi bilgisi yok</div>
+          <div style="font-size:13px;font-weight:700" id="sessionModeTitle">Bu Cihaz &bull; Web Tarayıcısı</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:2px" id="loginSince">Oturum aktif</div>
         </div>
-        <button class="btn-secondary" onclick="doLogout()" style="margin-left:auto;font-size:12px;padding:8px 14px">Cikis Yap</button>
+        <button class="btn-secondary" onclick="doLogout()" style="margin-left:auto;font-size:12px;padding:8px 14px">Çıkış Yap</button>
       </div>
     </div>
   </div>
@@ -382,43 +392,45 @@
   <!-- ═══ DATA TAB ═══ -->
   <div class="tab-panel" id="panel-data">
     <div class="settings-card glass">
-      <div class="sc-title">Veri Ozeti</div>
-      <div class="sc-sub">Bu hesaba ait tum verileriniz.</div>
+      <div class="sc-title">Veri Özeti</div>
+      <div class="sc-sub">Bu hesaba ait tüm verileriniz.</div>
       <div class="data-grid" id="dataGrid">
-        <div class="data-stat"><div class="ds-val" id="dsPlan">0</div><div class="ds-lbl">Gunluk Plan</div></div>
-        <div class="data-stat"><div class="ds-val" id="dsJournal">0</div><div class="ds-lbl">Gunluk Yazi</div></div>
-        <div class="data-stat"><div class="ds-val" id="dsGoals">0</div><div class="ds-lbl">Yillik Hedef</div></div>
-        <div class="data-stat"><div class="ds-val" id="dsWeeks">0</div><div class="ds-lbl">Haftalik Hedef</div></div>
+        <div class="data-stat"><div class="ds-val" id="dsPlan">0</div><div class="ds-lbl">Günlük Kayıt</div></div>
+        <div class="data-stat"><div class="ds-val" id="dsJournal">0</div><div class="ds-lbl">Günlük Yazı</div></div>
+        <div class="data-stat"><div class="ds-val" id="dsGoals">0</div><div class="ds-lbl">Yıllık Hedef</div></div>
+        <div class="data-stat"><div class="ds-val" id="dsWeeks">0</div><div class="ds-lbl">Haftalık Hedef</div></div>
       </div>
     </div>
 
     <div class="settings-card glass">
-      <div class="sc-title">Veri Disari Aktar</div>
-      <div class="sc-sub">Tum verilerinizi JSON formatinda indirin. Yedek almak icin kullanabilirsiniz.</div>
+      <div class="sc-title">Veri Dışa &amp; İçe Aktar (Yedekleme)</div>
+      <div class="sc-sub">Verilerinizi JSON formatında yedekleyin veya mevcut bir yedeği geri yükleyin.</div>
       <div class="btn-row">
-        <button class="btn-secondary" onclick="exportAll()">&#128229; Tum Veriyi indir</button>
-        <button class="btn-secondary" onclick="exportJournal()">&#128229; Sadece Gunluk</button>
+        <button class="btn-secondary" onclick="exportAll()">&#128229; Tüm Veriyi İndir</button>
+        <button class="btn-secondary" onclick="exportJournal()">&#128229; Sadece Günlük</button>
         <button class="btn-secondary" onclick="exportGoals()">&#128229; Sadece Hedefler</button>
+        <button class="btn-primary" onclick="document.getElementById('importFileInput').click()">&#128228; Yedekten İçe Aktar</button>
+        <input type="file" id="importFileInput" accept=".json,application/json" style="display:none" onchange="importAll(event)" />
       </div>
     </div>
 
     <div class="settings-card glass">
-      <div class="sc-title" style="color:var(--red)">&#9888; Tehlikeli Bolge</div>
-      <div class="sc-sub">Asagidaki islemler geri alinamaz. Dikkatli ol!</div>
+      <div class="sc-title" style="color:var(--red)">&#9888; Tehlikeli Bölge</div>
+      <div class="sc-sub">Aşağıdaki işlemler geri alınamaz. Dikkatli olun!</div>
       <div class="danger-zone" style="margin-bottom:12px">
-        <div class="dz-title">Gunluk Yazilari Temizle</div>
-        <div class="dz-sub">Tum gunluk kayitlariniz kalici olarak silinir.</div>
-        <button class="btn-danger" onclick="clearData('journal')">&#128465; Gunlugu Temizle</button>
+        <div class="dz-title">Günlük Yazıları Temizle</div>
+        <div class="dz-sub">Tüm günlük kayıtlarınız kalıcı olarak silinir.</div>
+        <button class="btn-danger" onclick="clearData('journal')">&#128465; Günlüğü Temizle</button>
       </div>
       <div class="danger-zone" style="margin-bottom:12px">
-        <div class="dz-title">Tum Verileri Temizle</div>
-        <div class="dz-sub">Planlar, hedefler, gunluk — her sey silinir. Hesabiniz kalir.</div>
-        <button class="btn-danger" onclick="clearData('all')">&#128465; Tum Verileri Sil</button>
+        <div class="dz-title">Tüm Verileri Temizle</div>
+        <div class="dz-sub">Planlar, skorlar, hedefler, günlük — her şey silinir. Hesabınız kalır.</div>
+        <button class="btn-danger" onclick="clearData('all')">&#128465; Tüm Verileri Sil</button>
       </div>
       <div class="danger-zone">
-        <div class="dz-title">Hesabi Sil</div>
-        <div class="dz-sub">Hesabiniz ve tum verileri kalici olarak silinir. Bu islem geri alinamaz.</div>
-        <button class="btn-danger" onclick="deleteAccount()">&#128683; Hesabi Kalici Sil</button>
+        <div class="dz-title">Hesabı Sil</div>
+        <div class="dz-sub">Hesabınız ve tüm verileri kalıcı olarak silinir. Bu işlem geri alınamaz.</div>
+        <button class="btn-danger" onclick="deleteAccount()">&#128683; Hesabı Kalıcı Sil</button>
       </div>
     </div>
   </div>
@@ -429,21 +441,23 @@
 
 <script>
 /* ═══ AUTH ═══ */
-const sessionUser = localStorage.getItem('gtk_session');
+const sessionUser = window.GTK ? GTK.getSessionUser() : localStorage.getItem('gtk_session');
 
 function doLogout() {
   if (window.doFirebaseLogout) {
     window.doFirebaseLogout();
   } else {
     localStorage.removeItem('gtk_session');
+    localStorage.removeItem('gtk_guest_mode');
     window.location.href = 'auth.html';
   }
 }
 
 /* ═══ UTILS ═══ */
 function showToast(msg, dur) {
+  if (window.GTK) { GTK.toast(msg, dur); return; }
   const t = document.getElementById('toast');
-  t.innerHTML = msg; t.classList.add('show');
+  t.textContent = msg; t.classList.add('show');
   clearTimeout(t._t);
   t._t = setTimeout(() => t.classList.remove('show'), dur||2600);
 }
@@ -465,6 +479,7 @@ function switchTab(id) {
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('tp-active'));
   document.getElementById('panel-'+id).classList.add('tp-active');
   if(id === 'data') renderDataStats();
+  if(id === 'security') renderSecurityState();
 }
 
 /* ═══ USER DATA ═══ */
@@ -488,17 +503,23 @@ let currentAvColor = 0;
 
 function loadProfile() {
   const u = getMyUser();
-  const nameParts = (u.displayName || u.name || sessionUser).split(' ');
-  const fn = nameParts[0] || '';
-  const ln = nameParts.slice(1).join(' ') || '';
+  const gp = window.GTK ? GTK.getProfile() : JSON.parse(localStorage.getItem('gtk_profile') || 'null');
+  let fn = gp?.fn || '';
+  let ln = gp?.ln || '';
+  if (!fn && (u.displayName || u.name)) {
+    const nameParts = (u.displayName || u.name || '').split(' ');
+    fn = nameParts[0] || '';
+    ln = nameParts.slice(1).join(' ') || '';
+  }
 
   document.getElementById('profFirstName').value = fn;
   document.getElementById('profLastName').value  = ln;
-  document.getElementById('profEmail').value     = u.email || '';
-  document.getElementById('profUsername').value  = sessionUser;
-  document.getElementById('profBio').value       = u.bio || '';
+  document.getElementById('profEmail').value     = gp?.email || u.email || '';
+  document.getElementById('profBirth').value     = gp?.bd || '';
+  document.getElementById('profUsername').value  = sessionUser || 'guest';
+  document.getElementById('profBio').value       = gp?.bio || u.bio || '';
 
-  currentAvColor = u.avColor || 0;
+  currentAvColor = (typeof gp?.avColor === 'number') ? gp.avColor : (u.avColor || 0);
   updateAvatarPreview(fn, ln);
   buildAvColorPicker();
   updateSidebarProfile(fn, ln);
@@ -506,12 +527,13 @@ function loadProfile() {
 }
 
 function updateAvatarPreview(fn, ln) {
-  const letter = ((fn||'?')[0] + (ln ? ln[0] : '')).toUpperCase();
+  const letter = ((fn||sessionUser||'?')[0] + (ln ? ln[0] : '')).toUpperCase();
   const av = document.getElementById('avatarBig');
-  av.style.background = AV_COLORS[currentAvColor];
-  av.innerHTML = '<div class="avatar-edit-hint">&#128247;</div>' + letter;
-  document.getElementById('avatarName').textContent    = (fn + ' ' + ln).trim() || 'Kullanici';
-  document.getElementById('avatarUsername').textContent = '@' + sessionUser;
+  av.style.background = AV_COLORS[currentAvColor] || AV_COLORS[0];
+  const safeLetter = window.GTK ? GTK.escHtml(letter) : letter;
+  av.innerHTML = '<div class="avatar-edit-hint">&#128247;</div>' + safeLetter;
+  document.getElementById('avatarName').textContent    = (fn + ' ' + ln).trim() || 'Kullanıcı';
+  document.getElementById('avatarUsername').textContent = '@' + (sessionUser || 'guest');
   updateSidebarProfile(fn, ln);
 }
 
@@ -535,18 +557,26 @@ function buildAvColorPicker() {
 }
 
 function updateSidebarProfile(fn, ln) {
-  const letter = ((fn||sessionUser)[0]).toUpperCase();
+  const letter = ((fn||sessionUser||'?')[0]).toUpperCase();
   document.getElementById('sbAv').textContent = letter;
-  document.getElementById('sbAv').style.background = AV_COLORS[currentAvColor];
-  document.getElementById('sbName').textContent = (fn + ' ' + ln).trim() || 'Kullanici';
-  document.getElementById('sbTag').textContent  = '@' + sessionUser;
+  document.getElementById('sbAv').style.background = AV_COLORS[currentAvColor] || AV_COLORS[0];
+  document.getElementById('sbName').textContent = (fn + ' ' + ln).trim() || 'Kullanıcı';
+  document.getElementById('sbTag').textContent  = '@' + (sessionUser || 'guest');
 }
 
 function updateLoginSince(ts) {
-  if(!ts) return;
+  const isGuest = window.GTK ? GTK.isGuestMode() : (localStorage.getItem('gtk_guest_mode') === '1');
+  const titleEl = document.getElementById('sessionModeTitle');
+  if (titleEl) {
+    titleEl.textContent = isGuest ? 'Yerel (Misafir) Mod • Bu Tarayıcı' : 'Bulut Hesabı (Firestore Senkron) • Web Tarayıcısı';
+  }
+  if(!ts) {
+    document.getElementById('loginSince').textContent = isGuest ? 'Veriler tarayıcınızda yerel olarak saklanıyor' : 'Oturum bulut ile senkronize';
+    return;
+  }
   const d = new Date(ts);
   document.getElementById('loginSince').textContent =
-    'Hesap olusturuldu: ' + d.getDate() + '/' + (d.getMonth()+1) + '/' + d.getFullYear();
+    'Hesap oluşturuldu: ' + d.getDate() + '/' + (d.getMonth()+1) + '/' + d.getFullYear();
 }
 
 function onProfileChange() {
@@ -560,9 +590,10 @@ function saveProfile() {
   const fn    = document.getElementById('profFirstName').value.trim();
   const ln    = document.getElementById('profLastName').value.trim();
   const email = document.getElementById('profEmail').value.trim();
+  const bd    = document.getElementById('profBirth').value;
   const bio   = document.getElementById('profBio').value.trim();
 
-  if(!fn) { showToast('Ad bos birakilamaz'); return; }
+  if(!fn) { showToast('Ad boş bırakılamaz'); return; }
 
   const users = getUsers();
   if(!users[sessionUser]) users[sessionUser] = {};
@@ -573,12 +604,16 @@ function saveProfile() {
   users[sessionUser].avColor     = currentAvColor;
   setUsers(users);
 
-  const profile = JSON.parse(localStorage.getItem('gtk_profile') || '{}');
-  profile.fn = fn; profile.ln = ln; profile.email = email;
-  localStorage.setItem('gtk_profile', JSON.stringify(profile));
+  if (window.GTK) {
+    GTK.saveProfile({ fn, ln, email, bd, bio, avColor: currentAvColor });
+  } else {
+    const profile = JSON.parse(localStorage.getItem('gtk_profile') || '{}');
+    profile.fn = fn; profile.ln = ln; profile.email = email; profile.bd = bd; profile.bio = bio; profile.avColor = currentAvColor;
+    localStorage.setItem('gtk_profile', JSON.stringify(profile));
+  }
 
   markSaved();
-  showToast('&#10003; Profil kaydedildi');
+  showToast('✓ Profil kaydedildi');
 }
 
 /* ═══ THEME SYSTEM ═══ */
@@ -592,7 +627,7 @@ const THEMES = {
   },
   light: {
     name:'Aydınlık', desc:'Temiz beyaz, gündüz için', base:'light',
-    vars:{'--bg':'#f0f0f8','--surface':'rgba(0,0,0,0.04)','--surface2':'rgba(0,0,0,0.08)','--border':'rgba(0,0,0,0.09)','--border2':'rgba(0,0,0,0.15)','--border3':'rgba(0,0,0,0.25)','--text':'#1a1a2e','--text2':'#55556f','--text3':'#9090a8','--accent':'#7c5cfc','--accent2':'#4e8cff','--cyan':'#00b4d8','--green':'#059669','--green-bg':'rgba(5,150,105,0.12)','--red':'#dc2626','--red-bg':'rgba(220,38,38,0.10)','--yellow':'#d97706','--yellow-bg':'rgba(217,119,6,0.10)'},
+    vars:{'--bg':'#f0f0f8','--surface':'rgba(0,0,0,0.04)','--surface2':'rgba(0,0,0,0.08)','--border':'rgba(0,0,0,0.09)','--border2':'rgba(0,0,0,0.15)','--border3':'rgba(0,0,0,0.25)','--text':'#1a1a2e','--text2':'#55556f','--text3':'#686888','--accent':'#7c5cfc','--accent2':'#4e8cff','--cyan':'#00b4d8','--green':'#059669','--green-bg':'rgba(5,150,105,0.12)','--red':'#dc2626','--red-bg':'rgba(220,38,38,0.10)','--yellow':'#d97706','--yellow-bg':'rgba(217,119,6,0.10)'},
     preview:{ bg:'#f0f0f8', sidebar:'rgba(0,0,0,0.08)', bar1:'#7c5cfc', bar2:'rgba(0,0,0,0.15)', bar3:'rgba(0,0,0,0.07)' }
   },
   midnight: {
@@ -668,7 +703,7 @@ function selectTheme(id, card) {
   if(id !== 'custom') {
     applyThemeVars(THEMES[id].vars);
     saveTheme(id, THEMES[id].vars);
-    showToast('&#127912; ' + THEMES[id].name + ' temasi uyguland&#305;');
+    showToast('🎨 ' + THEMES[id].name + ' teması uygulandı');
     buildThemeGrid();
   }
 }
@@ -682,6 +717,7 @@ function saveTheme(id, vars, fontSize) {
   const cur = JSON.parse(localStorage.getItem(SK_THEME) || '{}');
   const td  = { id, vars: vars || cur.vars || {}, fontSize: fontSize || cur.fontSize || 'md' };
   localStorage.setItem(SK_THEME, JSON.stringify(td));
+  if (window.GTK) GTK.applyTheme(td);
 }
 
 /* Custom theme */
@@ -732,7 +768,7 @@ function applyCustomTheme() {
   applyThemeVars(customVars);
   saveTheme('custom', customVars);
   buildThemeGrid();
-  showToast('&#127912; Ozel tema uyguland&#305;');
+  showToast('🎨 Özel tema uygulandı');
 }
 
 /* Font size */
@@ -742,7 +778,7 @@ function setFontSize(size) {
   const cur = JSON.parse(localStorage.getItem(SK_THEME) || '{}');
   cur.fontSize = size;
   localStorage.setItem(SK_THEME, JSON.stringify(cur));
-  showToast('Yazi boyutu guncellendi');
+  showToast('Yazı boyutu güncellendi');
 }
 
 function loadCurrentFontSize() {
@@ -752,24 +788,19 @@ function loadCurrentFontSize() {
 }
 
 /* ═══ SECURITY ═══ */
-async function hashPassword(password) {
-  if(window.crypto && window.crypto.subtle) {
-    const msgBuffer = new TextEncoder().encode(password);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-    return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2,'0')).join('');
-  }
-  let hash = 0;
-  for(let i=0; i<password.length; i++) { hash = ((hash<<5)-hash)+password.charCodeAt(i); hash=hash&hash; }
-  return 'fb_'+hash;
+function renderSecurityState() {
+  const isGuest = window.GTK ? GTK.isGuestMode() : (localStorage.getItem('gtk_guest_mode') === '1');
+  document.getElementById('guestPwNotice').style.display = isGuest ? 'block' : 'none';
+  document.getElementById('pwFormFields').style.display = isGuest ? 'none' : 'block';
 }
 
-function checkPwStrength(pw, labelId) {
+function checkPwStrength(pw) {
   const bars  = ['pwb1','pwb2','pwb3','pwb4'];
   const label = document.getElementById('pwStrengthLabel');
   let score = 0;
-  if(pw.length >= 8) score++;
-  if(/[A-Z]/.test(pw)) score++;
-  if(/[0-9]/.test(pw)) score++;
+  if(pw.length >= 6) score++;
+  if(pw.length >= 10) score++;
+  if(/[A-Z]/.test(pw) && /[0-9]/.test(pw)) score++;
   if(/[^A-Za-z0-9]/.test(pw)) score++;
   const cls   = ['','s-weak','s-fair','s-good','s-strong'];
   const names = ['','Zayıf','Orta','İyi','Güçlü'];
@@ -785,45 +816,54 @@ async function changePassword() {
   const confirm = document.getElementById('pwConfirm').value;
   const msg     = document.getElementById('pwMsg');
 
-  if(!cur || !newPw || !confirm) { msg.style.color='var(--red)'; msg.textContent='Tum alanlar doldurulmali.'; return; }
-  if(newPw !== confirm) { msg.style.color='var(--red)'; msg.textContent='Yeni sifreler eslesmiyor.'; return; }
-  if(newPw.length < 6)  { msg.style.color='var(--red)'; msg.textContent='Sifre en az 6 karakter olmali.'; return; }
+  if(!cur || !newPw || !confirm) { msg.style.color='var(--red)'; msg.textContent='Tüm alanlar doldurulmalı.'; return; }
+  if(newPw !== confirm) { msg.style.color='var(--red)'; msg.textContent='Yeni şifreler eşleşmiyor.'; return; }
+  if(newPw.length < 6)  { msg.style.color='var(--red)'; msg.textContent='Şifre en az 6 karakter olmalı.'; return; }
 
-  const users   = getUsers();
-  const u       = users[sessionUser];
-  const curHash = await hashPassword(cur);
-  if(u.passHash !== curHash) { msg.style.color='var(--red)'; msg.textContent='Mevcut sifre yanlis.'; return; }
+  const btn = document.getElementById('btnChangePw');
+  btn.disabled = true;
 
-  const newHash = await hashPassword(newPw);
-  users[sessionUser].passHash = newHash;
-  setUsers(users);
-  msg.style.color='var(--green)'; msg.textContent='✓ Sifre basariyla degistirildi!';
-  document.getElementById('pwCurrent').value = '';
-  document.getElementById('pwNew').value = '';
-  document.getElementById('pwConfirm').value = '';
-  showToast('&#128272; Sifre degistirildi');
-  setTimeout(() => { msg.textContent=''; }, 3000);
+  try {
+    if (!window.firebaseChangePassword) throw new Error('Bulut kimlik doğrulaması aktif değil.');
+    await window.firebaseChangePassword(cur, newPw);
+    msg.style.color='var(--green)'; msg.textContent='✓ Şifre başarıyla değiştirildi!';
+    document.getElementById('pwCurrent').value = '';
+    document.getElementById('pwNew').value = '';
+    document.getElementById('pwConfirm').value = '';
+    checkPwStrength('');
+    showToast('🔐 Şifre değiştirildi');
+    setTimeout(() => { msg.textContent=''; }, 3500);
+  } catch (e) {
+    let errText = 'Şifre değiştirilemedi.';
+    if (e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential') errText = 'Mevcut şifre yanlış.';
+    else if (e.code === 'auth/weak-password') errText = 'Yeni şifre çok zayıf.';
+    else if (e.code === 'auth/requires-recent-login') errText = 'Güvenlik için çıkış yapıp tekrar giriş yaptıktan sonra deneyin.';
+    else if (e.message) errText = e.message;
+    msg.style.color='var(--red)'; msg.textContent = errText;
+  } finally {
+    btn.disabled = false;
+  }
 }
 
 /* ═══ DATA ═══ */
 function renderDataStats() {
+  const sk   = 'gtk_scores_'+sessionUser;
   const jk   = 'gtk_journal_'+sessionUser;
   const wk   = 'gtk_weekly_'+sessionUser;
   const yk   = 'gtk_yearly_'+sessionUser;
-  const pk   = 'gtk_tasks_'+sessionUser;
 
+  const scores  = JSON.parse(localStorage.getItem(sk)||'{}');
   const journal = JSON.parse(localStorage.getItem(jk)||'{}');
   const weekly  = JSON.parse(localStorage.getItem(wk)||'{}');
   const yearly  = JSON.parse(localStorage.getItem(yk)||'null');
-  const plans   = JSON.parse(localStorage.getItem(pk)||'{}');
 
-  let journalCnt = Object.keys(journal).length;
-  let weekCnt    = 0; Object.values(weekly).forEach(w => weekCnt += (w.goals||[]).length);
-  let goalCnt    = 0;
+  const planCnt = Object.values(scores).filter(e => e && (e.score || (e.tasks && e.tasks.length) || e.note)).length;
+  const journalCnt = Object.keys(journal).length;
+  let weekCnt = 0; Object.values(weekly).forEach(w => weekCnt += (w.goals||[]).length);
+  let goalCnt = 0;
   if(yearly && yearly.yearData) {
     Object.values(yearly.yearData).forEach(y => { (y.categories||[]).forEach(c => { goalCnt += (c.goals||[]).length; }); });
   }
-  let planCnt = Object.keys(plans).length;
 
   document.getElementById('dsPlan').textContent    = planCnt;
   document.getElementById('dsJournal').textContent = journalCnt;
@@ -832,21 +872,72 @@ function renderDataStats() {
 }
 
 function exportAll() {
-  const exportObj = {};
-  const keys = Object.keys(localStorage).filter(k => k.includes(sessionUser) || k === 'gtk_users');
-  keys.forEach(k => { try { exportObj[k] = JSON.parse(localStorage.getItem(k)); } catch(e) { exportObj[k] = localStorage.getItem(k); } });
-  download('gelisim-takibi-tum-veri.json', JSON.stringify(exportObj, null, 2));
-  showToast('&#128229; Veriler indirildi');
+  const exportObj = { exportedAt: new Date().toISOString(), sessionUser };
+  const exactKeys = ['gtk_profile', 'gtk_years', 'gtk_months'];
+  const prefixes  = ['gtk_scores_', 'gtk_journal_', 'gtk_weekly_', 'gtk_yearly_', 'gtk_theme_'];
+  exactKeys.forEach(k => {
+    const v = localStorage.getItem(k);
+    if (v !== null) { try { exportObj[k] = JSON.parse(v); } catch(e) { exportObj[k] = v; } }
+  });
+  prefixes.forEach(p => {
+    const k = p + sessionUser;
+    const v = localStorage.getItem(k);
+    if (v !== null) { try { exportObj[k] = JSON.parse(v); } catch(e) { exportObj[k] = v; } }
+  });
+  download('gelisim-takibi-yedek.json', JSON.stringify(exportObj, null, 2));
+  showToast('📥 Tüm veriler indirildi');
 }
 function exportJournal() {
   const d = JSON.parse(localStorage.getItem('gtk_journal_'+sessionUser)||'{}');
   download('gelisim-takibi-gunluk.json', JSON.stringify(d, null, 2));
-  showToast('&#128229; Gunluk indirildi');
+  showToast('📥 Günlük indirildi');
 }
 function exportGoals() {
   const d = JSON.parse(localStorage.getItem('gtk_yearly_'+sessionUser)||'{}');
   download('gelisim-takibi-hedefler.json', JSON.stringify(d, null, 2));
-  showToast('&#128229; Hedefler indirildi');
+  showToast('📥 Hedefler indirildi');
+}
+
+function importAll(event) {
+  const file = event.target.files && event.target.files[0];
+  event.target.value = '';
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = async function(ev) {
+    try {
+      const parsed = JSON.parse(ev.target.result);
+      if (!parsed || typeof parsed !== 'object') throw new Error('Geçersiz JSON formatı.');
+      let importedCount = 0;
+      const keyPrefixes = ['gtk_scores_', 'gtk_journal_', 'gtk_weekly_', 'gtk_yearly_', 'gtk_theme_'];
+      Object.entries(parsed).forEach(([k, val]) => {
+        if (['gtk_profile', 'gtk_years', 'gtk_months'].includes(k)) {
+          localStorage.setItem(k, typeof val === 'string' ? val : JSON.stringify(val));
+          importedCount++;
+          return;
+        }
+        const matchedPrefix = keyPrefixes.find(p => k.startsWith(p));
+        if (matchedPrefix) {
+          const targetKey = matchedPrefix + sessionUser;
+          localStorage.setItem(targetKey, typeof val === 'string' ? val : JSON.stringify(val));
+          importedCount++;
+        }
+      });
+      if (!importedCount) {
+        showToast('Yedek dosyasında uyumlu veri bulunamadı');
+        return;
+      }
+      if (window.flushFirebaseSync) await window.flushFirebaseSync(true);
+      if (window.GTK) GTK.applyTheme();
+      loadProfile();
+      buildThemeGrid();
+      loadCurrentFontSize();
+      renderDataStats();
+      showToast('✅ ' + importedCount + ' veri grubu geri yüklendi');
+    } catch (err) {
+      showToast('❌ İçe aktarma hatası: geçersiz dosya');
+    }
+  };
+  reader.readAsText(file);
 }
 
 function download(filename, text) {
@@ -855,31 +946,50 @@ function download(filename, text) {
   a.download = filename; a.click();
 }
 
-function clearData(type) {
-  const labels = { journal:'gunluk yazilari', all:'tum veriler' };
-  if(!confirm('"' + (labels[type]||type) + '" kalici olarak silinecek. Emin misin?')) return;
+async function clearData(type) {
+  const labels = { journal:'günlük yazıları', all:'tüm veriler' };
+  if(!confirm('"' + (labels[type]||type) + '" kalıcı olarak silinecek. Emin misin?')) return;
   if(type === 'journal') {
     localStorage.removeItem('gtk_journal_'+sessionUser);
   } else if(type === 'all') {
-    if(!confirm('Son kontrol: tum planlar, hedefler ve gunluk girdileri silinecek. Devam et?')) return;
-    ['gtk_journal_','gtk_weekly_','gtk_yearly_','gtk_tasks_','gtk_days_','gtk_theme_'].forEach(prefix => {
+    if(!confirm('Son kontrol: tüm planlar, skorlar, hedefler ve günlük girdileri silinecek. Devam et?')) return;
+    ['gtk_scores_','gtk_journal_','gtk_weekly_','gtk_yearly_','gtk_tasks_','gtk_days_','gtk_theme_'].forEach(prefix => {
       localStorage.removeItem(prefix + sessionUser);
     });
+    localStorage.removeItem('gtk_years');
+    localStorage.removeItem('gtk_months');
   }
+  if (window.flushFirebaseSync) await window.flushFirebaseSync(true);
   renderDataStats();
   showToast('Veriler silindi');
 }
 
-function deleteAccount() {
-  const input = prompt('Hesabi silmek icin kullanici adini yaz: ' + sessionUser);
-  if(input !== sessionUser) { showToast('Kullanici adi eslesmiyor, islem iptal.'); return; }
+async function deleteAccount() {
+  const isGuest = window.GTK ? GTK.isGuestMode() : (localStorage.getItem('gtk_guest_mode') === '1');
+  const confirmTarget = sessionUser || 'guest';
+  const input = prompt('Hesabı silmek için kullanıcı adını yazın: ' + confirmTarget);
+  if(input !== confirmTarget) { showToast('Kullanıcı adı eşleşmiyor, işlem iptal.'); return; }
+
+  if (!isGuest && window.firebaseDeleteAccount) {
+    const pw = prompt('Güvenlik doğrulaması için mevcut şifrenizi girin (gerekirse):') || '';
+    try {
+      await window.firebaseDeleteAccount(pw);
+    } catch (e) {
+      showToast(e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential' ? 'Şifre hatalı, silme iptal edildi.' : 'Hesap silinemedi: yeniden giriş yapıp deneyin.');
+      return;
+    }
+  }
+
   const users = getUsers();
   delete users[sessionUser];
   setUsers(users);
-  ['gtk_journal_','gtk_weekly_','gtk_yearly_','gtk_tasks_','gtk_days_','gtk_theme_','gtk_profile'].forEach(prefix => {
-    localStorage.removeItem(prefix + (prefix.endsWith('_') ? sessionUser : ''));
+  ['gtk_scores_','gtk_journal_','gtk_weekly_','gtk_yearly_','gtk_tasks_','gtk_days_','gtk_theme_'].forEach(prefix => {
+    localStorage.removeItem(prefix + sessionUser);
   });
+  localStorage.removeItem('gtk_years');
+  localStorage.removeItem('gtk_months');
   localStorage.removeItem('gtk_session');
+  localStorage.removeItem('gtk_guest_mode');
   localStorage.removeItem('gtk_profile');
   window.location.href = 'auth.html';
 }
@@ -903,6 +1013,7 @@ loadProfile();
 buildThemeGrid();
 buildColorPickers();
 loadCurrentFontSize();
+renderSecurityState();
 </script>
 </body>
 </html>

@@ -3,9 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Yillik Hedefler — Gelisim Takibi</title>
+  <title>Yıllık Hedefler — Gelişim Takibi</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <script src="app_common.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -68,8 +69,8 @@
     /* SIDEBAR */
     .sidebar {
       position:fixed; top:0; left:0; bottom:0; width:var(--sb-w);
-      background:rgba(9,9,22,0.98);
-      border-right:1px solid rgba(255,255,255,0.09);
+      background:var(--sb-bg, rgba(9,9,22,0.98));
+      border-right:1px solid var(--sb-border, rgba(255,255,255,0.09));
       backdrop-filter:blur(30px); -webkit-backdrop-filter:blur(30px);
       z-index:150;
       transform:translateX(-100%);
@@ -353,7 +354,7 @@
       padding-top:10px; border-top:1px solid var(--border);
     }
     .cat-goal-input {
-      flex:1; background:rgba(255,255,255,.04); border:1px solid var(--border2);
+      flex:1; min-width:0; background:rgba(255,255,255,.04); border:1px solid var(--border2);
       border-radius:var(--rx); color:var(--text); font-family:'Inter',sans-serif;
       font-size:13px; padding:9px 14px; outline:none; transition:border-color .2s;
     }
@@ -397,7 +398,7 @@
     @keyframes ovIn{from{opacity:0}to{opacity:1}}
     @keyframes mdIn{from{opacity:0;transform:translateY(26px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
     .modal {
-      background:#12122a; border:1px solid var(--border3); border-radius:22px;
+      background:var(--modal-bg, #12122a); border:1px solid var(--border3); border-radius:22px;
       padding:26px; width:100%; max-width:480px; position:relative;
       animation:mdIn .24s ease; box-shadow:0 50px 100px rgba(0,0,0,.65);
       max-height:90vh; overflow-y:auto;
@@ -415,18 +416,18 @@
     .field { display:flex; flex-direction:column; gap:5px; margin-bottom:14px; }
     .field-label { font-size:10px; font-weight:700; color:var(--text2); text-transform:uppercase; letter-spacing:.6px; }
     .field-input {
-      background:rgba(255,255,255,.05); border:1px solid var(--border2); border-radius:var(--rs);
+      background:var(--input-bg, rgba(255,255,255,.05)); border:1px solid var(--border2); border-radius:var(--rs);
       color:var(--text); font-family:'Inter',sans-serif; font-size:14px; padding:11px 13px;
       width:100%; outline:none; transition:border-color .2s, box-shadow .2s; resize:vertical;
     }
     .field-input:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(124,92,252,.15); }
     .field-input::placeholder { color:var(--text3); }
     .field-select {
-      background:rgba(255,255,255,.05); border:1px solid var(--border2); border-radius:var(--rs);
+      background:var(--input-bg, rgba(255,255,255,.05)); border:1px solid var(--border2); border-radius:var(--rs);
       color:var(--text); font-family:'Inter',sans-serif; font-size:14px; padding:11px 13px;
       width:100%; outline:none; transition:border-color .2s; cursor:pointer;
     }
-    .field-select option { background:#12122a; }
+    .field-select option { background:var(--modal-bg, #12122a); color:var(--text); }
     .field-select:focus { border-color:var(--accent); }
 
     /* Color picker swatches */
@@ -467,16 +468,25 @@
     /* TOAST */
     .toast {
       position:fixed; bottom:22px; left:50%; transform:translateX(-50%) translateY(90px);
-      background:#1a1a36; border:1px solid var(--border3); border-radius:50px;
+      background:var(--toast-bg, #1a1a36); border:1px solid var(--border3); border-radius:50px;
       padding:10px 22px; font-size:13px; font-weight:700; color:var(--text); z-index:999;
       pointer-events:none; white-space:nowrap; box-shadow:0 10px 40px rgba(0,0,0,.5);
       transition:transform .35s cubic-bezier(.34,1.56,.64,1);
     }
     .toast.show { transform:translateX(-50%) translateY(0); }
 
+    @media(hover:none),(max-width:640px){ .goal-action-btn{ opacity:1!important; } }
+    .year-add-inline{display:flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--border2);border-radius:50px;padding:3px 6px 3px 12px}
+    .year-add-inline.hidden{display:none}
+    .year-add-inline input{width:70px;background:transparent;border:none;outline:none;color:var(--text);font-family:inherit;font-size:13px;font-weight:700}
+    .year-add-inline button{border:none;border-radius:50px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit}
+    .btn-template{margin-top:8px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;border-radius:var(--rs);font-family:inherit;font-size:13px;font-weight:700;padding:10px 18px;cursor:pointer}
+
     @media(max-width:800px) {
-      .app { padding-left:64px; }
+      .app { padding:70px 14px 60px 14px; }
       .summary-grid { grid-template-columns:1fr 1fr; }
+      .cat-header { flex-wrap:wrap; padding:12px 14px; }
+      .cat-body { padding:12px 14px; }
     }
     @media(max-width:520px) {
       .summary-grid { grid-template-columns:1fr 1fr; }
@@ -488,11 +498,12 @@
   <script type="module" src="firebase_sync.js"></script>
 </head>
 <body>
+<script>if(window.GTK)GTK.applyTheme();</script>
 
 <div class="bg-scene"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div></div>
 
 <!-- Hamburger -->
-<button class="hamburger" id="hamburger" onclick="toggleSidebar()" title="Menu">
+<button class="hamburger" id="hamburger" onclick="toggleSidebar()" title="Menü">
   <svg width="18" height="14" viewBox="0 0 18 14" fill="none">
     <rect width="18" height="2" rx="1" fill="white"/>
     <rect y="6" width="14" height="2" rx="1" fill="white"/>
@@ -506,32 +517,33 @@
 <!-- SIDEBAR -->
 <div class="sidebar" id="sidebar">
   <div class="sb-header">
-    <div class="sb-logo">&#128200; Gelisim Takibi</div>
+    <div class="sb-logo">&#128200; Gelişim Takibi</div>
     <button class="sb-close" onclick="closeSidebar()">&#10005;</button>
   </div>
   <div class="sb-body">
     <div class="sb-nav">
       <a class="sb-nav-item" href="index.html"><span class="sb-nav-icon">&#128197;</span><span>Takvim</span></a>
       <a class="sb-nav-item" href="chart.html"><span class="sb-nav-icon">&#128202;</span><span>Grafik Analizi</span></a>
-      <a class="sb-nav-item" href="planner.html"><span class="sb-nav-icon">&#128221;</span><span>Gunluk Planlama</span></a>
-      <a class="sb-nav-item" href="weekly.html"><span class="sb-nav-icon">&#127919;</span><span>Haftalik Hedefler</span></a>
-      <a class="sb-nav-item sb-active" href="yearly.html"><span class="sb-nav-icon">&#127882;</span><span>Yillik Hedefler</span></a>
-      <a class="sb-nav-item" href="journal.html"><span class="sb-nav-icon">&#128218;</span><span>Gunluk</span></a>
+      <a class="sb-nav-item" href="planner.html"><span class="sb-nav-icon">&#128221;</span><span>Günlük Planlama</span></a>
+      <a class="sb-nav-item" href="weekly.html"><span class="sb-nav-icon">&#127919;</span><span>Haftalık Hedefler</span></a>
+      <a class="sb-nav-item sb-active" href="yearly.html"><span class="sb-nav-icon">&#127882;</span><span>Yıllık Hedefler</span></a>
+      <a class="sb-nav-item" href="journal.html"><span class="sb-nav-icon">&#128218;</span><span>Günlük</span></a>
+      <a class="sb-nav-item" href="settings.html"><span class="sb-nav-icon">&#9881;</span><span>Ayarlar</span></a>
     </div>
 
     <div class="sb-divider"></div>
-    <div class="sb-section-lbl" id="sbYearLabel">2026 OZETI</div>
+    <div class="sb-section-lbl" id="sbYearLabel">2026 ÖZETİ</div>
 
     <div class="sb-mini-stats">
       <div class="sb-mini-chip"><div class="smc-lbl">Toplam</div><div class="smc-val a" id="sms-total">0</div></div>
-      <div class="sb-mini-chip"><div class="smc-lbl">Tamamlandi</div><div class="smc-val g" id="sms-done">0</div></div>
+      <div class="sb-mini-chip"><div class="smc-lbl">Tamamlandı</div><div class="smc-val g" id="sms-done">0</div></div>
       <div class="sb-mini-chip"><div class="smc-lbl">Kategori</div><div class="smc-val y" id="sms-cats">0</div></div>
-      <div class="sb-mini-chip"><div class="smc-lbl">Basari %</div><div class="smc-val a" id="sms-pct">-</div></div>
+      <div class="sb-mini-chip"><div class="smc-lbl">Başarı %</div><div class="smc-val a" id="sms-pct">-</div></div>
     </div>
 
     <div class="sb-prog-wrap">
       <div class="sb-prog-label">
-        <span>Yillik ilerleme</span>
+        <span>Yıllık ilerleme</span>
         <span id="sbProgPct">%0</span>
       </div>
       <div class="sb-prog-track">
@@ -540,8 +552,8 @@
     </div>
 
     <div style="padding-top:10px; border-top:1px solid var(--border);">
-      <a class="sb-nav-item" href="#" onclick="doLogout()" style="color:var(--red);">
-        <span class="sb-nav-icon">&#128682;</span> Cikis Yap
+      <a class="sb-nav-item" href="#" onclick="doLogout(); return false;" style="color:var(--red);">
+        <span class="sb-nav-icon">&#128682;</span> Çıkış Yap
       </a>
     </div>
   </div>
@@ -553,8 +565,8 @@
   <!-- Page Header -->
   <header class="page-header glass">
     <div>
-      <div class="logo-text">&#127882; Yillik Hedefler</div>
-      <div class="logo-sub" id="headerSub">Yilini kategorilere ayir, buyuk resmi gor</div>
+      <div class="logo-text">&#127882; Yıllık Hedefler</div>
+      <div class="logo-sub" id="headerSub">Yılını kategorilere ayır, büyük resmi gör</div>
     </div>
     <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
       <button class="btn-add-cat" onclick="openCatModal()">&#43; Kategori Ekle</button>
@@ -564,15 +576,20 @@
 
   <!-- Year Selector -->
   <div class="year-bar glass">
-    <span class="year-label">Yil:</span>
+    <span class="year-label">Yıl:</span>
     <div class="year-pills" id="yearPills"></div>
-    <button class="year-add-btn" onclick="addYear()">&#43; Yil Ekle</button>
+    <button class="year-add-btn" id="btnShowAddYear" onclick="showAddYear()">&#43; Yıl Ekle</button>
+    <div class="year-add-inline hidden" id="addYearInline">
+      <input type="number" id="newYearInput" placeholder="örn: 2027" min="2000" max="2100" />
+      <button type="button" onclick="confirmAddYear()" style="background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;">Ekle</button>
+      <button type="button" onclick="hideAddYear()" style="background:transparent;color:var(--text2);">✕</button>
+    </div>
   </div>
 
   <!-- Overall Progress -->
   <div class="overall-prog glass">
     <div class="prog-top">
-      <span class="prog-top-label" id="progLabel">Yillik Tamamlanma</span>
+      <span class="prog-top-label" id="progLabel">Yıllık Tamamlanma</span>
       <span class="prog-top-pct" id="progPct">%0</span>
     </div>
     <div class="prog-track">
@@ -582,22 +599,22 @@
 
   <!-- Global summary -->
   <div class="summary-grid">
-    <div class="sum-card"><div class="sum-label">Toplam Hedef</div><div class="sum-val sv-a" id="sumTotal">0</div><div class="sum-hint">bu yil eklenen</div></div>
-    <div class="sum-card"><div class="sum-label">Tamamlandi</div><div class="sum-val sv-g" id="sumDone">0</div><div class="sum-hint">&#10003; basariyla bitirildi</div></div>
-    <div class="sum-card"><div class="sum-label">Kismen</div><div class="sum-val sv-y" id="sumPartial">0</div><div class="sum-hint">&#9681; devam ediyor</div></div>
+    <div class="sum-card"><div class="sum-label">Toplam Hedef</div><div class="sum-val sv-a" id="sumTotal">0</div><div class="sum-hint">bu yıl eklenen</div></div>
+    <div class="sum-card"><div class="sum-label">Tamamlandı</div><div class="sum-val sv-g" id="sumDone">0</div><div class="sum-hint">&#10003; başarıyla bitirildi</div></div>
+    <div class="sum-card"><div class="sum-label">Kısmen</div><div class="sum-val sv-y" id="sumPartial">0</div><div class="sum-hint">&#9681; devam ediyor</div></div>
     <div class="sum-card"><div class="sum-label">Kategori</div><div class="sum-val sv-a" id="sumCats">0</div><div class="sum-hint">aktif alan</div></div>
   </div>
 
   <!-- Controls: search + status filter -->
   <div class="controls-row">
     <div class="search-wrap">
-      <input type="text" id="searchInput" class="search-input" placeholder="Hedeflerde ara..." oninput="renderCategories()" />
+      <input type="text" id="searchInput" class="search-input" placeholder="Hedeflerde, etiketlerde veya notlarda ara..." oninput="renderCategories()" />
       <span class="search-icon">&#128269;</span>
     </div>
     <div class="filter-status">
-      <button class="fs-btn fs-active" data-status="all"    onclick="setFilter('all')">Tumü</button>
+      <button class="fs-btn fs-active" data-status="all"    onclick="setFilter('all')">Tümü</button>
       <button class="fs-btn"           data-status="pending" onclick="setFilter('pending')">Bekliyor</button>
-      <button class="fs-btn fs-partial" data-status="partial" onclick="setFilter('partial')">Kismen</button>
+      <button class="fs-btn fs-partial" data-status="partial" onclick="setFilter('partial')">Kısmen</button>
       <button class="fs-btn fs-done"   data-status="done"   onclick="setFilter('done')">Tamam</button>
     </div>
   </div>
@@ -684,12 +701,13 @@
 /* ═══════════════════════════════════════
    AUTH GUARD
 ═══════════════════════════════════════ */
-const sessionUser = localStorage.getItem('gtk_session');
+const sessionUser = window.GTK ? GTK.getSessionUser() : localStorage.getItem('gtk_session');
 
 function doLogout() {
   if (window.doFirebaseLogout) window.doFirebaseLogout();
   else {
     localStorage.removeItem('gtk_session');
+    localStorage.removeItem('gtk_guest_mode');
     localStorage.removeItem('gtk_profile');
     window.location.href = 'auth.html';
   }
@@ -778,15 +796,45 @@ function setFilter(status) {
 /* ═══════════════════════════════════════
    YEAR MANAGEMENT
 ═══════════════════════════════════════ */
-function addYear() {
-  const y = parseInt(prompt('Yil ekle (ornek: 2027):') || '');
-  if(!y || isNaN(y) || y < 2000 || y > 2100) { showToast('Gecersiz yil'); return; }
-  if(data.years.includes(y)) { showToast('Bu yil zaten mevcut'); return; }
+function showAddYear() {
+  document.getElementById('addYearInline').classList.remove('hidden');
+  document.getElementById('btnShowAddYear').style.display = 'none';
+  setTimeout(() => document.getElementById('newYearInput').focus(), 40);
+}
+function hideAddYear() {
+  document.getElementById('addYearInline').classList.add('hidden');
+  document.getElementById('btnShowAddYear').style.display = '';
+  document.getElementById('newYearInput').value = '';
+}
+function confirmAddYear() {
+  const y = parseInt(document.getElementById('newYearInput').value, 10);
+  if(!y || isNaN(y) || y < 2000 || y > 2100) { showToast('Geçerli bir yıl girin (2000-2100)'); return; }
+  if(data.years.includes(y)) { showToast('Bu yıl zaten mevcut'); hideAddYear(); return; }
   data.years.push(y);
   data.years.sort((a,b) => a-b);
   data.viewYear = y;
   saveData();
+  hideAddYear();
   renderAll();
+  showToast(y + ' yılı eklendi');
+}
+document.getElementById('newYearInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') confirmAddYear();
+  if (e.key === 'Escape') hideAddYear();
+});
+
+function createStarterCategories() {
+  const yd = getYearData(data.viewYear);
+  if (yd.categories && yd.categories.length) return;
+  yd.categories = [
+    { id: uid(), name: 'Kariyer & Eğitim', icon: '&#128188;', color: '#7c5cfc', goals: [] },
+    { id: uid(), name: 'Sağlık & Spor',    icon: '&#128170;', color: '#00e5a0', goals: [] },
+    { id: uid(), name: 'Finans',           icon: '&#128176;', color: '#ffcd47', goals: [] },
+    { id: uid(), name: 'Kişisel Gelişim',  icon: '&#128218;', color: '#00d4ff', goals: [] }
+  ];
+  saveData();
+  renderAll();
+  showToast('Örnek kategoriler eklendi');
 }
 
 function switchYear(y) {
@@ -839,13 +887,13 @@ function renderSummary() {
   const y = data.viewYear;
   const s = calcStats(y);
 
-  document.getElementById('headerSub').textContent = y + ' yiliniza ait hedeflerinizi takip edin';
-  document.getElementById('sbYearLabel').textContent = y + ' OZETI';
+  document.getElementById('headerSub').textContent = y + ' yılınıza ait hedeflerinizi takip edin';
+  document.getElementById('sbYearLabel').textContent = y + ' ÖZETİ';
 
   const pct = s.pct;
   document.getElementById('progFill').style.width  = pct + '%';
   document.getElementById('progPct').textContent    = '%' + pct;
-  document.getElementById('progLabel').textContent  = y + ' Yillik Tamamlanma';
+  document.getElementById('progLabel').textContent  = y + ' Yıllık Tamamlanma';
 
   document.getElementById('sumTotal').textContent   = s.total;
   document.getElementById('sumDone').textContent    = s.done;
@@ -862,7 +910,7 @@ function renderSidebar() {
   document.getElementById('sms-pct').textContent   = s.total > 0 ? '%' + s.pct : '-';
   document.getElementById('sbProgFill').style.width = s.pct + '%';
   document.getElementById('sbProgPct').textContent  = '%' + s.pct;
-  document.getElementById('sbYearLabel').textContent = y + ' OZETI';
+  document.getElementById('sbYearLabel').textContent = y + ' ÖZETİ';
 }
 
 /* ═══════════════════════════════════════
@@ -880,8 +928,9 @@ function renderCategories() {
     wrap.innerHTML =
       '<div class="goals-empty" style="padding:60px 20px;">' +
         '<div class="goals-empty-icon">&#127882;</div>' +
-        '<div class="goals-empty-title">' + y + ' icin henuz kategori yok</div>' +
-        '<div class="goals-empty-sub">Hedeflerinizi siniflandirmak icin ilk kategorinizi ekleyin.</div>' +
+        '<div class="goals-empty-title">' + y + ' için henüz kategori yok</div>' +
+        '<div class="goals-empty-sub">Hedeflerinizi sınıflandırmak için ilk kategorinizi ekleyin veya hazır şablonla başlayın.</div>' +
+        '<button type="button" class="btn-template" onclick="createStarterCategories()">✨ Örnek Kategoriler Oluştur</button>' +
       '</div>';
     return;
   }
@@ -891,7 +940,12 @@ function renderCategories() {
   cats.forEach(cat => {
     const goals = (cat.goals || []).filter(g => {
       if(filterStatus !== 'all' && g.status !== filterStatus) return false;
-      if(q && !g.text.toLowerCase().includes(q)) return false;
+      if(q) {
+        const matchText = (g.text || '').toLowerCase().includes(q);
+        const matchTag  = (g.tag  || '').toLowerCase().includes(q);
+        const matchNote = (g.note || '').toLowerCase().includes(q);
+        if (!matchText && !matchTag && !matchNote) return false;
+      }
       return true;
     });
 
@@ -1220,19 +1274,23 @@ function saveGoal() {
   const oldCatId = document.getElementById('goalCatId').value;
 
   if(editId) {
-    /* If category changed, move goal */
+    /* If category changed, move goal while preserving status */
     if(oldCatId && oldCatId !== catId) {
+      let movedStatus = 'pending';
       const oldCat = findCat(oldCatId);
       if(oldCat) {
         const gIdx = oldCat.goals.findIndex(g => g.id === editId);
-        if(gIdx > -1) { oldCat.goals.splice(gIdx, 1); }
+        if(gIdx > -1) {
+          movedStatus = oldCat.goals[gIdx].status || 'pending';
+          oldCat.goals.splice(gIdx, 1);
+        }
       }
-      cat.goals.push({ id:editId, text, priority, note, tag, status:'pending' });
+      cat.goals.push({ id:editId, text, priority, note, tag, status:movedStatus });
     } else {
       const goal = cat.goals.find(g => g.id === editId);
       if(goal) { goal.text = text; goal.priority = priority; goal.note = note; goal.tag = tag; }
     }
-    showToast('Hedef guncellendi');
+    showToast('Hedef güncellendi');
   } else {
     cat.goals.push({ id:uid(), text, priority, note, tag, status:'pending' });
     showToast('Hedef eklendi');

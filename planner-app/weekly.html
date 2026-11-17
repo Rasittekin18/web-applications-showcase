@@ -6,6 +6,7 @@
   <title>Haftalık Hedefler — Gelişim Takibi</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <script src="app_common.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -65,8 +66,8 @@
     /* SIDEBAR */
     .sidebar {
       position:fixed; top:0; left:0; bottom:0; width:var(--sb-w);
-      background:rgba(9,9,22,0.98);
-      border-right:1px solid rgba(255,255,255,0.09);
+      background:var(--sb-bg, rgba(9,9,22,0.98));
+      border-right:1px solid var(--sb-border, rgba(255,255,255,0.09));
       backdrop-filter:blur(30px); -webkit-backdrop-filter:blur(30px);
       z-index:150;
       transform:translateX(-100%);
@@ -223,7 +224,7 @@
     /* Add goal input */
     .goal-add-row { display:flex; gap:8px; margin-bottom:16px; }
     .goal-input {
-      flex:1; background:rgba(255,255,255,.05); border:1px solid var(--border2);
+      flex:1; min-width:0; background:var(--input-bg, rgba(255,255,255,.05)); border:1px solid var(--border2);
       border-radius:var(--rs); color:var(--text); font-family:'Inter',sans-serif;
       font-size:14px; padding:12px 16px; outline:none; transition:border-color .2s, box-shadow .2s;
     }
@@ -326,21 +327,29 @@
     .overlay.hidden { display:none; }
     @keyframes ovIn{from{opacity:0}to{opacity:1}}
     @keyframes mdIn{from{opacity:0;transform:translateY(26px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
-    .modal { background:#12122a; border:1px solid var(--border3); border-radius:22px; padding:26px; width:100%; max-width:460px; position:relative; animation:mdIn .24s ease; box-shadow:0 50px 100px rgba(0,0,0,.65); }
+    .modal { background:var(--modal-bg, #12122a); border:1px solid var(--border3); border-radius:22px; padding:26px; width:100%; max-width:460px; position:relative; animation:mdIn .24s ease; box-shadow:0 50px 100px rgba(0,0,0,.65); }
     .modal-title { font-size:18px; font-weight:800; letter-spacing:-.4px; margin-bottom:16px; }
     .btn-x { position:absolute; top:13px; right:13px; background:var(--surface2); border:1px solid var(--border); color:var(--text2); width:28px; height:28px; border-radius:7px; font-size:13px; cursor:pointer; display:flex; align-items:center; justify-content:center; font-family:'Inter',sans-serif; transition:all .2s; }
     .btn-x:hover { background:var(--red-bg); border-color:var(--red); color:var(--red); }
     .field { display:flex; flex-direction:column; gap:5px; margin-bottom:14px; }
     .field-label { font-size:10px; font-weight:700; color:var(--text2); text-transform:uppercase; letter-spacing:.6px; }
-    .field-input { background:rgba(255,255,255,.05); border:1px solid var(--border2); border-radius:var(--rs); color:var(--text); font-family:'Inter',sans-serif; font-size:14px; padding:11px 13px; width:100%; outline:none; transition:border-color .2s, box-shadow .2s; resize:vertical; }
+    .field-input { background:var(--input-bg, rgba(255,255,255,.05)); border:1px solid var(--border2); border-radius:var(--rs); color:var(--text); font-family:'Inter',sans-serif; font-size:14px; padding:11px 13px; width:100%; outline:none; transition:border-color .2s, box-shadow .2s; resize:vertical; }
     .field-input:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(124,92,252,.15); }
     .field-input::placeholder { color:var(--text3); }
     .btn-primary { width:100%; background:linear-gradient(135deg,var(--accent),var(--accent2)); color:#fff; border:none; border-radius:var(--rs); font-family:'Inter',sans-serif; font-size:15px; font-weight:800; padding:13px; cursor:pointer; transition:opacity .2s, transform .2s; }
     .btn-primary:hover { opacity:.9; transform:translateY(-1px); }
 
     /* TOAST */
-    .toast { position:fixed; bottom:22px; left:50%; transform:translateX(-50%) translateY(90px); background:#1a1a36; border:1px solid var(--border3); border-radius:50px; padding:10px 22px; font-size:13px; font-weight:700; color:var(--text); z-index:999; pointer-events:none; white-space:nowrap; box-shadow:0 10px 40px rgba(0,0,0,.5); transition:transform .35s cubic-bezier(.34,1.56,.64,1); }
+    .toast { position:fixed; bottom:22px; left:50%; transform:translateX(-50%) translateY(90px); background:var(--toast-bg, #1a1a36); border:1px solid var(--border3); border-radius:50px; padding:10px 22px; font-size:13px; font-weight:700; color:var(--text); z-index:999; pointer-events:none; white-space:nowrap; box-shadow:0 10px 40px rgba(0,0,0,.5); transition:transform .35s cubic-bezier(.34,1.56,.64,1); }
     .toast.show { transform:translateX(-50%) translateY(0); }
+
+    .wf-row{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+    .wf-pills{display:flex;gap:5px;flex-wrap:wrap}
+    .wf-pill{background:var(--surface2);border:1px solid var(--border2);color:var(--text2);font-family:inherit;font-size:11px;font-weight:700;padding:5px 12px;border-radius:50px;cursor:pointer;transition:all .15s}
+    .wf-pill.wf-active{background:rgba(124,92,252,.18);border-color:var(--accent);color:var(--accent)}
+    .wf-carry{background:var(--surface2);border:1px solid var(--border2);color:var(--text2);font-family:inherit;font-size:11px;font-weight:700;padding:5px 12px;border-radius:50px;cursor:pointer;transition:all .15s}
+    .wf-carry:hover{border-color:var(--cyan);color:var(--cyan)}
+    @media(hover:none),(max-width:640px){.goal-actions{opacity:1!important}}
 
     /* Planner link button */
     .planner-link-btn {
@@ -354,8 +363,12 @@
     .planner-link-btn:hover { opacity:.9; transform:translateY(-1px); }
 
     @media(max-width:640px){
-      .app{padding-left:64px}
+      .app{padding:70px 14px 60px 14px}
       .summary-grid{grid-template-columns:1fr 1fr}
+      .goals-card{padding:16px}
+      .week-nav{padding:12px}
+      .wstrip-day{padding:7px 2px}
+      .wstrip-btn{font-size:8px;padding:2px 4px}
     }
     @media(max-width:480px){
       .summary-grid{grid-template-columns:1fr}
@@ -365,12 +378,12 @@
   <script type="module" src="firebase_sync.js"></script>
 </head>
 <body>
-<script>!function(){var u=localStorage.getItem('gtk_session');if(!u)return;var t=JSON.parse(localStorage.getItem('gtk_theme_'+u)||'null');if(!t||!t.vars)return;var r=document.documentElement;Object.keys(t.vars).forEach(function(k){r.style.setProperty(k,t.vars[k]);});if(t.fontSize==='lg')r.style.fontSize='17px';else if(t.fontSize==='sm')r.style.fontSize='13px';}();</script>
+<script>if(window.GTK)GTK.applyTheme();</script>
 
 <div class="bg-scene"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div></div>
 
 <!-- Hamburger -->
-<button class="hamburger" id="hamburger" onclick="toggleSidebar()" title="Menu">
+<button class="hamburger" id="hamburger" onclick="toggleSidebar()" title="Menü">
   <svg width="18" height="14" viewBox="0 0 18 14" fill="none">
     <rect width="18" height="2" rx="1" fill="white"/>
     <rect y="6" width="14" height="2" rx="1" fill="white"/>
@@ -384,7 +397,7 @@
 <!-- SIDEBAR -->
 <div class="sidebar" id="sidebar">
   <div class="sb-header">
-    <div class="sb-logo">&#128200; Gelisim Takibi</div>
+    <div class="sb-logo">&#128200; Gelişim Takibi</div>
     <button class="sb-close" onclick="closeSidebar()">&#10005;</button>
   </div>
   <div class="sb-body">
@@ -396,16 +409,16 @@
         <span class="sb-nav-icon">&#128202;</span><span>Grafik Analizi</span>
       </a>
       <a class="sb-nav-item" href="planner.html">
-        <span class="sb-nav-icon">&#128221;</span><span>Gunluk Planlama</span>
+        <span class="sb-nav-icon">&#128221;</span><span>Günlük Planlama</span>
       </a>
       <a class="sb-nav-item sb-active" href="weekly.html">
-        <span class="sb-nav-icon">&#127919;</span><span>Haftalik Hedefler</span>
+        <span class="sb-nav-icon">&#127919;</span><span>Haftalık Hedefler</span>
       </a>
       <a class="sb-nav-item" href="yearly.html">
-        <span class="sb-nav-icon">&#127882;</span><span>Yillik Hedefler</span>
+        <span class="sb-nav-icon">&#127882;</span><span>Yıllık Hedefler</span>
       </a>
       <a class="sb-nav-item" href="journal.html">
-        <span class="sb-nav-icon">&#128218;</span><span>Gunluk</span>
+        <span class="sb-nav-icon">&#128218;</span><span>Günlük</span>
       </a>
       <a class="sb-nav-item" href="settings.html">
         <span class="sb-nav-icon">&#9881;</span><span>Ayarlar</span>
@@ -416,12 +429,12 @@
     <div class="sb-section-lbl">BU HAFTA</div>
     <div class="sb-mini-stats">
       <div class="sb-mini-chip"><div class="smc-lbl">Toplam</div><div class="smc-val a" id="sms-total">0</div></div>
-      <div class="sb-mini-chip"><div class="smc-lbl">Tamamlandi</div><div class="smc-val g" id="sms-done">0</div></div>
+      <div class="sb-mini-chip"><div class="smc-lbl">Tamamlandı</div><div class="smc-val g" id="sms-done">0</div></div>
     </div>
 
     <div style="margin-top:16px; padding-top:16px; border-top:1px solid var(--border);">
-      <a class="sb-nav-item" href="#" onclick="doLogout()" style="color:var(--red);">
-        <span class="sb-nav-icon">&#128682;</span> Cikis Yap
+      <a class="sb-nav-item" href="#" onclick="doLogout(); return false;" style="color:var(--red);">
+        <span class="sb-nav-icon">&#128682;</span> Çıkış Yap
       </a>
     </div>
   </div>
@@ -432,22 +445,22 @@
 
   <header class="page-header glass">
     <div>
-      <div class="logo-text">&#127919; Haftalik Hedefler</div>
-      <div class="logo-sub">Haftani planla, gunluk adimlarla ilerle</div>
+      <div class="logo-text">&#127919; Haftalık Hedefler</div>
+      <div class="logo-sub">Haftanı planla, günlük adımlarla ilerle</div>
     </div>
     <a href="planner.html" class="planner-link-btn">
-      <span>&#128221;</span> Gunluk Planlayici
+      <span>&#128221;</span> Günlük Planlayıcı
     </a>
   </header>
 
   <!-- Week Navigator -->
   <div class="week-nav glass">
     <button class="week-nav-btn" id="btnPrevWeek" onclick="shiftWeek(-1)">
-      &larr; <span class="label">Onceki Hafta</span>
+      &larr; <span class="label">Önceki Hafta</span>
     </button>
     <div class="week-center">
       <div class="week-label" id="weekLabel">Bu Hafta</div>
-      <div class="week-dates" id="weekDates">Yukleniyor...</div>
+      <div class="week-dates" id="weekDates">Yükleniyor...</div>
       <span class="week-badge current" id="weekBadge">Mevcut Hafta</span>
     </div>
     <button class="week-nav-btn" id="btnNextWeek" onclick="shiftWeek(1)">
@@ -457,8 +470,8 @@
 
   <!-- Flexible date picker -->
   <div class="week-picker-row">
-    <span class="week-picker-label">Tarih Sec:</span>
-    <input type="date" id="weekDatePicker" class="week-picker-input" title="Bu tarihin haftasina git" />
+    <span class="week-picker-label">Tarih Seç:</span>
+    <input type="date" id="weekDatePicker" class="week-picker-input" title="Bu tarihin haftasına git" />
     <button class="week-nav-btn" onclick="goToCurrentWeek()" style="font-size:12px;">
       &#128205; Bu Hafta
     </button>
@@ -475,14 +488,14 @@
       <div class="sum-hint">bu hafta eklenen</div>
     </div>
     <div class="sum-card">
-      <div class="sum-label">Tamamlandi</div>
+      <div class="sum-label">Tamamlandı</div>
       <div class="sum-val sv-g" id="sumDone">0</div>
-      <div class="sum-hint">&#10003; basariyla bitirildi</div>
+      <div class="sum-hint">&#10003; başarıyla bitirildi</div>
     </div>
     <div class="sum-card">
       <div class="sum-label">Tamamlanma %</div>
       <div class="sum-val sv-y" id="sumPct">&#8212;</div>
-      <div class="sum-hint">haftalik oran</div>
+      <div class="sum-hint">haftalık oran</div>
     </div>
   </div>
 
@@ -491,14 +504,14 @@
     <div class="goals-header">
       <div class="goals-title-row">
         <span class="goals-icon">&#127919;</span>
-        <span class="goals-title">Haftalik Hedeflerim</span>
+        <span class="goals-title">Haftalık Hedeflerim</span>
       </div>
       <span class="goals-progress-chip" id="goalsChip">0 / 0</span>
     </div>
 
     <div class="goals-prog-wrap">
       <div class="goals-prog-labels">
-        <span>Ilerleme</span>
+        <span>İlerleme</span>
         <span id="progPct">%0</span>
       </div>
       <div class="goals-prog-track">
@@ -507,8 +520,18 @@
     </div>
 
     <div class="goal-add-row">
-      <input type="text" id="goalInput" class="goal-input" placeholder="Yeni bir haftalik hedef ekle..." autocomplete="off" />
+      <input type="text" id="goalInput" class="goal-input" placeholder="Yeni bir haftalık hedef ekle..." autocomplete="off" />
       <button class="goal-add-btn" onclick="addGoal()">&#65291; Ekle</button>
+    </div>
+
+    <div class="wf-row">
+      <div class="wf-pills">
+        <button type="button" class="wf-pill wf-active" data-wf="all" onclick="setWeeklyFilter('all')">Tümü</button>
+        <button type="button" class="wf-pill" data-wf="pending" onclick="setWeeklyFilter('pending')">Bekliyor</button>
+        <button type="button" class="wf-pill" data-wf="partial" onclick="setWeeklyFilter('partial')">Kısmen</button>
+        <button type="button" class="wf-pill" data-wf="done" onclick="setWeeklyFilter('done')">Tamamlandı</button>
+      </div>
+      <button type="button" class="wf-carry" onclick="carryOverWeeklyGoals()">⏭ Tamamlanmayanları Gelecek Haftaya Aktar</button>
     </div>
 
     <div class="goal-list" id="goalList"></div>
@@ -516,19 +539,23 @@
 
 </main>
 
-<!-- Note modal -->
+<!-- Note / Edit modal -->
 <div class="overlay hidden" id="noteOverlay">
   <div class="modal">
     <button class="btn-x" onclick="closeNoteModal()">&#10005;</button>
-    <div class="modal-title">&#128204; Hedef Notu</div>
+    <div class="modal-title">&#128204; Hedef Detayı</div>
     <input type="hidden" id="noteGoalId" />
     <div class="field">
-      <label class="field-label" for="noteText">Not / Aciklama</label>
-      <textarea class="field-input" id="noteText" rows="4" placeholder="Bu hedef hakkinda notlarini yaz..."></textarea>
+      <label class="field-label" for="noteGoalText">Hedef Metni</label>
+      <input type="text" class="field-input" id="noteGoalText" placeholder="Hedef başlığı..." />
+    </div>
+    <div class="field">
+      <label class="field-label" for="noteText">Not / Açıklama</label>
+      <textarea class="field-input" id="noteText" rows="4" placeholder="Bu hedef hakkında notlarını yaz..."></textarea>
     </div>
     <div class="field">
       <label class="field-label" for="noteTag">Etiket (opsiyonel)</label>
-      <input type="text" class="field-input" id="noteTag" placeholder="orn: saglik, kariyer, kisisel..." />
+      <input type="text" class="field-input" id="noteTag" placeholder="örn: sağlık, kariyer, kişisel..." />
     </div>
     <button class="btn-primary" onclick="saveNote()">&#128190; Kaydet</button>
   </div>
@@ -538,11 +565,12 @@
 
 <script>
 /* AUTH */
-const sessionUser = localStorage.getItem('gtk_session');
+const sessionUser = window.GTK ? GTK.getSessionUser() : localStorage.getItem('gtk_session');
 function doLogout() {
   if (window.doFirebaseLogout) window.doFirebaseLogout();
   else {
     localStorage.removeItem('gtk_session');
+    localStorage.removeItem('gtk_guest_mode');
     localStorage.removeItem('gtk_profile');
     window.location.href = 'auth.html';
   }
@@ -551,13 +579,14 @@ function doLogout() {
 /* CONSTANTS */
 const SK_WEEKLY = 'gtk_weekly_' + sessionUser;
 const SK_SC     = 'gtk_scores_' + sessionUser;
-const WD_SHORT  = ['Pzt','Sal','Car','Per','Cum','Cmt','Paz'];
-const MONTHS    = ['Ocak','Subat','Mart','Nisan','Mayis','Haziran','Temmuz','Agustos','Eylul','Ekim','Kasim','Aralik'];
+const WD_SHORT  = ['Pzt','Sal','Çar','Per','Cum','Cmt','Paz'];
+const MONTHS    = ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
 
 /* STATE */
 let weekly = JSON.parse(localStorage.getItem(SK_WEEKLY) || '{}');
 let scores = JSON.parse(localStorage.getItem(SK_SC)     || '{}');
 let viewMonday = getMondayOf(new Date());
+let weeklyFilter = 'all';
 
 /* WEEK UTILITIES */
 function getMondayOf(date) {
@@ -578,7 +607,7 @@ function addDays(date, n) {
 function weekKey(monday) {
   const y = monday.getFullYear();
   const startOfYear = new Date(y, 0, 1);
-  const diff = (monday - startOfYear) / 86400000;
+  const diff = Math.round((monday - startOfYear) / 86400000);
   const wn = Math.floor(diff / 7) + 1;
   return y + '-W' + String(wn).padStart(2,'0');
 }
@@ -608,17 +637,31 @@ function getWeekData(monday) {
 
 /* HELPERS */
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
-function escHtml(str) {
-  if(!str)return'';
-  return String(str).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[m]));
+function escHtml(str) { return window.GTK ? GTK.escHtml(str) : String(str||''); }
+function showToast(msg) { if(window.GTK) GTK.toast(msg); }
+
+function setWeeklyFilter(f) {
+  weeklyFilter = f;
+  document.querySelectorAll('.wf-pill').forEach(b => b.classList.toggle('wf-active', b.dataset.wf === f));
+  renderGoals();
 }
 
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  clearTimeout(t._timer);
-  t._timer = setTimeout(() => t.classList.remove('show'), 2500);
+function carryOverWeeklyGoals() {
+  const data = getWeekData(viewMonday);
+  const unfinished = (data.goals || []).filter(g => g.status !== 'done');
+  if (!unfinished.length) { showToast('Aktarılacak tamamlanmamış hedef yok'); return; }
+  const nextMonday = addDays(viewMonday, 7);
+  const nextData = getWeekData(nextMonday);
+  const existing = new Set((nextData.goals || []).map(g => g.text.toLowerCase()));
+  let added = 0;
+  unfinished.forEach(g => {
+    if (!existing.has(g.text.toLowerCase())) {
+      nextData.goals.push({ id: uid(), text: g.text, status: 'pending', note: g.note || '', tag: g.tag || '' });
+      added++;
+    }
+  });
+  saveWeekly();
+  showToast(added > 0 ? '⏭ ' + added + ' hedef gelecek haftaya aktarıldı' : 'Bu hedefler gelecek haftada zaten mevcut');
 }
 
 /* WEEK NAVIGATION */
@@ -670,9 +713,9 @@ function renderWeekNav() {
 function getWeekLabelText() {
   const today  = getMondayOf(new Date());
   const diff   = Math.round((viewMonday - today) / 86400000);
-  if(diff === -7) return 'Gecen Hafta';
+  if(diff === -7) return 'Geçen Hafta';
   if(diff ===  7) return 'Gelecek Hafta';
-  return MONTHS[viewMonday.getMonth()] + ' Haftasi';
+  return MONTHS[viewMonday.getMonth()] + ' Haftası';
 }
 
 function renderWeekStrip() {
@@ -718,8 +761,8 @@ function renderGoals() {
     list.innerHTML =
       '<div class="goals-empty">' +
         '<div class="goals-empty-icon">&#127919;</div>' +
-        '<div class="goals-empty-title">Bu hafta icin henuz hedef yok</div>' +
-        '<div class="goals-empty-sub">Yukaridaki alana yazarak haftalik hedeflerini ekle.<br>Sonra gunluk planlayicida bunlara bakarak gunleri planla.</div>' +
+        '<div class="goals-empty-title">Bu hafta için henüz hedef yok</div>' +
+        '<div class="goals-empty-sub">Yukarıdaki alana yazarak haftalık hedeflerini ekle.<br>Sonra günlük planlayıcıda bunlara bakarak günleri planla.</div>' +
       '</div>';
     updateProgressBar(0, 0);
     updateGoalsChip(0, 0);
@@ -727,16 +770,19 @@ function renderGoals() {
   }
 
   let doneCount = 0;
-  goals.forEach(g => {
-    if(g.status === 'done') doneCount++;
-    list.appendChild(buildGoalItem(g));
-  });
+  goals.forEach(g => { if(g.status === 'done') doneCount++; });
+  const visible = goals.filter(g => weeklyFilter === 'all' || g.status === weeklyFilter);
+  if(visible.length === 0) {
+    list.innerHTML = '<div class="goals-empty"><div class="goals-empty-title">Bu filtreye uyan hedef yok</div></div>';
+  } else {
+    visible.forEach(g => list.appendChild(buildGoalItem(g)));
+  }
   updateProgressBar(doneCount, goals.length);
   updateGoalsChip(doneCount, goals.length);
 }
 
 function buildGoalItem(g) {
-  const statusLabels = { pending: '&#9675; Bekliyor', done: '&#10003; Tamam', partial: '&#9681; Kismen' };
+  const statusLabels = { pending: '&#9675; Bekliyor', done: '&#10003; Tamam', partial: '&#9681; Kısmen' };
   const statusClass  = { pending: 'gs-pending', done: 'gs-done', partial: 'gs-partial' };
   const checkClass   = g.status==='done' ? 'gc-done' : g.status==='partial' ? 'gc-partial' : '';
   const checkIcon    = g.status==='done' ? '&#10003;' : g.status==='partial' ? '&#9681;' : '';
@@ -748,7 +794,7 @@ function buildGoalItem(g) {
   item.dataset.id = g.id;
 
   item.innerHTML =
-    '<button class="goal-check ' + checkClass + '" onclick="cycleStatus(\'' + g.id + '\')" title="Durumu degistir">' +
+    '<button class="goal-check ' + checkClass + '" onclick="cycleStatus(\'' + g.id + '\')" title="Durumu değiştir">' +
       checkIcon +
     '</button>' +
     '<div class="goal-body">' +
@@ -759,7 +805,7 @@ function buildGoalItem(g) {
       '</div>' +
     '</div>' +
     '<div class="goal-actions">' +
-      '<button class="goal-action-btn" onclick="openNoteModal(\'' + g.id + '\')" title="Not ekle">&#128204;</button>' +
+      '<button class="goal-action-btn" onclick="openNoteModal(\'' + g.id + '\')" title="Düzenle &amp; Not Ekle">&#9998;</button>' +
       '<button class="goal-status-btn ' + statusClass[g.status] + '" onclick="cycleStatus(\'' + g.id + '\')">' + statusLabels[g.status] + '</button>' +
       '<button class="goal-action-btn del-btn" onclick="deleteGoal(\'' + g.id + '\')" title="Sil">&#10005;</button>' +
     '</div>';
@@ -805,8 +851,8 @@ function cycleStatus(id) {
   goal.status = cycle[goal.status] || 'done';
   saveWeekly();
   renderAll();
-  const labels = { done:'Tamamlandi', partial:'Kismen tamamlandi', pending:'Beklemeye alindi' };
-  showToast(labels[goal.status] || 'Guncellendi');
+  const labels = { done:'Tamamlandı', partial:'Kısmen tamamlandı', pending:'Beklemeye alındı' };
+  showToast(labels[goal.status] || 'Güncellendi');
 }
 
 function deleteGoal(id) {
@@ -822,9 +868,10 @@ function openNoteModal(id) {
   const data = getWeekData(viewMonday);
   const goal = data.goals.find(g => g.id === id);
   if(!goal) return;
-  document.getElementById('noteGoalId').value = id;
-  document.getElementById('noteText').value   = goal.note || '';
-  document.getElementById('noteTag').value    = goal.tag  || '';
+  document.getElementById('noteGoalId').value   = id;
+  document.getElementById('noteGoalText').value = goal.text || '';
+  document.getElementById('noteText').value     = goal.note || '';
+  document.getElementById('noteTag').value      = goal.tag  || '';
   document.getElementById('noteOverlay').classList.remove('hidden');
 }
 
@@ -834,17 +881,20 @@ function closeNoteModal() {
 
 function saveNote() {
   const id   = document.getElementById('noteGoalId').value;
+  const text = document.getElementById('noteGoalText').value.trim();
   const note = document.getElementById('noteText').value.trim();
   const tag  = document.getElementById('noteTag').value.trim();
+  if(!text) { showToast('Hedef metni boş olamaz'); return; }
   const data = getWeekData(viewMonday);
   const goal = data.goals.find(g => g.id === id);
   if(!goal) return;
+  goal.text = text;
   goal.note = note;
   goal.tag  = tag;
   saveWeekly();
   closeNoteModal();
   renderAll();
-  showToast('Not kaydedildi');
+  showToast('Hedef güncellendi');
 }
 
 document.getElementById('noteOverlay').addEventListener('click', e => {

@@ -1,7 +1,7 @@
 <div align="center">
-  <h1>Gelişim Takibi & Kişisel Planlayıcı 🚀</h1>
+  <h1>Gelişim Takibi &amp; Kişisel Planlayıcı 🚀</h1>
   <p><strong>Hayatınızı organize edin, alışkanlıklarınızı takip edin ve hedeflerinize ulaşın.</strong></p>
-  
+
   <br/>
 
   <a href="https://planner-app-chi-three.vercel.app/" target="_blank">
@@ -9,7 +9,7 @@
   </a>
   <br/>
   <p><i>👉 Hemen denemek için yukarıdaki butona tıklayabilirsiniz. 👈</i></p>
-  
+
   <br/>
 </div>
 
@@ -17,45 +17,63 @@
 
 ## 📖 Proje Hakkında
 
-**Gelişim Takibi**, kişisel gelişiminizi veri odaklı ve görsel olarak takip edebileceğiniz modern bir web uygulamasıdır. Günlerinizi nasıl geçirdiğinizi puanlayabilir, haftalık/yıllık hedeflerinizi belirleyip ilerlemenizi yüzdelik dilimlerle takip edebilir ve geçmişe dönük kişisel bir günlük tutabilirsiniz. Tamamen bulut tabanlı çalışan bu sistem sayesinde verileriniz her zaman güvendedir.
+**Gelişim Takibi**, kişisel gelişiminizi veri odaklı ve görsel olarak takip edebileceğiniz modern bir web uygulamasıdır. Günlerinizi nasıl geçirdiğinizi puanlayabilir, günlük görevlerinizi ve haftalık/yıllık hedeflerinizi belirleyip ilerlemenizi yüzdelik dilimlerle takip edebilir, ruh halinize göre kişisel günlük tutabilir ve verilerinizi JSON olarak yedekleyebilirsiniz.
+
+Uygulama hem **Firebase Authentication + Firestore** ile cihazlar arası bulut senkronizasyonunu hem de hesap açmadan tarayıcı üzerinde anında çalışabilen **Misafir / Yerel Modu** destekler.
 
 ---
 
-## 🛠️ Nasıl Kullanılır? (Kullanım Rehberi)
+## 🛠️ Özellikler ve Kullanım Rehberi
 
-Uygulamanın arayüzü son derece sezgisel ve "Karanlık Mod" (Dark Mode) odaklı tasarlanmıştır. Göz yormayan tasarımı ile aşağıdaki adımları izleyerek hemen planlamaya başlayabilirsiniz:
+### 1. Kayıt, Şifre Kurtarma &amp; Misafir Modu 🔒
+- **Bulut Hesabı:** E-posta ve şifre ile kayıt olarak verilerinizi Firestore üzerinde güvenle senkronize edebilirsiniz; şifre sıfırlama bağlantısı ve Ayarlar üzerinden şifre değiştirme desteği mevcuttur.
+- **Misafir / Yerel Mod:** Hesap oluşturmadan tüm planlama, grafik ve günlük araçlarını tarayıcınızın yerel deposunda (`localStorage`) anında deneyebilirsiniz.
 
-### 1. Kayıt ve Güvenli Giriş 🔒
-Uygulamayı kullanmaya başlamak için e-posta adresinizle saniyeler içinde kayıt olabilirsiniz. Firebase Authentication altyapısı sayesinde şifreleriniz şifrelenir ve güvenle saklanır. Herkes sadece kendi hesabına ait verileri görebilir.
+### 2. Takvim Görünümü ve Gün Puanlama (`index.html`) 📅
+- **Günü Puanlama:** Her günü `＋ İyi Gün`, `○ Normal` veya `− Kötü Gün` olarak değerlendirin ve kesintisiz **İyi Gün Serisi (Streak)** takibi yapın.
+- **Takvim &amp; Ay Filtresi:** Geçmiş, bugün ve gelecek tarihlere serbestçe görev ve not ekleyin; yıl/ay filtreleri ve tek tıkla **"Bugünü Yönet"** kısayolu ile hızlıca kayıt oluşturun.
 
-### 2. Günlük Planlama ve Puanlama 📅
-- **Günlük Görevler:** Her gün için tamamlamanız gereken görevleri (To-Do list) ekleyebilirsiniz.
-- **Günü Puanlama:** Gün bittiğinde gününüzü değerlendirin:
-  - `+ İyi Gün` : Hedeflerinize sadık kaldığınız, verimli geçen günler.
-  - `- Kötü Gün` : Planların aksadığı, verimsiz günler.
-  - `Normal Gün` : Rutin geçen günler.
-- Geçmiş veya gelecek tarihlere tıklayarak o günler için de serbestçe görev ekleyebilir veya günleri sonradan puanlayabilirsiniz.
+### 3. Günlük Planlama (`planner.html`) ✅
+- **3 Durumlu Görev Takibi:** Görevleri `Bekliyor (○) → Tamamlandı (✓) → Yapılamadı (✕)` arasında değiştirin, satır içi düzenleyin ve duruma göre filtreleyin.
+- **Ertesi Güne Aktarma:** Tamamlanmayan görevleri tek tıkla (**Yarına Aktar**) ertesi güne kopyalayın.
+- **Entegre Gün Puanı &amp; Notu:** Takvim modülüyle senkronize çalışan gün puanlama butonları ve otomatik kaydedilen gün notu alanı.
 
-### 3. Hedef Belirleme (Haftalık & Yıllık) 🎯
-- Sadece günü kurtarmakla kalmayın; daha büyük hedefler koyun!
-- **Haftalık Hedefler:** O hafta bitirmeniz gereken işleri ekleyin ve tamamladıkça ilerleme çubuğunun (Progress Bar) dolmasını izleyin.
-- **Yıllık Hedefler:** Yıl sonuna kadar ulaşmak istediğiniz vizyon hedeflerinizi ekleyin ve aylara bölerek durumunuzu analiz edin.
+### 4. Haftalık ve Yıllık Hedefler (`weekly.html`, `yearly.html`) 🎯
+- **Haftalık Hedefler:** Haftanın günlerine göre doğrudan Günlük Planlayıcı'ya geçiş yapın, hedefleri durumuna göre filtreleyin ve tamamlanmayan hedefleri tek tıkla gelecek haftaya aktarın.
+- **Yıllık Hedefler:** Özel simge ve renklerle kategoriler oluşturun (veya tek tıkla örnek kategorilerle başlayın), öncelik seviyesi belirleyin; başlık, etiket ve notlarda anlık arama yapın.
 
-### 4. Analiz ve Gelişim Grafikleri 📈
-Sadece veri girmek yetmez, verileri anlamlandırmak gerekir!
-- **Grafik Analizi:** Son günlerde ne kadar "İyi Gün" veya "Kötü Gün" geçirdiğinizi gösteren dinamik ve etkileşimli çizgisel grafikler sayesinde düşüş veya yükseliş trendlerinizi kolayca fark edebilirsiniz.
-- **Günlük (Journal):** Önemli anılarınızı veya kişisel notlarınızı uzun metinler halinde kaydedin ve geriye dönüp okuyun.
+### 5. Kişisel Günlük (`journal.html`) 📖
+- Çizgili defter görünümünde günlük sayfaları oluşturun, 5 kademeli ruh hali (`Harika`, `İyi`, `Orta`, `Zor`, `Çok Zor`) ve etiket ekleyin.
+- Geçmiş sayfalarda **arama + ruh hali filtresi** uygulayın, yazma serinizi (Streak) takip edin ve `Ctrl+S` ile hızlıca kaydedin.
+
+### 6. İnteraktif Grafik Analizi (`chart.html`) 📈
+- `1 Hafta`, `1 Ay`, `3 Ay`, `6 Ay`, `1 Yıl` ve `Tümü` dönem filtreleriyle kümülatif gelişim eğrinizi, en iyi serinizi ve görev tamamlama oranlarınızı inceleyin.
+- Günlük kayıt kartlarına tıklayarak doğrudan o günün planlayıcısına geçin.
+
+### 7. Tema Özelleştirme &amp; Yedekleme (`settings.html`) ⚙️
+- **Çoklu Tema &amp; Aydınlık Mod:** *Karanlık, Aydınlık, Gece Yarısı, Okyanus, Orman* hazır temaları veya **Özel Tema Oluşturucu** + yazı boyutu (`Küçük / Orta / Büyük`) ayarları.
+- **JSON Dışa &amp; İçe Aktarma:** Tüm verilerinizi JSON formatında yedekleyin ve istediğiniz zaman tek tıkla geri yükleyin.
 
 ---
 
 ## 💻 Teknolojik Altyapı
 
-Bu proje, hız ve modern web standartları gözetilerek geliştirilmiştir:
-- **Frontend (Arayüz):** Saf HTML, CSS (Modern, Responsive, Dark Theme) ve Vanilla JavaScript.
-- **Backend & Veritabanı:** Firebase Firestore (Gerçek zamanlı veri senkronizasyonu).
-- **Kimlik Doğrulama:** Firebase Authentication.
-- **Hosting:** Vercel (Hızlı ve sürekli entegrasyon).
-- **Güvenlik:** Kapsamlı Firestore Kuralları ve XSS (Cross-Site Scripting) koruması ile zırhlandırılmıştır.
+- **Frontend:** Saf HTML5, CSS3 (Responsive, Dark/Light &amp; Custom Themes, Glassmorphism) ve Vanilla JavaScript (`app_common.js` ortak çekirdek).
+- **Backend &amp; Veritabanı:** Firebase Firestore (anlık senkronizasyon + sayfa geçişlerinde otomatik flush) ve Firebase Authentication.
+- **Yerel Çalışma:** Firebase yapılandırması olmayan ortamlarda otomatik Misafir / Yerel Mod desteği.
+- **Hosting &amp; Güvenlik:** Vercel / Firebase Hosting uyumlu, XSS korumalı (`escHtml`) ve responsive mobil arayüz.
+
+---
+
+## ▶️ Yerelde Çalıştırma
+
+```bash
+cd planner-app
+python -m http.server 8000
+# Tarayıcıda açın: http://localhost:8000
+```
+
+> **Not:** Bulut senkronizasyonunu etkinleştirmek için [`planner-app/firebase_sync.js`](../planner-app/firebase_sync.js) içindeki `firebaseConfig.apiKey` değerini kendi Firebase projenizin anahtarıyla güncelleyebilir veya doğrudan **Misafir / Yerel Mod** ile kullanabilirsiniz.
 
 ---
 
@@ -68,9 +86,9 @@ Bu proje, hız ve modern web standartları gözetilerek geliştirilmiştir:
       <td align="center"><b>Giriş Yap / Kayıt Ol</b><br><br><img src="https://github.com/user-attachments/assets/8a6bba9e-ac98-477d-a0fc-f287395a9deb" width="300" alt="Giriş Ekranı"/></td>
     </tr>
   </table>
-  
+
   <br>
-  
+
   <b>Takvim ve Gelişim Görünümü</b><br><br>
   <img src="https://github.com/user-attachments/assets/ceb41066-1bea-4780-a2d0-881162ad2dc9" width="800" alt="Takvim Görünümü"/>
 </div>
